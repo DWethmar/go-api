@@ -12,13 +12,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// NodeData is a basic type.
-type NodeData struct {
-	ID   int    `json:"id"   db:"id"`
-	Name string `json:"name" db:"name"`
-	Data string `json:"text" db:"data"`
-}
-
 var db *sql.DB
 var err error
 
