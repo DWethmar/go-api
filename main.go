@@ -7,32 +7,42 @@ import (
 	"html"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "go-api"
-)
-
 // NodeData is a basic type.
 type NodeData struct {
-	ID   int    `json:"id" db:"id"`
+	ID   int    `json:"id"   db:"id"`
 	Name string `json:"name" db:"name"`
 	Data string `json:"text" db:"data"`
 }
 
 var db *sql.DB
+var err error
 
 func main() {
 	fmt.Println("Staring API")
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
+	host := os.Getenv("pgHost")
+	port := os.Getenv("pgPort")
+	user := os.Getenv("pgUser")
+	password := os.Getenv("pgPassword")
+	dbname := os.Getenv("pgDbName")
+	dbType := os.Getenv("dbType")
+
+	fmt.Println("host = ", host)
+	fmt.Println("port = ", port)
+	fmt.Println("user = ", user)
+	fmt.Println("password = ", password)
+	fmt.Println("dbname = ", dbname)
+	fmt.Println("dbType = ", dbType)
+
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	fmt.Println(psqlInfo)
+
+	db, err = sql.Open(dbType, psqlInfo)
 	if err != nil {
 		panic(err)
 	}
@@ -48,28 +58,32 @@ func main() {
 	http.HandleFunc("/api/index", indexHandler)
 	http.HandleFunc("/api/repo/", repoHandler)
 
-	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+
 	rows, err := db.Query("SELECT * FROM public.data_node")
 
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	var nodes []NodeData
 
-	dataNodes := []NodeData{}
+	defer rows.Close()
 
 	for rows.Next() {
-		var u NodeData
-		if err := rows.Scan(&u.ID, &u.Name, &u.Data); err != nil {
-			return
+		var node NodeData
+		err := rows.Scan(&node.ID, &node.Name, &node.Data)
+		if err != nil {
+			panic(err.Error())
 		}
-		dataNodes = append(dataNodes, u)
+		nodes = append(nodes, node)
 	}
-	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(dataNodes)
+
+	json.NewEncoder(w).Encode(nodes)
 }
 
 func repoHandler(w http.ResponseWriter, r *http.Request) {

@@ -2,6 +2,25 @@
 version: '3.5'
 
 services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    volumes:
+      - .:/go/src/github.com/DWethmar/go-api
+    environment:
+      app_env: "development"
+      pgHost: "postgres"
+      pgPort: 5432
+      pgUser: "postgres"
+      pgPassword: "postgres"
+      pgDbName: "go-api"      
+      dbType: "postgres"      
+
   postgres:
     container_name: postgres_container
     image: postgres
@@ -12,11 +31,9 @@ services:
       PGDATA: /data/postgres
     volumes:
        - postgres:/data/postgres
-       - ./sql/init.sql:/docker-entrypoint-initdb.d/10-init.sql
+       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
-    networks:
-      - postgres
     restart: unless-stopped
 
   pgadmin:
@@ -29,13 +46,7 @@ services:
        - ./pgadmin4/servers.json:/pgadmin4/servers.json
     ports:
       - "${PGADMIN_PORT:-5050}:80"
-    networks:
-      - postgres
     restart: unless-stopped
-
-networks:
-  postgres:
-    driver: bridge
 
 volumes:
     postgres:
