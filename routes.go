@@ -2,13 +2,15 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/DWethmar/go-api/models"
 )
 
 type Route struct {
 	Name        string
 	Method      string
 	Pattern     string
-	HandlerFunc http.HandlerFunc
+	HandlerFunc func(ds models.Datastore) http.HandlerFunc
 }
 
 type Routes []Route
@@ -18,12 +20,12 @@ var routes = Routes{
 		"Index",
 		"GET",
 		"/",
-		indexHandler,
+		createIndexHandler,
 	},
 	Route{
 		"Single",
 		"GET",
 		"/{id}",
-		singleHandler,
+		createSingleHandler,
 	},
 }

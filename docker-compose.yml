@@ -19,7 +19,7 @@ services:
       pgUser: "postgres"
       pgPassword: "postgres"
       pgDbName: "go-api"      
-      dbType: "postgres"      
+      driverName: "postgres"      
 
   postgres:
     container_name: postgres_container

@@ -1,56 +1,42 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/DWethmar/go-api/models"
 	"github.com/gorilla/mux"
 )
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query("SELECT * FROM public.data_node")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	var data []Data
-	defer rows.Close()
-	for rows.Next() {
-		var node Data
-		err := rows.Scan(&node.ID, &node.Name, &node.Data)
+func createIndexHandler(ds models.Datastore) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var data, err = ds.GetAllContentItems()
 		if err != nil {
-			panic(err.Error())
-		}
-		data = append(data, node)
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(data)
-}
-
-func singleHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if len(id) == 0 {
-		http.Error(w, "No ID found!", 400)
-		return
-	}
-
-	var data Data
-	row := db.QueryRow(`SELECT * FROM public.data_node WHERE data_node.id = $1`, id)
-	err := row.Scan(&data.ID, &data.Name, &data.Data)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			http.Error(w, "No results!", 404)
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		panic(err)
-	}
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(data)
+	})
+}
 
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(data)
+func createSingleHandler(ds models.Datastore) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		data, err := ds.GetOneContentItem(id)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(data)
+	})
 }
