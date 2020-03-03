@@ -14,7 +14,6 @@ func (repo *PostgresRepository) GetAll() ([]ContentItem, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	contentItems := make([]ContentItem, 0)
 	for rows.Next() {
 		contentItem := ContentItem{}

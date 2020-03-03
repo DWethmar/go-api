@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -97,15 +96,13 @@ func DeleteHandler(ds store.Datastore) http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
 		contentItem, err := ds.ContentItem.GetOne(id)
 		if err != nil {
+			if err == contentitem.ErrNotFound {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
 			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if contentItem.ID == 0 {
-			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 
@@ -115,7 +112,6 @@ func DeleteHandler(ds store.Datastore) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(contentItem)
 	})
@@ -135,7 +131,7 @@ func SingleHandler(ds store.Datastore) http.HandlerFunc {
 		contentItem, err := ds.ContentItem.GetOne(id)
 
 		if err != nil {
-			if err == sql.ErrNoRows {
+			if err == contentitem.ErrNotFound {
 				w.WriteHeader(http.StatusNotFound)
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
