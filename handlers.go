@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -39,7 +38,7 @@ func CreateHandler(ds store.Datastore) http.HandlerFunc {
 		contentItem.CreatedOn = time.Now()
 		contentItem.UpdatedOn = time.Now()
 
-		err = ds.ContentItem.Create(&contentItem)
+		err = ds.ContentItem.Create(contentItem)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -52,7 +51,7 @@ func CreateHandler(ds store.Datastore) http.HandlerFunc {
 func UpdateHandler(ds store.Datastore) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		id, err := strconv.Atoi(vars["id"])
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -62,11 +61,6 @@ func UpdateHandler(ds store.Datastore) http.HandlerFunc {
 		decoder := json.NewDecoder(r.Body)
 		var newContentItem contentitem.ContentItem
 		err = decoder.Decode(&newContentItem)
-
-		fmt.Println(id)
-		fmt.Println(newContentItem)
-		fmt.Println(err)
-		fmt.Println(r.Body)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -98,7 +92,7 @@ func UpdateHandler(ds store.Datastore) http.HandlerFunc {
 func DeleteHandler(ds store.Datastore) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		id, err := strconv.Atoi(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
@@ -110,7 +104,7 @@ func DeleteHandler(ds store.Datastore) http.HandlerFunc {
 			return
 		}
 
-		if contentItem == nil {
+		if contentItem.ID == 0 {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -131,7 +125,7 @@ func SingleHandler(ds store.Datastore) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		id, err := strconv.Atoi(vars["id"])
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)

@@ -7,14 +7,6 @@ import (
 	"time"
 )
 
-type Repository interface {
-	GetAll() ([]*ContentItem, error)
-	GetOne(id int64) (*ContentItem, error)
-	Create(contentItem *ContentItem) error
-	Update(contentItem *ContentItem) error
-	Delete(id int64) error
-}
-
 type ContentItem struct {
 	ID        int       `json:"id"   db:"id"`
 	Name      string    `json:"name" db:"name"`
