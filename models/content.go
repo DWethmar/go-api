@@ -5,12 +5,15 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"time"
 )
 
 type ContentItem struct {
-	ID   int    `json:"id"   db:"id"`
-	Name string `json:"name" db:"name"`
-	Data Attrs  `json:"data" db:"data"`
+	ID        int       `json:"id"   db:"id"`
+	Name      string    `json:"name" db:"name"`
+	Data      Attrs     `json:"data" db:"data"`
+	CreatedOn time.Time `json:"createdOn" db:"created_on"`
+	UpdatedOn time.Time `json:"updatedOn" db:"updated_on"`
 }
 
 type Attrs map[string]interface{}
@@ -38,7 +41,7 @@ func (db *DB) GetAllContentItems() ([]*ContentItem, error) {
 	contentItems := make([]*ContentItem, 0)
 	for rows.Next() {
 		contentItem := new(ContentItem)
-		err := rows.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Data)
+		err := rows.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Data, &contentItem.CreatedOn, &contentItem.UpdatedOn)
 		if err != nil {
 			return nil, err
 		}
@@ -53,7 +56,7 @@ func (db *DB) GetAllContentItems() ([]*ContentItem, error) {
 func (db *DB) GetOneContentItem(id int64) (*ContentItem, error) {
 	var contentItem ContentItem
 	row := db.QueryRow(`SELECT * FROM public.content_item WHERE content_item.id = $1`, id)
-	err := row.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Data)
+	err := row.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Data, &contentItem.CreatedOn, &contentItem.UpdatedOn)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, err
@@ -61,4 +64,12 @@ func (db *DB) GetOneContentItem(id int64) (*ContentItem, error) {
 		panic(err)
 	}
 	return &contentItem, nil
+}
+
+func (db *DB) CreateContentItem(contentItem ContentItem) error {
+	sqlStatement := `
+	INSERT INTO public.content_item (name, data)
+	VALUES ($1, $2)`
+	_, err := db.Exec(sqlStatement, contentItem.Name, contentItem.Data)
+	return err
 }

@@ -20,12 +20,18 @@ var routes = Routes{
 		"Index",
 		"GET",
 		"/",
-		createIndexHandler,
+		IndexHandler,
+	},
+	Route{
+		"Create",
+		"POST",
+		"/",
+		CreateHandler,
 	},
 	Route{
 		"Single",
 		"GET",
 		"/{id}",
-		createSingleHandler,
+		SingleHandler,
 	},
 }

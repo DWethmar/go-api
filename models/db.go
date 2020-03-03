@@ -9,6 +9,7 @@ import (
 type Datastore interface {
 	GetAllContentItems() ([]*ContentItem, error)
 	GetOneContentItem(id int64) (*ContentItem, error)
+	CreateContentItem(contentItem ContentItem) error
 }
 
 type DB struct {
