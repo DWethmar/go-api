@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cat ./content-item.json | http -f POST localhost:8080
+cat ./new-content-item.json | http -f POST localhost:8080

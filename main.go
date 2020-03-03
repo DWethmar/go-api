@@ -6,15 +6,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/DWethmar/go-api/models"
+	"github.com/DWethmar/go-api/internal/store"
+	"github.com/DWethmar/go-api/pkg/contentitem"
 	_ "github.com/lib/pq"
 )
 
-type Env struct {
-	db models.Datastore
-}
-
-var env Env
+var dataStore store.Datastore
 
 func main() {
 	fmt.Println("Staring API")
@@ -28,14 +25,17 @@ func main() {
 	dataSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbName)
 
 	// Make connection
-	db, err := models.NewDB(driverName, dataSource)
+	db, err := store.NewDB(driverName, dataSource)
 	if err != nil {
 		log.Panic(err)
 	}
-	env := &Env{db}
+
+	store := store.Datastore{
+		ContentItem: contentitem.CreatePostgresRepository(db),
+	}
 
 	defer db.Close()
 
 	fmt.Println("Successfully connected with Postgress db!")
-	log.Fatal(http.ListenAndServe(":8080", NewRouter(env.db)))
+	log.Fatal(http.ListenAndServe(":8080", NewRouter(store)))
 }
