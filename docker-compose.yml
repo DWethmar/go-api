@@ -13,13 +13,13 @@ services:
     volumes:
       - .:/go/src/github.com/DWethmar/go-api
     environment:
-      app_env: "development"
-      pgHost: "postgres"
-      pgPort: 5432
-      pgUser: "postgres"
-      pgPassword: "postgres"
-      pgDbName: "go-api"      
-      driverName: "postgres"      
+      APP_ENV: "development"
+      PQ_HOST: "postgres"
+      PG_PORT: 5432
+      PQ_USER: "postgres"
+      PQ_PASSWORD: "postgres"
+      PQ_DB_NAME: "go-api"      
+      DRIVER_NAME: "postgres"      
 
   postgres:
     container_name: postgres_container

@@ -1,9 +1,14 @@
 package contentitem
 
+import (
+	"time"
+)
+
 type Service interface {
 	GetOne(int) (ContentItem, error)
 	GetAll() ([]ContentItem, error)
 	Update(ContentItem) error
+	Create(NewContentItem) (ContentItem, error)
 	Delete(int) error
 }
 
@@ -27,8 +32,21 @@ func (s *service) GetAll() ([]ContentItem, error) {
 }
 
 func (s *service) Update(contentItem ContentItem) error {
+	contentItem.UpdatedOn = time.Now()
 	err := s.r.Update(contentItem)
 	return err
+}
+
+func (s *service) Create(newContentItem NewContentItem) (ContentItem, error) {
+	var contentItem = ContentItem{
+		Name:      newContentItem.Name,
+		Attrs:     newContentItem.Attrs,
+		CreatedOn: time.Now(),
+		UpdatedOn: time.Now(),
+	}
+	id, err := s.r.Create(contentItem)
+	contentItem, err = s.GetOne(id)
+	return contentItem, err
 }
 
 func (s *service) Delete(id int) error {

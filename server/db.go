@@ -1,9 +1,8 @@
-package store
+package server
 
 import (
 	"database/sql"
-
-	_ "github.com/lib/pq"
+	"fmt"
 )
 
 type DB struct {
@@ -18,5 +17,6 @@ func NewDB(driverName string, dataSourceName string) (*sql.DB, error) {
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}
+	fmt.Println("Successfully connected with Postgress db!")
 	return db, nil
 }

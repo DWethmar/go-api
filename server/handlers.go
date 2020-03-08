@@ -1,19 +1,19 @@
-package main
+package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/DWethmar/go-api/internal/store"
-	"github.com/DWethmar/go-api/pkg/contentitem"
+	"github.com/DWethmar/go-api/contentitem"
 	"github.com/gorilla/mux"
 )
 
-func IndexHandler(ds store.Datastore) http.HandlerFunc {
+func (s *Server) HandleIndex() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var data, err = ds.ContentItem.GetAll()
+		var data, err = s.contentItem.GetAll()
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
@@ -24,30 +24,28 @@ func IndexHandler(ds store.Datastore) http.HandlerFunc {
 	})
 }
 
-func CreateHandler(ds store.Datastore) http.HandlerFunc {
+func (s *Server) HandleCreate() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
-		var contentItem contentitem.ContentItem
-		err := decoder.Decode(&contentItem)
+		var newContentItem contentitem.NewContentItem
+		err := decoder.Decode(&newContentItem)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
-		contentItem.CreatedOn = time.Now()
-		contentItem.UpdatedOn = time.Now()
-
-		err = ds.ContentItem.Create(contentItem)
+		contentItem, err := s.contentItem.Create(newContentItem)
 		if err != nil {
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(contentItem)
 	})
 }
 
-func UpdateHandler(ds store.Datastore) http.HandlerFunc {
+func (s *Server) HandleUpdate() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["id"])
@@ -66,17 +64,17 @@ func UpdateHandler(ds store.Datastore) http.HandlerFunc {
 			return
 		}
 
-		contentItem, err := ds.ContentItem.GetOne(id)
+		contentItem, err := s.contentItem.GetOne(id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		contentItem.Name = newContentItem.Name
-		contentItem.Data = newContentItem.Data
+		contentItem.Attrs = newContentItem.Attrs
 		contentItem.UpdatedOn = time.Now()
 
-		err = ds.ContentItem.Update(contentItem)
+		err = s.contentItem.Update(contentItem)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -88,7 +86,7 @@ func UpdateHandler(ds store.Datastore) http.HandlerFunc {
 	})
 }
 
-func DeleteHandler(ds store.Datastore) http.HandlerFunc {
+func (s *Server) HandleDelete() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["id"])
@@ -96,7 +94,7 @@ func DeleteHandler(ds store.Datastore) http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		contentItem, err := ds.ContentItem.GetOne(id)
+		contentItem, err := s.contentItem.GetOne(id)
 		if err != nil {
 			if err == contentitem.ErrNotFound {
 				w.WriteHeader(http.StatusNotFound)
@@ -106,7 +104,7 @@ func DeleteHandler(ds store.Datastore) http.HandlerFunc {
 			return
 		}
 
-		err = ds.ContentItem.Delete(id)
+		err = s.contentItem.Delete(id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -117,7 +115,7 @@ func DeleteHandler(ds store.Datastore) http.HandlerFunc {
 	})
 }
 
-func SingleHandler(ds store.Datastore) http.HandlerFunc {
+func (s *Server) HandleSingle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -128,7 +126,7 @@ func SingleHandler(ds store.Datastore) http.HandlerFunc {
 			return
 		}
 
-		contentItem, err := ds.ContentItem.GetOne(id)
+		contentItem, err := s.contentItem.GetOne(id)
 
 		if err != nil {
 			if err == contentitem.ErrNotFound {

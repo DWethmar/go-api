@@ -17,7 +17,7 @@ func (repo *PostgresRepository) GetAll() ([]ContentItem, error) {
 	contentItems := make([]ContentItem, 0)
 	for rows.Next() {
 		contentItem := ContentItem{}
-		err := rows.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Data, &contentItem.CreatedOn, &contentItem.UpdatedOn)
+		err := rows.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Attrs, &contentItem.CreatedOn, &contentItem.UpdatedOn)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +34,7 @@ func (repo *PostgresRepository) GetOne(id int) (ContentItem, error) {
 	row := repo.db.QueryRow(`
 	SELECT * FROM public.content_item WHERE content_item.id = $1
 	`, id)
-	err := row.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Data, &contentItem.CreatedOn, &contentItem.UpdatedOn)
+	err := row.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Attrs, &contentItem.CreatedOn, &contentItem.UpdatedOn)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return ContentItem{}, ErrNotFound
@@ -44,19 +44,26 @@ func (repo *PostgresRepository) GetOne(id int) (ContentItem, error) {
 	return contentItem, nil
 }
 
-func (repo *PostgresRepository) Create(contentItem ContentItem) error {
+func (repo *PostgresRepository) Create(contentItem ContentItem) (int, error) {
 	sqlStatement := `
 	INSERT INTO public.content_item (name, data, created_on, updated_on)
-	VALUES ($1, $2, $3, $4)`
-	_, err := repo.db.Exec(sqlStatement, contentItem.Name, contentItem.Data, contentItem.CreatedOn, contentItem.UpdatedOn)
-	return err
+	VALUES ($1, $2, $3, $4) RETURNING id`
+	lastInsertId := 0
+	err := repo.db.QueryRow(
+		sqlStatement,
+		contentItem.Name,
+		contentItem.Attrs,
+		contentItem.CreatedOn,
+		contentItem.UpdatedOn,
+	).Scan(&lastInsertId)
+	return lastInsertId, err
 }
 
 func (repo *PostgresRepository) Update(contentItem ContentItem) error {
 	sqlStatement := `
 	UPDATE public.content_item SET (name, data, updated_on) = ($1, $2, $3)
 	  WHERE id = $4`
-	_, err := repo.db.Exec(sqlStatement, contentItem.Name, contentItem.Data, contentItem.UpdatedOn, contentItem.ID)
+	_, err := repo.db.Exec(sqlStatement, contentItem.Name, contentItem.Attrs, contentItem.UpdatedOn, contentItem.ID)
 	return err
 }
 
