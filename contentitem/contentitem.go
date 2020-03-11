@@ -10,11 +10,22 @@ import (
 
 var MaxNameLength = 50
 
+type UnsupportedAttrTypeError struct {
+	Attr string
+}
+
+func (e *UnsupportedAttrTypeError) Error() string {
+	return fmt.Sprintf("Attribute type of %v is not supported.", e.Attr)
+}
+
+type NameLengthError struct{}
+
+func (e *NameLengthError) Error() string {
+	return fmt.Sprintf("Name exceeded max length of %d.", MaxNameLength)
+}
+
 var (
-	NameRequiredError    = errors.New("Name is required.")
-	NameLengthError      = errors.New(fmt.Sprintf("Name exceeded max length of %d.", MaxNameLength))
-	AttrsRequiredError   = errors.New("Attrs is required.")
-	UnknownAttrTypeError = errors.New("Attrs has an unknown type.")
+	AttrsRequiredError = errors.New("Attrs is required.")
 )
 
 type ContentItem struct {
@@ -45,42 +56,33 @@ func (a *Attrs) Scan(value interface{}) error {
 	return json.Unmarshal(b, &a)
 }
 
-func (c *ContentItem) Validate() map[string][]error {
-	e := map[string][]error{}
+func (c *ContentItem) Validate() []error {
+	var e []error
 
-	addErr := func(attr string, err error) {
-		if e[attr] == nil {
-			e[attr] = []error{}
-		}
-		e[attr] = append(e[attr], err)
-	}
-
-	if c.Name == "" {
-		addErr("Name", NameRequiredError)
-	}
 	if len(c.Name) > MaxNameLength {
-		addErr("Name", NameLengthError)
+		e = append(e, &NameLengthError{})
 	}
 
 	ct := func(attrs map[string]interface{}) []error {
 		ce := make([]error, 0)
-		for _, value := range attrs {
-			switch v := value.(type) {
+		for key, value := range attrs {
+			switch t := value.(type) {
 			case float64:
-				fmt.Println("float64:", v)
+				fmt.Printf("%v is of type float64: %v\n", key, t)
 			case int:
-				fmt.Println("int:", v)
+				fmt.Printf("%v is of type int: %v\n", key, t)
 			case []int:
-				fmt.Println("[]int:", v)
+				fmt.Printf("%v is of type []int: %v\n", key, t)
 			case string:
-				fmt.Println("string:", v)
+				fmt.Printf("%v is of type string: %v\n", key, t)
 			case []string:
-				fmt.Println("[]string:", v)
+				fmt.Printf("%v is of type []string: %v\n", key, t)
 			case bool:
-				fmt.Println("bool:", v)
+				fmt.Printf("%v is of type bool: %v\n", key, t)
 			default:
-				fmt.Println("unknown")
-				addErr("Name", UnknownAttrTypeError)
+				e = append(e, &UnsupportedAttrTypeError{
+					Attr: key,
+				})
 			}
 		}
 		return ce
