@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DWethmar/go-api/contentitem"
+	"github.com/DWethmar/go-api/pkg/contentitem"
 	"github.com/gorilla/mux"
 )
 

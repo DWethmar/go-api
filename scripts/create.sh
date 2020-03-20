@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cat ./new-content-item.json | http -f POST localhost:8080
+cat $(dirname $(realpath $0))/new-content-item.json | http -f POST localhost:8080

@@ -2,22 +2,27 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/DWethmar/go-api/contentitem"
+	"github.com/DWethmar/go-api/pkg/contentitem"
 	"github.com/gorilla/mux"
 )
+
+type ErrorResponds struct {
+	error string
+}
 
 func (s *Server) HandleIndex() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var data, err = s.contentItem.GetAll()
+
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(data)
@@ -29,16 +34,25 @@ func (s *Server) HandleCreate() http.HandlerFunc {
 		decoder := json.NewDecoder(r.Body)
 		var newContentItem contentitem.NewContentItem
 		err := decoder.Decode(&newContentItem)
+
 		if err != nil {
+			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponds{
+				error: "bad request!",
+			})
 			return
 		}
+
 		contentItem, err := s.contentItem.Create(newContentItem)
+
 		if err != nil {
-			fmt.Println(err)
+			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
+
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(contentItem)

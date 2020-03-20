@@ -46,7 +46,7 @@ func (repo *PostgresRepository) GetOne(id int) (ContentItem, error) {
 
 func (repo *PostgresRepository) Create(contentItem ContentItem) (int, error) {
 	sqlStatement := `
-	INSERT INTO public.content_item (name, data, created_on, updated_on)
+	INSERT INTO public.content_item (name, attrs, created_on, updated_on)
 	VALUES ($1, $2, $3, $4) RETURNING id`
 	lastInsertId := 0
 	err := repo.db.QueryRow(
@@ -61,7 +61,7 @@ func (repo *PostgresRepository) Create(contentItem ContentItem) (int, error) {
 
 func (repo *PostgresRepository) Update(contentItem ContentItem) error {
 	sqlStatement := `
-	UPDATE public.content_item SET (name, data, updated_on) = ($1, $2, $3)
+	UPDATE public.content_item SET (name, attrs, updated_on) = ($1, $2, $3)
 	  WHERE id = $4`
 	_, err := repo.db.Exec(sqlStatement, contentItem.Name, contentItem.Attrs, contentItem.UpdatedOn, contentItem.ID)
 	return err

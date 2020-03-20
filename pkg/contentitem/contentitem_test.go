@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestAttrsValidation(t *testing.T) {
+func TestAttrsValueValidation(t *testing.T) {
 	c := ContentItem{
 		Name: "Test Name",
 		Attrs: Attrs{
@@ -41,7 +41,7 @@ func TestNameValidation(t *testing.T) {
 	}
 }
 
-func TestInvalidAttrsValidation(t *testing.T) {
+func TestInvalidAttrsValueValidation(t *testing.T) {
 	var names []interface{}
 
 	c := ContentItem{
@@ -61,4 +61,26 @@ func TestInvalidAttrsValidation(t *testing.T) {
 	} else {
 		t.Errorf("Expected %v errors but got %v error", len(c.Attrs), len(errors))
 	}
+}
+
+func TestInvalidAttrsKeyValidation(t *testing.T) {
+	// var names []interface{}
+
+	// c := ContentItem{
+	// 	Name: "Test Name",
+	// 	Attrs: Attrs{
+	// 		"attr 1": nil,
+	// 		"attr2":  names,
+	// 	},
+	// }
+
+	// if errors := c.Validate(); len(errors) == 2 {
+	// 	for _, e := range errors {
+	// 		if e, ok := e.(*UnsupportedAttrTypeError); !ok {
+	// 			t.Error("Validation returned unexpected error:", e)
+	// 		}
+	// 	}
+	// } else {
+	// 	t.Errorf("Expected %v errors but got %v error", len(c.Attrs), len(errors))
+	// }
 }

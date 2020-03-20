@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/DWethmar/go-api/config"
-	"github.com/DWethmar/go-api/server"
+	"github.com/DWethmar/go-api/pkg/config"
+	"github.com/DWethmar/go-api/pkg/server"
 	_ "github.com/lib/pq"
 )
 
