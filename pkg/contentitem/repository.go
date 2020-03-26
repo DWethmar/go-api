@@ -5,9 +5,9 @@ import "errors"
 var ErrNotFound = errors.New("ContentItem(s) not found")
 
 type Repository interface {
-	GetAll() ([]ContentItem, error)
-	GetOne(id int) (ContentItem, error)
-	Create(contentItem ContentItem) (int, error)
+	GetAll() ([]*ContentItem, error)
+	GetOne(id ID) (*ContentItem, error)
+	Add(contentItem ContentItem) error
 	Update(contentItem ContentItem) error
-	Delete(id int) error
+	Delete(id ID) error
 }

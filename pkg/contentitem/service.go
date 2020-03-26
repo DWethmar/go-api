@@ -5,51 +5,55 @@ import (
 )
 
 type Service interface {
-	GetOne(int) (ContentItem, error)
-	GetAll() ([]ContentItem, error)
+	GetOne(ID) (*ContentItem, error)
+	GetAll() ([]*ContentItem, error)
 	Update(ContentItem) error
-	Create(NewContentItem) (ContentItem, error)
-	Delete(int) error
+	Create(AddContentItem) (*ContentItem, error)
+	Delete(ID) error
 }
 
 type service struct {
-	r Repository
+	repo Repository
 }
 
-// NewService creates a listing service with the necessary dependencies
-func NewService(r Repository) Service {
-	return &service{r}
-}
-
-func (s *service) GetOne(id int) (ContentItem, error) {
-	item, err := s.r.GetOne(id)
+func (s *service) GetOne(id ID) (*ContentItem, error) {
+	item, err := s.repo.GetOne(id)
 	return item, err
 }
 
-func (s *service) GetAll() ([]ContentItem, error) {
-	item, err := s.r.GetAll()
-	return item, err
+func (s *service) GetAll() ([]*ContentItem, error) {
+	items, err := s.repo.GetAll()
+	return items, err
 }
 
 func (s *service) Update(contentItem ContentItem) error {
 	contentItem.UpdatedOn = time.Now()
-	err := s.r.Update(contentItem)
+	err := s.repo.Update(contentItem)
 	return err
 }
 
-func (s *service) Create(newContentItem NewContentItem) (ContentItem, error) {
+func (s *service) Create(newContentItem AddContentItem) (*ContentItem, error) {
 	var contentItem = ContentItem{
+		ID:        createNewId(),
 		Name:      newContentItem.Name,
 		Attrs:     newContentItem.Attrs,
 		CreatedOn: time.Now(),
 		UpdatedOn: time.Now(),
 	}
-	id, err := s.r.Create(contentItem)
-	contentItem, err = s.GetOne(id)
-	return contentItem, err
+	err := s.repo.Add(contentItem)
+	if err != nil {
+		return nil, err
+	}
+	addedContentItem, err := s.GetOne(contentItem.ID)
+	return addedContentItem, err
 }
 
-func (s *service) Delete(id int) error {
-	err := s.r.Delete(id)
+func (s *service) Delete(id ID) error {
+	err := s.repo.Delete(id)
 	return err
+}
+
+// CreateService creates a listing service with the necessary dependencies
+func CreateService(r Repository) Service {
+	return &service{r}
 }

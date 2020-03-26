@@ -5,23 +5,39 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/google/uuid"
 )
 
-type ContentItem struct {
-	ID        int       `json:"id"   db:"id"`
-	Name      string    `json:"name" db:"name"`
-	Attrs     Attrs     `json:"attrs" db:"attrs"`
-	CreatedOn time.Time `json:"createdOn" db:"created_on"`
-	UpdatedOn time.Time `json:"updatedOn" db:"updated_on"`
+type ID = uuid.UUID
+
+func createNewId() ID {
+	return uuid.New()
 }
 
-type NewContentItem struct {
+func ParseId(val string) (ID, error) {
+	id, err := uuid.Parse(val)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return id, nil
+}
+
+type ContentItem struct {
+	ID        ID        `json:"id"   db:"id"`
+	Name      string    `json:"name" db:"name"`
+	CreatedOn time.Time `json:"createdOn" db:"created_on"`
+	UpdatedOn time.Time `json:"updatedOn" db:"updated_on"`
+	Attrs     Attrs     `json:"attrs" db:"attrs"`
+}
+
+type AddContentItem struct {
 	Name  string `json:"name" db:"name"`
-	Attrs Attrs  `json:"data" db:"attrs"`
+	Attrs Attrs  `json:"attrs"`
 }
 
 // https://www.alexedwards.net/blog/using-postgresql-jsonb
-type Attrs map[string]interface{}
+type Attrs map[string]map[string]interface{}
 
 // Make the Attrs struct implement the driver.Valuer interface. This method
 // simply returns the JSON-encoded representation of the struct.
@@ -38,4 +54,10 @@ func (a *Attrs) Scan(value interface{}) error {
 	}
 
 	return json.Unmarshal(b, &a)
+}
+
+func CreateContentItem() ContentItem {
+	return ContentItem{
+		Attrs: Attrs{},
+	}
 }

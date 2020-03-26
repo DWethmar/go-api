@@ -17,7 +17,7 @@ type Server struct {
 
 func CreateServer(db *sql.DB) Server {
 	s := Server{
-		contentItem: contentitem.NewService(contentitem.CreatePostgresRepository(db)),
+		contentItem: contentitem.CreateService(contentitem.CreatePostgresRepository(db)),
 		router:      mux.NewRouter().StrictSlash(true),
 	}
 	s.routes()

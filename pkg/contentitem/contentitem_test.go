@@ -7,7 +7,9 @@ import (
 
 func TestAttrsValue(t *testing.T) {
 	a := Attrs{
-		"attrA": 1,
+		"nl": {
+			"attrA": 1,
+		},
 	}
 
 	value, err := a.Value()
@@ -20,7 +22,7 @@ func TestAttrsValue(t *testing.T) {
 		t.Errorf("type of Value() assertion to []byte failed.")
 	}
 
-	expected := "{\"attrA\":1}"
+	expected := "{\"nl\":{\"attrA\":1}}"
 	if expected != string(valueBytes) {
 		t.Errorf("Encountered %v expected %v", string(valueBytes), expected)
 	}
@@ -28,11 +30,11 @@ func TestAttrsValue(t *testing.T) {
 
 func TestAttrsScan(t *testing.T) {
 	a := make(Attrs)
-	err := a.Scan([]byte("{\"attrA\": 1}"))
+	err := a.Scan([]byte("{\"nl\":{\"attrA\":1}}"))
 	if err != nil {
 		t.Errorf("A error occurred while performing a scan. %v", err)
 	}
-	if a["attrA"] != float64(1) {
+	if a["nl"] != nil && a["nl"]["attrA"] != float64(1) {
 		t.Errorf("Expected attr1 to be 1 but got %v of type %v", a["attr1"], reflect.TypeOf(a["attr1"]))
 	}
 }

@@ -15,19 +15,34 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func TestHandleIndex(t *testing.T) {
+func createTestServer() (contentitem.ContentItem, Server) {
 	server := Server{
-		contentItem: contentitem.NewService(contentitem.CreateMockRepository(contentitem.ContentItem{
-			ID:   1,
-			Name: "Name",
-			Attrs: contentitem.Attrs{
-				"Test": "Value",
-			},
-		})),
-		router: mux.NewRouter().StrictSlash(true),
+		contentItem: contentitem.CreateService(contentitem.CreateMockRepository()),
+		router:      mux.NewRouter().StrictSlash(true),
 	}
+	c, _ := server.contentItem.Create(contentitem.AddContentItem{
+		Name: "Test",
+	})
 	server.routes()
+	return *c, server
+}
 
+var addContentItem = contentitem.AddContentItem{
+	Name: "name",
+	Attrs: contentitem.Attrs{
+		"nl": {
+			"attrA": "Value",
+			"attrB": 1,
+			"attrC": []string{"one", "two", "three"},
+			"attrD": []int{1, 2, 3, 4},
+			"attrE": float64(100) / float64(3),
+			"attrF": math.MaxFloat64,
+		},
+	},
+}
+
+func TestHandleIndex(t *testing.T) {
+	contentItem, server := createTestServer()
 	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
@@ -42,11 +57,9 @@ func TestHandleIndex(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	contentItem, _ := server.contentItem.GetOne(1)
 	c, err := json.Marshal(contentItem)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Errorf("Error while parsing body %v", err)
 	}
 	if expected := fmt.Sprintf("[%s]\n", string(c)); rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v", strings.TrimSuffix(rr.Body.String(), "\n"), expected)
@@ -55,27 +68,8 @@ func TestHandleIndex(t *testing.T) {
 
 func TestHandleCreate(t *testing.T) {
 	now := time.Now()
-	contentItem := contentitem.ContentItem{
-		ID:   1,
-		Name: "Name",
-		Attrs: contentitem.Attrs{
-			"test1": "Value",
-			"test2": 1,
-			"test3": []string{"one", "two", "three"},
-			"test4": []int{1, 2, 3, 4},
-			"test5": float64(100) / float64(3),
-			"test6": math.MaxFloat64,
-		},
-	}
-	server := Server{
-		contentItem: contentitem.NewService(contentitem.CreateMockRepository()),
-		router:      mux.NewRouter().StrictSlash(true),
-	}
-	server.routes()
-	body, _ := json.Marshal(contentitem.NewContentItem{
-		Name:  contentItem.Name,
-		Attrs: contentItem.Attrs,
-	})
+	_, server := createTestServer()
+	body, _ := json.Marshal(addContentItem)
 	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
 	rr := httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
@@ -93,31 +87,26 @@ func TestHandleCreate(t *testing.T) {
 	newContentitem := contentitem.ContentItem{}
 	err := json.Unmarshal(rr.Body.Bytes(), &newContentitem)
 	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	if newContentitem.ID != 1 {
-		t.Errorf("handler returned unexpected ID: got %v want %v", newContentitem.ID, 1)
+		t.Errorf("Error while parsing body %v", err)
 	}
 
 	if now.After(newContentitem.CreatedOn) {
-		t.Errorf("handler returned unexpected createdOn: got %v want %v", newContentitem.CreatedOn, now)
+		t.Errorf("handler returned invalid createdOn: got %v excepted %v", newContentitem.CreatedOn, now)
 	}
 
 	if now.After(newContentitem.UpdatedOn) {
-		t.Errorf("handler returned unexpected updatedOn: got %v want %v", newContentitem.UpdatedOn, now)
+		t.Errorf("handler returned invalid updatedOn: got %v excepted %v", newContentitem.UpdatedOn, now)
 	}
 
-	eAttr, err := json.Marshal(contentItem.Attrs)
+	eAttr, err := json.Marshal(addContentItem.Attrs)
 	if err != nil {
-		panic(err)
+		t.Errorf("Error while parsing body %v", err)
 	}
 	gAttr, err := json.Marshal(newContentitem.Attrs)
 	if err != nil {
-		panic(err)
+		t.Errorf("Error while parsing body %v", err)
 	}
 	if string(eAttr) != string(gAttr) {
-		t.Errorf("handler returned unexpected Attrs: got %v want %v", contentItem.Attrs, newContentitem.Attrs)
+		t.Errorf("handler returned unexpected Attrs: got %v want %v", addContentItem.Attrs, newContentitem.Attrs)
 	}
 }

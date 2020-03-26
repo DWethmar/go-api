@@ -1,12 +1,15 @@
 package contentitem
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
 
 type PostgresRepository struct {
 	db *sql.DB
 }
 
-func (repo *PostgresRepository) GetAll() ([]ContentItem, error) {
+func (repo *PostgresRepository) GetAll() ([]*ContentItem, error) {
 	rows, err := repo.db.Query(`
 	SELECT * FROM public.content_item ORDER BY created_on ASC
 	`)
@@ -14,9 +17,9 @@ func (repo *PostgresRepository) GetAll() ([]ContentItem, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	contentItems := make([]ContentItem, 0)
+	contentItems := make([]*ContentItem, 0)
 	for rows.Next() {
-		contentItem := ContentItem{}
+		contentItem := &ContentItem{}
 		err := rows.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Attrs, &contentItem.CreatedOn, &contentItem.UpdatedOn)
 		if err != nil {
 			return nil, err
@@ -29,34 +32,42 @@ func (repo *PostgresRepository) GetAll() ([]ContentItem, error) {
 	return contentItems, nil
 }
 
-func (repo *PostgresRepository) GetOne(id int) (ContentItem, error) {
-	var contentItem ContentItem
+func (repo *PostgresRepository) GetOne(id ID) (*ContentItem, error) {
+	contentItem := CreateContentItem()
 	row := repo.db.QueryRow(`
-	SELECT * FROM public.content_item WHERE content_item.id = $1
+	SELECT id, name, attrs, created_on, updated_on FROM public.content_item WHERE content_item.id = $1
 	`, id)
-	err := row.Scan(&contentItem.ID, &contentItem.Name, &contentItem.Attrs, &contentItem.CreatedOn, &contentItem.UpdatedOn)
+	var i string
+	err := row.Scan(&i, &contentItem.Name, &contentItem.Attrs, &contentItem.CreatedOn, &contentItem.UpdatedOn)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return ContentItem{}, ErrNotFound
+			return nil, ErrNotFound
 		}
 		panic(err)
 	}
-	return contentItem, nil
+
+	contentItem.ID, err = ParseId(i)
+
+	if err != nil {
+		return nil, errors.New("Could not parse ID")
+	}
+	return &contentItem, nil
 }
 
-func (repo *PostgresRepository) Create(contentItem ContentItem) (int, error) {
+func (repo *PostgresRepository) Add(contentItem ContentItem) error {
 	sqlStatement := `
-	INSERT INTO public.content_item (name, attrs, created_on, updated_on)
-	VALUES ($1, $2, $3, $4) RETURNING id`
-	lastInsertId := 0
-	err := repo.db.QueryRow(
+	INSERT INTO public.content_item (id, name, attrs, created_on, updated_on)
+	VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	_, err := repo.db.Exec(
 		sqlStatement,
+		contentItem.ID,
 		contentItem.Name,
 		contentItem.Attrs,
 		contentItem.CreatedOn,
 		contentItem.UpdatedOn,
-	).Scan(&lastInsertId)
-	return lastInsertId, err
+	)
+	return err
 }
 
 func (repo *PostgresRepository) Update(contentItem ContentItem) error {
@@ -67,7 +78,7 @@ func (repo *PostgresRepository) Update(contentItem ContentItem) error {
 	return err
 }
 
-func (repo *PostgresRepository) Delete(id int) error {
+func (repo *PostgresRepository) Delete(id ID) error {
 	sqlStatement := `DELETE FROM public.content_item WHERE id = $1`
 	_, err := repo.db.Exec(sqlStatement, id)
 	return err

@@ -2,8 +2,8 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/DWethmar/go-api/pkg/contentitem"
@@ -14,12 +14,18 @@ type ErrorResponds struct {
 	error string
 }
 
-func (s *Server) HandleIndex() http.HandlerFunc {
+func (s *Server) HandleContentItemIndex() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var data, err = s.contentItem.GetAll()
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			if err == contentitem.ErrNotFound {
+				json.NewEncoder(w).Encode([]string{})
+			} else {
+				json.NewEncoder(w).Encode(err.Error())
+			}
 			return
 		}
 
@@ -29,18 +35,28 @@ func (s *Server) HandleIndex() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleCreate() http.HandlerFunc {
+func (s *Server) HandleContentItemCreate() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
-		var newContentItem contentitem.NewContentItem
+		newContentItem := contentitem.AddContentItem{
+			Attrs: make(contentitem.Attrs),
+		}
 		err := decoder.Decode(&newContentItem)
 
 		if err != nil {
 			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(&ErrorResponds{
-				error: "bad request!",
+				error: "something went wrong..",
 			})
+			return
+		}
+
+		v := contentitem.ValidateAddContentItem(newContentItem)
+		if !v.IsValid() {
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(v)
 			return
 		}
 
@@ -49,7 +65,11 @@ func (s *Server) HandleCreate() http.HandlerFunc {
 		if err != nil {
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(err.Error())
+			if err == contentitem.ErrNotFound {
+				json.NewEncoder(w).Encode("Could not find contentItem.")
+			} else {
+				json.NewEncoder(w).Encode(err.Error())
+			}
 			return
 		}
 
@@ -59,10 +79,10 @@ func (s *Server) HandleCreate() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleUpdate() http.HandlerFunc {
+func (s *Server) HandleContentItemUpdate() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id, err := strconv.Atoi(vars["id"])
+		id, err := contentitem.ParseId(vars["id"])
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -88,7 +108,7 @@ func (s *Server) HandleUpdate() http.HandlerFunc {
 		contentItem.Attrs = newContentItem.Attrs
 		contentItem.UpdatedOn = time.Now()
 
-		err = s.contentItem.Update(contentItem)
+		err = s.contentItem.Update(*contentItem)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -100,10 +120,10 @@ func (s *Server) HandleUpdate() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleDelete() http.HandlerFunc {
+func (s *Server) HandleContentItemDelete() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id, err := strconv.Atoi(vars["id"])
+		id, err := contentitem.ParseId(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
@@ -129,12 +149,12 @@ func (s *Server) HandleDelete() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleSingle() http.HandlerFunc {
+func (s *Server) HandleContentItemSingle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+		fmt.Print(vars["id"])
 
-		id, err := strconv.Atoi(vars["id"])
-
+		id, err := contentitem.ParseId(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return

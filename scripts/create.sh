@@ -1,3 +1,5 @@
 #!/bin/bash
 
-cat $(dirname $(realpath $0))/new-content-item.json | http -f POST localhost:8080
+mydir="${0%/*}"
+
+cat $(mydir)new-content-item.json | http -f POST localhost:8080

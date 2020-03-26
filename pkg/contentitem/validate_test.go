@@ -6,9 +6,8 @@ import (
 )
 
 func TestAttrsValues(t *testing.T) {
-	c := ContentItem{
-		Name: "Test Name",
-		Attrs: Attrs{
+	c := Attrs{
+		"nl": {
 			"attr1": 1,
 			"attr2": "attribute string value",
 			"attr3": []int{1, 2, 3},
@@ -17,20 +16,9 @@ func TestAttrsValues(t *testing.T) {
 		},
 	}
 
-	if errors := ValidateAttr(c.Attrs); len(errors) > 0 {
-		for _, err := range errors {
-			fmt.Printf("Validation error: %+v\n", err)
-		}
-		t.Errorf("Encountered %v validation errors", len(errors))
-	}
-}
-
-func TestEmptyAttrs(t *testing.T) {
-	c := ContentItem{}
-
-	if errors := ValidateAttr(c.Attrs); len(errors) > 0 {
-		for _, err := range errors {
-			fmt.Printf("Validation error: %+v\n", err)
+	if errors := ValidateAttr(c["nl"]); len(errors) > 0 {
+		for key, err := range errors {
+			fmt.Printf("Validation error on attr %v %+v\n", key, err)
 		}
 		t.Errorf("Encountered %v validation errors", len(errors))
 	}
@@ -41,35 +29,32 @@ func TestNameValidation(t *testing.T) {
 		Name: "This name is to loooooooOooooOOo0000000000000000000000000oooong",
 	}
 
-	if errors := ValidateName(c.Name); len(errors) == 1 {
-		for _, e := range errors {
-			if e, ok := e.(*NameLengthError); !ok {
-				t.Error("Expected name to fail.", e)
-			}
-		}
+	if err := ValidateName(c.Name); err == nil {
+		t.Errorf("Expected error")
 	} else {
-		t.Errorf("Expected %v errors but got %v error", len(c.Attrs), len(errors))
+		if err != ErrNameLength {
+			t.Error("Unexpected error.", err)
+		}
 	}
 }
 
 func TestInvalidAttrsValues(t *testing.T) {
 	var names []interface{}
 
-	c := ContentItem{
-		Name: "Test Name",
-		Attrs: Attrs{
+	c := Attrs{
+		"nl": {
 			"attr1": nil,
 			"attr2": names,
 		},
 	}
 
-	if errors := ValidateAttr(c.Attrs); len(errors) == 2 {
-		for _, e := range errors {
-			if e, ok := e.(*ErrUnsupportedAttrType); !ok {
-				t.Error("Validation returned unexpected error:", e.Error())
+	if errors := ValidateAttr(c["nl"]); len(errors) == 2 {
+		for attr, err := range errors {
+			if err != ErrUnsupportedAttrType {
+				t.Errorf("Validation returned unexpected error on attr %v with error %v:", attr, err)
 			}
 		}
 	} else {
-		t.Errorf("Expected %v errors but got %v error", len(c.Attrs), len(errors))
+		t.Errorf("Expected %v errors but got %v error", len(c), len(errors))
 	}
 }
