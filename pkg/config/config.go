@@ -9,29 +9,29 @@ import (
 )
 
 type Config struct {
-	host       string
-	port       string
-	user       string
-	password   string
-	dbName     string
-	driverName string
+	DBHost       string
+	DBPort       string
+	DBUser       string
+	DBPassword   string
+	DBName       string
+	DBDriverName string
 }
 
 func LoadEnv() Config {
-	host := os.Getenv("PQ_HOST")
-	port := os.Getenv("PG_PORT")
-	user := os.Getenv("PQ_USER")
-	password := os.Getenv("PQ_PASSWORD")
+	dbHost := os.Getenv("PQ_HOST")
+	dbPort := os.Getenv("PG_PORT")
+	dbUser := os.Getenv("PQ_USER")
+	dbPassword := os.Getenv("PQ_PASSWORD")
 	dbName := os.Getenv("PQ_DB_NAME")
-	driverName := os.Getenv("DRIVER_NAME")
+	dbDriverName := os.Getenv("DRIVER_NAME")
 
 	return Config{
-		host,
-		port,
-		user,
-		password,
+		dbHost,
+		dbPort,
+		dbUser,
+		dbPassword,
 		dbName,
-		driverName,
+		dbDriverName,
 	}
 }
 
@@ -49,12 +49,12 @@ func LoadEnvFile(path ...string) Config {
 }
 
 func GetPostgresConnectionInfo(config Config) (string, string) {
-	return config.driverName, fmt.Sprintf(
+	return config.DBDriverName, fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		config.host,
-		config.port,
-		config.user,
-		config.password,
-		config.dbName,
+		config.DBHost,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBName,
 	)
 }

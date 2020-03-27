@@ -52,7 +52,6 @@ func (a *Attrs) Scan(value interface{}) error {
 	if !ok {
 		return errors.New("type assertion to []byte failed")
 	}
-
 	return json.Unmarshal(b, &a)
 }
 

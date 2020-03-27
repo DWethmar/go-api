@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestAttrsValues(t *testing.T) {
+func TestUnitAttrsValues(t *testing.T) {
 	c := Attrs{
 		"nl": {
 			"attr1": 1,
@@ -24,7 +24,7 @@ func TestAttrsValues(t *testing.T) {
 	}
 }
 
-func TestNameValidation(t *testing.T) {
+func TestUnitNameValidation(t *testing.T) {
 	c := ContentItem{
 		Name: "This name is to loooooooOooooOOo0000000000000000000000000oooong",
 	}
@@ -38,23 +38,31 @@ func TestNameValidation(t *testing.T) {
 	}
 }
 
-func TestInvalidAttrsValues(t *testing.T) {
+func TestUnitInvalidAttrsValues(t *testing.T) {
 	var names []interface{}
+	names = append(names, "test")
+	names = append(names, make(map[string]string))
 
 	c := Attrs{
 		"nl": {
-			"attr1": nil,
-			"attr2": names,
+			"attrX": nil,
+			"attrY": names,
 		},
 	}
 
 	if errors := ValidateAttr(c["nl"]); len(errors) == 2 {
 		for attr, err := range errors {
-			if err != ErrUnsupportedAttrType {
-				t.Errorf("Validation returned unexpected error on attr %v with error %v:", attr, err)
+			if err != ErrUnsupportedAttrValue {
+				if err != ErrUnsupportedAttrSliceValue {
+					t.Errorf("Validation returned unexpected error on attr %v with error %v:", attr, err)
+				}
 			}
 		}
 	} else {
-		t.Errorf("Expected %v errors but got %v error", len(c), len(errors))
+		t.Errorf("Expected %v errors but got %v error.", len(c), len(errors))
+
+		for attr, err := range errors {
+			fmt.Printf("%v: %v\n", attr, err)
+		}
 	}
 }

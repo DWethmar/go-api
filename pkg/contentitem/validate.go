@@ -2,13 +2,15 @@ package contentitem
 
 import (
 	"errors"
+	"reflect"
 )
 
 var (
-	MaxNameLength          = 50
-	ErrAttrsRequired       = errors.New("Attrs is required.")
-	ErrNameLength          = errors.New("Name exceeded max length of 50.")
-	ErrUnsupportedAttrType = errors.New("Unsupported value.")
+	MaxNameLength                = 50
+	ErrAttrsRequired             = errors.New("Attrs is required.")
+	ErrNameLength                = errors.New("Name exceeded max length of 50.")
+	ErrUnsupportedAttrValue      = errors.New("Value is unsupported.")
+	ErrUnsupportedAttrSliceValue = errors.New("This array contains one or more unsupported values.")
 )
 
 type validationResult struct {
@@ -69,27 +71,61 @@ func ValidateName(name string) error {
 	return nil
 }
 
-func ValidateAttr(attr map[string]interface{}) map[string]error {
+func ValidateAttr(attrs map[string]interface{}) map[string]error {
 	var e = make(map[string]error)
 
-	validateAttr := func(attrs map[string]interface{}) []error {
-		ce := make([]error, 0)
-		for key, value := range attrs {
-			switch value.(type) {
-			case int:
-			case []int:
-			case string:
-			case []string:
-			case float64:
-			case bool:
-			default:
-				e[key] = ErrUnsupportedAttrType
-			}
-		}
-		return ce
+	validTypes := []reflect.Kind{
+		reflect.Int,
+		reflect.String,
+		reflect.Bool,
+		reflect.Float64,
 	}
 
-	validateAttr(attr)
+	isValidType := func(kind reflect.Kind) bool {
+		for _, item := range validTypes {
+			if item == kind {
+				return true
+			}
+		}
+		return false
+	}
+
+	for attr, value := range attrs {
+		t := reflect.TypeOf(value)
+		if t == nil {
+			e[attr] = ErrUnsupportedAttrValue
+			continue
+		}
+
+		kind := t.Kind()
+
+		if kind == reflect.Invalid {
+			e[attr] = ErrUnsupportedAttrValue
+			continue
+		}
+
+		valid := isValidType(kind)
+		if !valid {
+			if kind == reflect.Slice {
+
+				s := reflect.ValueOf(value)
+
+				for i := 0; i < s.Len(); i++ {
+
+					z := s.Index(i).Interface()
+					k := reflect.TypeOf(z).Kind()
+
+					if !isValidType(k) {
+						e[attr] = ErrUnsupportedAttrSliceValue
+						break
+					}
+				}
+			} else {
+				e[attr] = ErrUnsupportedAttrValue
+			}
+		}
+	}
+
 	return e
 }
 

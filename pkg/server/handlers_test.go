@@ -4,45 +4,50 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/DWethmar/go-api/pkg/config"
 	"github.com/DWethmar/go-api/pkg/contentitem"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
-func createTestServer() (contentitem.ContentItem, Server) {
+func createTestServer(dbName string) (contentitem.ContentItem, Server) {
+	var repo contentitem.Repository
+	con := config.LoadEnv()
+
+	if dbName != "" && con.DBHost != "" {
+		con.DBName = dbName
+		driver, cs := config.GetPostgresConnectionInfo(con)
+		db, err := NewDB(driver, cs)
+		if err != nil {
+			panic(err)
+		}
+		repo = contentitem.CreatePostgresRepository(db)
+	} else {
+		repo = contentitem.CreateMockRepository()
+	}
+
 	server := Server{
-		contentItem: contentitem.CreateService(contentitem.CreateMockRepository()),
+		contentItem: contentitem.CreateService(repo),
 		router:      mux.NewRouter().StrictSlash(true),
 	}
-	c, _ := server.contentItem.Create(contentitem.AddContentItem{
+	contentItem, err := server.contentItem.Create(contentitem.AddContentItem{
 		Name: "Test",
 	})
+	if err != nil {
+		panic("Could not create contentitem.")
+	}
 	server.routes()
-	return *c, server
+	return *contentItem, server
 }
 
-var addContentItem = contentitem.AddContentItem{
-	Name: "name",
-	Attrs: contentitem.Attrs{
-		"nl": {
-			"attrA": "Value",
-			"attrB": 1,
-			"attrC": []string{"one", "two", "three"},
-			"attrD": []int{1, 2, 3, 4},
-			"attrE": float64(100) / float64(3),
-			"attrF": math.MaxFloat64,
-		},
-	},
-}
-
-func TestHandleIndex(t *testing.T) {
-	contentItem, server := createTestServer()
+func TestIntergrationHandleIndex(t *testing.T) {
+	contentItem, server := createTestServer("test_one")
 	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
@@ -62,13 +67,25 @@ func TestHandleIndex(t *testing.T) {
 		t.Errorf("Error while parsing body %v", err)
 	}
 	if expected := fmt.Sprintf("[%s]\n", string(c)); rr.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v", strings.TrimSuffix(rr.Body.String(), "\n"), expected)
+		t.Errorf("handler returned unexpected body: \n excpected: %v \n received:%v", expected, strings.TrimSuffix(rr.Body.String(), "\n"))
 	}
 }
 
-func TestHandleCreate(t *testing.T) {
+func TestIntergrationHandleCreate(t *testing.T) {
 	now := time.Now()
-	_, server := createTestServer()
+	_, server := createTestServer("")
+
+	addContentItem := contentitem.AddContentItem{
+		Name: "name",
+		Attrs: contentitem.Attrs{
+			"nl": {
+				"attrA": "Value",
+				"attrB": 1,
+				"attrC": []string{"one", "two", "three"},
+			},
+		},
+	}
+
 	body, _ := json.Marshal(addContentItem)
 	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
 	rr := httptest.NewRecorder()
@@ -84,29 +101,29 @@ func TestHandleCreate(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	newContentitem := contentitem.ContentItem{}
-	err := json.Unmarshal(rr.Body.Bytes(), &newContentitem)
+	addedContentitem := contentitem.ContentItem{}
+	err := json.Unmarshal(rr.Body.Bytes(), &addedContentitem)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
 
-	if now.After(newContentitem.CreatedOn) {
-		t.Errorf("handler returned invalid createdOn: got %v excepted %v", newContentitem.CreatedOn, now)
+	if now.After(addedContentitem.CreatedOn) {
+		t.Errorf("handler returned invalid createdOn: got %v excepted CreatedOn to be smaller then %v", addedContentitem.CreatedOn, now)
 	}
 
-	if now.After(newContentitem.UpdatedOn) {
-		t.Errorf("handler returned invalid updatedOn: got %v excepted %v", newContentitem.UpdatedOn, now)
+	if now.After(addedContentitem.UpdatedOn) {
+		t.Errorf("handler returned invalid updatedOn: got %v excepted UpdatedOn to be smaller then  %v", addedContentitem.UpdatedOn, now)
 	}
 
 	eAttr, err := json.Marshal(addContentItem.Attrs)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
-	gAttr, err := json.Marshal(newContentitem.Attrs)
+	gAttr, err := json.Marshal(addedContentitem.Attrs)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
 	if string(eAttr) != string(gAttr) {
-		t.Errorf("handler returned unexpected Attrs: got %v want %v", addContentItem.Attrs, newContentitem.Attrs)
+		t.Errorf("handler returned unexpected Attrs: got %v want %v", addContentItem.Attrs, addedContentitem.Attrs)
 	}
 }

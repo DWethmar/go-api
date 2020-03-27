@@ -1,0 +1,3 @@
+#!/bin/bash
+
+go test -run 'Unit' -v ./... 

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestAttrsValue(t *testing.T) {
+func TestUnitAttrsValue(t *testing.T) {
 	a := Attrs{
 		"nl": {
 			"attrA": 1,
@@ -28,9 +28,9 @@ func TestAttrsValue(t *testing.T) {
 	}
 }
 
-func TestAttrsScan(t *testing.T) {
+func TestUnitAttrsScan(t *testing.T) {
 	a := make(Attrs)
-	err := a.Scan([]byte("{\"nl\":{\"attrA\":1}}"))
+	err := a.Scan([]byte("{\"nl\":{\"attrA\":1,\"attrB\":[\"a\",\"b\"]}}"))
 	if err != nil {
 		t.Errorf("A error occurred while performing a scan. %v", err)
 	}

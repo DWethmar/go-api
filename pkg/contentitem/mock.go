@@ -14,7 +14,7 @@ func (repo *MockRepository) GetOne(id ID) (*ContentItem, error) {
 			return n, nil
 		}
 	}
-	return nil, nil
+	return nil, ErrNotFound
 }
 
 func (repo *MockRepository) Add(contentItem ContentItem) error {

@@ -32,11 +32,14 @@ func (s *service) Update(contentItem ContentItem) error {
 	return err
 }
 
-func (s *service) Create(newContentItem AddContentItem) (*ContentItem, error) {
+func (s *service) Create(addContentItem AddContentItem) (*ContentItem, error) {
+	if addContentItem.Attrs == nil {
+		addContentItem.Attrs = make(map[string]map[string]interface{})
+	}
 	var contentItem = ContentItem{
 		ID:        createNewId(),
-		Name:      newContentItem.Name,
-		Attrs:     newContentItem.Attrs,
+		Name:      addContentItem.Name,
+		Attrs:     addContentItem.Attrs,
 		CreatedOn: time.Now(),
 		UpdatedOn: time.Now(),
 	}
