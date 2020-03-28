@@ -93,11 +93,13 @@ func (repo *PostgresRepository) GetOne(id ID) (*ContentItem, error) {
 
 func (repo *PostgresRepository) Add(contentItem ContentItem) error {
 	insertContentItem := `
-	INSERT INTO public.content_item (id, name, created_on, updated_on)
-	VALUES ($1, $2, $3, $4) RETURNING id`
+		INSERT INTO public.content_item (id, name, created_on, updated_on)
+		VALUES ($1, $2, $3, $4) RETURNING id
+	`
 
 	insertContentItemTrans := `
-	INSERT INTO public.content_item_translation(content_item_id, locale, attrs) VALUES($1, $2, $3)`
+		INSERT INTO public.content_item_translation(content_item_id, locale, attrs) VALUES($1, $2, $3)
+	`
 
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
@@ -132,14 +134,17 @@ func (repo *PostgresRepository) Add(contentItem ContentItem) error {
 
 func (repo *PostgresRepository) Update(contentItem ContentItem) error {
 	sqlStatement := `
-	UPDATE public.content_item SET (name, attrs, updated_on) = ($1, $2, $3)
-	  WHERE id = $4`
+		UPDATE public.content_item SET (name, attrs, updated_on) = ($1, $2, $3)
+		WHERE id = $4
+	`
 	_, err := repo.db.Exec(sqlStatement, contentItem.Name, contentItem.Attrs, contentItem.UpdatedOn, contentItem.ID)
 	return err
 }
 
 func (repo *PostgresRepository) Delete(id ID) error {
-	sqlStatement := `DELETE FROM public.content_item WHERE id = $1`
+	sqlStatement := `
+		DELETE FROM public.content_item WHERE id = $1
+	`
 	_, err := repo.db.Exec(sqlStatement, id)
 	return err
 }
