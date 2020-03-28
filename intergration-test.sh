@@ -31,6 +31,8 @@ function create_user_and_database() {
 	    CREATE USER $database WITH PASSWORD '$database';
 	    CREATE DATABASE $database;
 	    GRANT ALL PRIVILEGES ON DATABASE $database TO $database;
+		GRANT ALL PRIVILEGES ON DATABASE $database TO postgres;
+
 EOSQL
     PGPASSWORD=$PQ_PASSWORD psql -h localhost -v ON_ERROR_STOP=1 -d $database -p $PG_PORT -U $PQ_USER -f ${SCRIPTPATH}/scripts/sql/init.sql
 }

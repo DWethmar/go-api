@@ -32,7 +32,7 @@ type ContentItem struct {
 }
 
 type AddContentItem struct {
-	Name  string       `json:"name" db:"name"`
+	Name  string       `json:"name"`
 	Attrs AttrsLocales `json:"attrs"`
 }
 

@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"github.com/DWethmar/go-api/pkg/database"
-	_ "github.com/lib/pq"
 )
 
 type PostgresRepository struct {
@@ -24,12 +23,16 @@ func (repo *PostgresRepository) GetAll() ([]*ContentItem, error) {
 		FROM public.content_item c
 		LEFT OUTER JOIN public.content_item_translation t ON c.id = t.content_item_id
 		GROUP BY c.id
+		ORDER BY updated_on ASC
 	`)
+
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 	contentItems := make([]*ContentItem, 0)
+
 	for rows.Next() {
 		contentItem := &ContentItem{}
 		err := rows.Scan(
@@ -44,9 +47,11 @@ func (repo *PostgresRepository) GetAll() ([]*ContentItem, error) {
 		}
 		contentItems = append(contentItems, contentItem)
 	}
+
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return contentItems, nil
 }
 
@@ -63,9 +68,11 @@ func (repo *PostgresRepository) GetOne(id ID) (*ContentItem, error) {
 		LEFT OUTER JOIN public.content_item_translation t ON c.id = t.content_item_id
 		WHERE c.id = $1
 		GROUP BY c.id
+		LIMIT 1
 		`,
 		id,
 	)
+
 	var i string
 	err := row.Scan(
 		&i,
@@ -87,17 +94,19 @@ func (repo *PostgresRepository) GetOne(id ID) (*ContentItem, error) {
 	if err != nil {
 		return nil, errors.New("Could not parse ID")
 	}
+
 	return &contentItem, nil
 }
 
 func (repo *PostgresRepository) Add(contentItem ContentItem) error {
 	insertContentItem := `
 		INSERT INTO public.content_item (id, name, created_on, updated_on)
-		VALUES ($1, $2, $3, $4) RETURNING id
+		VALUES ($1, $2, $3, $4)
 	`
 
 	insertContentItemTrans := `
-		INSERT INTO public.content_item_translation(content_item_id, locale, attrs) VALUES($1, $2, $3)
+		INSERT INTO public.content_item_translation(content_item_id, locale, attrs) 
+		VALUES($1, $2, $3)
 	`
 
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
@@ -108,6 +117,7 @@ func (repo *PostgresRepository) Add(contentItem ContentItem) error {
 			contentItem.CreatedOn,
 			contentItem.UpdatedOn,
 		)
+
 		if err != nil {
 			return err
 		}
@@ -119,9 +129,11 @@ func (repo *PostgresRepository) Add(contentItem ContentItem) error {
 				locale,
 				attrs,
 			)
+
 			if err != nil {
 				return err
 			}
+
 		}
 
 		return err
@@ -131,11 +143,44 @@ func (repo *PostgresRepository) Add(contentItem ContentItem) error {
 }
 
 func (repo *PostgresRepository) Update(contentItem ContentItem) error {
-	sqlStatement := `
-		UPDATE public.content_item SET (name, attrs, updated_on) = ($1, $2, $3)
-		WHERE id = $4
+	updateContentItem := `
+		UPDATE public.content_item SET (name, updated_on) = ($1, $2)
+		WHERE id = $3
 	`
-	_, err := repo.db.Exec(sqlStatement, contentItem.Name, contentItem.Attrs, contentItem.UpdatedOn, contentItem.ID)
+
+	updateContentItemTrans := `
+		UPDATE public.content_item_translation SET attrs = $1
+		WHERE content_item_id = $2 AND locale = $3
+	`
+
+	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
+		_, err := repo.db.Exec(
+			updateContentItem,
+			contentItem.Name,
+			contentItem.UpdatedOn,
+			contentItem.ID,
+		)
+
+		if err != nil {
+			return err
+		}
+
+		for locale, attrs := range contentItem.Attrs {
+			_, err = tx.Exec(
+				updateContentItemTrans,
+				attrs,
+				contentItem.ID,
+				locale,
+			)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return err
+	})
+
 	return err
 }
 

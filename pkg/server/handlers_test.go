@@ -26,9 +26,11 @@ func createTestServer(dbName string) (contentitem.ContentItem, Server) {
 		con.DBName = dbName
 		driver, cs := config.GetPostgresConnectionInfo(con)
 		db, err := database.CreateDB(driver, cs)
+
 		if err != nil {
 			panic(err)
 		}
+
 		repo = contentitem.CreatePostgresRepository(db)
 	} else {
 		repo = contentitem.CreateMockRepository()
@@ -38,13 +40,22 @@ func createTestServer(dbName string) (contentitem.ContentItem, Server) {
 		contentItem: contentitem.CreateService(repo),
 		router:      mux.NewRouter().StrictSlash(true),
 	}
+
 	contentItem, err := server.contentItem.Create(contentitem.AddContentItem{
 		Name: "Test",
+		Attrs: contentitem.AttrsLocales{
+			"nl": {
+				"attr1": "test",
+			},
+		},
 	})
+
 	if err != nil {
 		panic("Could not create contentitem.")
 	}
+
 	server.routes()
+
 	return *contentItem, server
 }
 
@@ -68,6 +79,7 @@ func TestIntergrationHandleContentItemIndex(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
+
 	if expected := fmt.Sprintf("[%s]\n", string(c)); rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: \n excpected: %v \n received:%v", expected, strings.TrimSuffix(rr.Body.String(), "\n"))
 	}
