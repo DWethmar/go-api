@@ -46,7 +46,7 @@ func createTestServer(dbName string) (contentitem.ContentItem, Server) {
 	return *contentItem, server
 }
 
-func TestIntergrationHandleIndex(t *testing.T) {
+func TestIntergrationHandleContentItemIndex(t *testing.T) {
 	contentItem, server := createTestServer("test_one")
 	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
@@ -71,9 +71,9 @@ func TestIntergrationHandleIndex(t *testing.T) {
 	}
 }
 
-func TestIntergrationHandleCreate(t *testing.T) {
+func TestIntergrationHandleContentItemCreate(t *testing.T) {
 	now := time.Now()
-	_, server := createTestServer("")
+	_, server := createTestServer("test_two")
 
 	addContentItem := contentitem.AddContentItem{
 		Name: "name",

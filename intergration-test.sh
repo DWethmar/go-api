@@ -9,9 +9,9 @@ PQ_USER="postgres"
 PQ_PASSWORD="postgres"
 DRIVER_NAME="postgres"     
 
-POSTGRES_MULTIPLE_DATABASES=test_one,test_two
-
 SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
+POSTGRES_MULTIPLE_DATABASES=test_one,test_two
 
 # connect with: psql -h localhost -p 5433  -U postgres --password
 docker run --name testing-postgres --rm -e POSTGRES_PASSWORD=$PQ_PASSWORD -d -p $PG_PORT:5432 postgres

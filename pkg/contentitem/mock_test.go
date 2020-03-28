@@ -23,12 +23,6 @@ var mock = ContentItem{
 	UpdatedOn: time.Now(),
 }
 
-// GetAll() ([]*ContentItem, error)
-// GetOne(id ID) (*ContentItem, error)
-// Add(contentItem ContentItem) error
-// Update(contentItem ContentItem) error
-// Delete(id ID) error
-
 func TestUnitMockGetAll(t *testing.T) {
 	c := CreateMockRepository()
 	c.Add(mock)
@@ -78,7 +72,7 @@ func TestUnitMockAdd(t *testing.T) {
 
 	b, err := json.Marshal(createdContentItem)
 	if err != nil {
-		t.Errorf("Unecpected error")
+		t.Errorf("Unexpected error")
 		return
 	}
 
@@ -91,25 +85,28 @@ func TestUnitMockUpdate(t *testing.T) {
 	c := CreateMockRepository()
 	c.Add(mock)
 
-	a, err := json.Marshal(mock)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
 	createdContentItem, err := c.GetOne(mock.ID)
 	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-
-	b, err := json.Marshal(createdContentItem)
-	if err != nil {
-		fmt.Println(err)
+		t.Errorf("Unexpected error")
 		return
 	}
 
-	if string(a) != string(b) {
-		t.Errorf("Expected %v but received %v", string(a), string(b))
+	updateContentItem := *createdContentItem
+	updateContentItem.Attrs["nl"]["attr1"] = "new value!"
+
+	err = c.Update(updateContentItem)
+	if err != nil {
+		t.Errorf("Unexpected error while updating element")
+		return
+	}
+
+	updatedContentItem, err := c.GetOne(mock.ID)
+	if err != nil {
+		t.Errorf("Unexpected error")
+		return
+	}
+
+	if updatedContentItem.Attrs["nl"]["attr1"] != "new value!" {
+		t.Errorf("Expected Attrs.nl.attr1 to be \"new value!\"")
 	}
 }
