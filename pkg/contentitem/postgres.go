@@ -3,7 +3,6 @@ package contentitem
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/DWethmar/go-api/pkg/database"
@@ -120,7 +119,6 @@ func (repo *PostgresRepository) Add(contentItem ContentItem) error {
 				locale,
 				attrs,
 			)
-			fmt.Printf("LIEP %v", err)
 			if err != nil {
 				return err
 			}
