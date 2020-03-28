@@ -12,6 +12,8 @@ import (
 
 	"github.com/DWethmar/go-api/pkg/config"
 	"github.com/DWethmar/go-api/pkg/contentitem"
+	"github.com/DWethmar/go-api/pkg/database"
+
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
@@ -23,7 +25,7 @@ func createTestServer(dbName string) (contentitem.ContentItem, Server) {
 	if dbName != "" && con.DBHost != "" {
 		con.DBName = dbName
 		driver, cs := config.GetPostgresConnectionInfo(con)
-		db, err := NewDB(driver, cs)
+		db, err := database.CreateDB(driver, cs)
 		if err != nil {
 			panic(err)
 		}
@@ -77,8 +79,8 @@ func TestIntergrationHandleContentItemCreate(t *testing.T) {
 
 	addContentItem := contentitem.AddContentItem{
 		Name: "name",
-		Attrs: contentitem.Attrs{
-			"nl": {
+		Attrs: contentitem.AttrsLocales{
+			"nl": contentitem.Attrs{
 				"attrA": "Value",
 				"attrB": 1,
 				"attrC": []string{"one", "two", "three"},

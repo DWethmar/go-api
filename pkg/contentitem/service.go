@@ -34,7 +34,7 @@ func (s *service) Update(contentItem ContentItem) error {
 
 func (s *service) Create(addContentItem AddContentItem) (*ContentItem, error) {
 	if addContentItem.Attrs == nil {
-		addContentItem.Attrs = make(map[string]map[string]interface{})
+		addContentItem.Attrs = make(AttrsLocales)
 	}
 	var contentItem = ContentItem{
 		ID:        createNewId(),

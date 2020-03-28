@@ -1,5 +1,4 @@
 #!/bin/bash
 
-mydir="${0%/*}"
-
-cat $(mydir)new-content-item.json | http -f POST localhost:8080
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+cat ${SCRIPTPATH}/new-content-item.json | http -f POST localhost:8080

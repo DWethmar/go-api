@@ -10,8 +10,8 @@ import (
 var mock = ContentItem{
 	ID:   createNewId(),
 	Name: "wow",
-	Attrs: Attrs{
-		"nl": {
+	Attrs: AttrsLocales{
+		"nl": Attrs{
 			"attr1": 1,
 			"attr2": "attribute string value",
 			"attr3": []int{1, 2, 3},

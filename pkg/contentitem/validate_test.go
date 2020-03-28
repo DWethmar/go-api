@@ -6,7 +6,7 @@ import (
 )
 
 func TestUnitAttrsValues(t *testing.T) {
-	c := Attrs{
+	c := AttrsLocales{
 		"nl": {
 			"attr1": 1,
 			"attr2": "attribute string value",
@@ -43,7 +43,7 @@ func TestUnitInvalidAttrsValues(t *testing.T) {
 	names = append(names, "test")
 	names = append(names, make(map[string]string))
 
-	c := Attrs{
+	c := AttrsLocales{
 		"nl": {
 			"attrX": nil,
 			"attrY": names,

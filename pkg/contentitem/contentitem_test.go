@@ -6,8 +6,8 @@ import (
 )
 
 func TestUnitAttrsValue(t *testing.T) {
-	a := Attrs{
-		"nl": {
+	a := AttrsLocales{
+		"nl": Attrs{
 			"attrA": 1,
 		},
 	}
@@ -29,7 +29,7 @@ func TestUnitAttrsValue(t *testing.T) {
 }
 
 func TestUnitAttrsScan(t *testing.T) {
-	a := make(Attrs)
+	a := make(AttrsLocales)
 	err := a.Scan([]byte("{\"nl\":{\"attrA\":1,\"attrB\":[\"a\",\"b\"]}}"))
 	if err != nil {
 		t.Errorf("A error occurred while performing a scan. %v", err)

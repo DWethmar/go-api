@@ -39,7 +39,7 @@ func (s *Server) HandleContentItemCreate() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		newContentItem := contentitem.AddContentItem{
-			Attrs: make(contentitem.Attrs),
+			Attrs: make(contentitem.AttrsLocales),
 		}
 		err := decoder.Decode(&newContentItem)
 
