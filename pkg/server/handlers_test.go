@@ -292,3 +292,64 @@ func TestIntergrationHandleContentItemDelete(t *testing.T) {
 		return
 	}
 }
+
+func TestIntergrationHandleContentItemGetOne(t *testing.T) {
+	_, server := createTestServer("test_two")
+
+	addContentItem := contentitem.AddContentItem{
+		Name: "test",
+		Attrs: contentitem.AttrsLocales{
+			"nl": contentitem.Attrs{
+				"attrA": "Value A",
+				"attrB": 1,
+				"attrC": []string{"one", "two", "three"},
+			},
+		},
+	}
+
+	body, _ := json.Marshal(addContentItem)
+	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
+	rr := httptest.NewRecorder()
+	server.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("handler returned wrong status code: got %v want %v on %v", status, http.StatusCreated, req.RequestURI)
+		return
+	}
+
+	// Check the response content-type is what we expect.
+	if rType := rr.Header().Get("Content-Type"); rType != "application/json" {
+		t.Errorf("content type header does not match: got %v want %v", rType, "application/json")
+		return
+	}
+
+	addedContentitem := contentitem.ContentItem{}
+	err := json.Unmarshal(rr.Body.Bytes(), &addedContentitem)
+	if err != nil {
+		t.Errorf("Error while parsing body for added content-item %v", err)
+		return
+	}
+
+	req = httptest.NewRequest("GET", fmt.Sprintf("/%v", addedContentitem.ID), nil)
+	rr = httptest.NewRecorder()
+	server.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: received %v expected %v on %v", status, http.StatusNotFound, req.RequestURI)
+		return
+	}
+
+	eAttr, err := json.Marshal(addContentItem.Attrs)
+	if err != nil {
+		t.Errorf("Error while parsing body %v", err)
+	}
+
+	gAttr, err := json.Marshal(addedContentitem.Attrs)
+	if err != nil {
+		t.Errorf("Error while parsing body %v", err)
+	}
+
+	if string(eAttr) != string(gAttr) {
+		t.Errorf("handler returned unexpected Attrs: got %v want %v", addContentItem.Attrs, addedContentitem.Attrs)
+	}
+}
