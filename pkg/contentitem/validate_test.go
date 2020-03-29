@@ -59,7 +59,7 @@ func TestUnitInvalidAttrsValues(t *testing.T) {
 			}
 		}
 	} else {
-		t.Errorf("Expected %v errors but got %v error.", len(c), len(errors))
+		t.Errorf("Expected %v errors but received %v errors.", 2, len(errors))
 
 		for attr, err := range errors {
 			fmt.Printf("%v: %v\n", attr, err)

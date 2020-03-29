@@ -24,6 +24,7 @@ func (v *validationResult) IsValid() bool {
 	if v.Errors.Name != "" || len(v.Errors.Attrs) > 0 {
 		return false
 	}
+
 	return true
 }
 
@@ -37,12 +38,15 @@ func ValidateAddContentItem(addContentItem AddContentItem) validationResult {
 
 	for locale, attrs := range addContentItem.Attrs {
 		attrErRors := ValidateAttr(attrs)
+
 		for attr, error := range attrErRors {
 			if e.Errors.Attrs[locale] == nil {
 				e.Errors.Attrs[locale] = map[string]string{}
 			}
+
 			e.Errors.Attrs[locale][attr] = error.Error()
 		}
+
 	}
 	return e
 }
@@ -51,12 +55,14 @@ func ValidateContentItem(contentItem ContentItem) validationResult {
 	e := CreateValidationResult()
 
 	nameErr := ValidateName(contentItem.Name)
+
 	if nameErr != nil {
 		e.Errors.Name = nameErr.Error()
 	}
 
 	for locale, attrs := range contentItem.Attrs {
 		attrErRors := ValidateAttr(attrs)
+
 		for attr, error := range attrErRors {
 			e.Errors.Attrs[locale][attr] = error.Error()
 		}
@@ -68,10 +74,11 @@ func ValidateName(name string) error {
 	if len(name) > MaxNameLength {
 		return ErrNameLength
 	}
+
 	return nil
 }
 
-func ValidateAttr(attrs map[string]interface{}) map[string]error {
+func ValidateAttr(attrs Attrs) map[string]error {
 	var e = make(map[string]error)
 
 	validTypes := []reflect.Kind{
@@ -87,6 +94,7 @@ func ValidateAttr(attrs map[string]interface{}) map[string]error {
 				return true
 			}
 		}
+
 		return false
 	}
 
@@ -111,7 +119,6 @@ func ValidateAttr(attrs map[string]interface{}) map[string]error {
 				s := reflect.ValueOf(value)
 
 				for i := 0; i < s.Len(); i++ {
-
 					z := s.Index(i).Interface()
 					k := reflect.TypeOf(z).Kind()
 

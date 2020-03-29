@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -152,9 +151,8 @@ func (s *Server) HandleContentItemDelete() http.HandlerFunc {
 func (s *Server) HandleContentItemSingle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		fmt.Print(vars["id"])
-
 		id, err := contentitem.ParseId(vars["id"])
+
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
