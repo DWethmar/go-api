@@ -1,12 +1,12 @@
-package contentitem
+package contententry
 
 import (
 	"fmt"
 	"testing"
 )
 
-func TestUnitAttrsValues(t *testing.T) {
-	c := AttrsLocales{
+func TestUnitFieldValues(t *testing.T) {
+	c := FieldTranslations{
 		"nl": {
 			"attr1": 1,
 			"attr2": "attribute string value",
@@ -25,7 +25,7 @@ func TestUnitAttrsValues(t *testing.T) {
 }
 
 func TestUnitNameValidation(t *testing.T) {
-	c := ContentItem{
+	c := Entry{
 		Name: "This name is to loooooooOooooOOo0000000000000000000000000oooong",
 	}
 
@@ -38,12 +38,12 @@ func TestUnitNameValidation(t *testing.T) {
 	}
 }
 
-func TestUnitInvalidAttrsValues(t *testing.T) {
+func TestUnitInvalidFieldValues(t *testing.T) {
 	var names []interface{}
 	names = append(names, "test")
 	names = append(names, make(map[string]string))
 
-	c := AttrsLocales{
+	c := FieldTranslations{
 		"nl": {
 			"attrX": nil,
 			"attrY": names,
@@ -52,8 +52,8 @@ func TestUnitInvalidAttrsValues(t *testing.T) {
 
 	if errors := ValidateAttr(c["nl"]); len(errors) == 2 {
 		for attr, err := range errors {
-			if err != ErrUnsupportedAttrValue {
-				if err != ErrUnsupportedAttrSliceValue {
+			if err != ErrUnsupportedFieldValue {
+				if err != ErrUnsupportedFieldSliceValue {
 					t.Errorf("Validation returned unexpected error on attr %v with error %v:", attr, err)
 				}
 			}

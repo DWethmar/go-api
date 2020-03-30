@@ -6,19 +6,19 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/DWethmar/go-api/pkg/contentitem"
+	"github.com/DWethmar/go-api/pkg/contententry"
 	"github.com/gorilla/mux"
 )
 
 type Server struct {
-	contentItem contentitem.Service
-	router      *mux.Router
+	entries contententry.Service
+	router  *mux.Router
 }
 
 func CreateServer(db *sql.DB) Server {
 	s := Server{
-		contentItem: contentitem.CreateService(contentitem.CreatePostgresRepository(db)),
-		router:      mux.NewRouter().StrictSlash(true),
+		entries: contententry.CreateService(contententry.CreatePostgresRepository(db)),
+		router:  mux.NewRouter().StrictSlash(true),
 	}
 	s.routes()
 	s.router.Use(logging)

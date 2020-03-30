@@ -1,14 +1,14 @@
-package contentitem
+package contententry
 
 import (
 	"time"
 )
 
 type Service interface {
-	GetOne(ID) (*ContentItem, error)
-	GetAll() ([]*ContentItem, error)
-	Update(ContentItem) error
-	Create(AddContentItem) (*ContentItem, error)
+	GetOne(ID) (*Entry, error)
+	GetAll() ([]*Entry, error)
+	Update(Entry) error
+	Create(AddEntry) (*Entry, error)
 	Delete(ID) error
 }
 
@@ -16,30 +16,30 @@ type service struct {
 	repo Repository
 }
 
-func (s *service) GetOne(id ID) (*ContentItem, error) {
+func (s *service) GetOne(id ID) (*Entry, error) {
 	item, err := s.repo.GetOne(id)
 	return item, err
 }
 
-func (s *service) GetAll() ([]*ContentItem, error) {
+func (s *service) GetAll() ([]*Entry, error) {
 	items, err := s.repo.GetAll()
 	return items, err
 }
 
-func (s *service) Update(contentItem ContentItem) error {
+func (s *service) Update(contentItem Entry) error {
 	contentItem.UpdatedOn = time.Now()
 	err := s.repo.Update(contentItem)
 	return err
 }
 
-func (s *service) Create(addContentItem AddContentItem) (*ContentItem, error) {
-	if addContentItem.Attrs == nil {
-		addContentItem.Attrs = make(AttrsLocales)
+func (s *service) Create(entry AddEntry) (*Entry, error) {
+	if entry.Fields == nil {
+		entry.Fields = make(FieldTranslations)
 	}
-	var contentItem = ContentItem{
+	var contentItem = Entry{
 		ID:        createNewId(),
-		Name:      addContentItem.Name,
-		Attrs:     addContentItem.Attrs,
+		Name:      entry.Name,
+		Fields:    entry.Fields,
 		CreatedOn: time.Now(),
 		UpdatedOn: time.Now(),
 	}

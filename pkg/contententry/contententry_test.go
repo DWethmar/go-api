@@ -1,13 +1,13 @@
-package contentitem
+package contententry
 
 import (
 	"reflect"
 	"testing"
 )
 
-func TestUnitAttrsValue(t *testing.T) {
-	a := AttrsLocales{
-		"nl": Attrs{
+func TestUnitFieldValue(t *testing.T) {
+	a := FieldTranslations{
+		"nl": Fields{
 			"attrA": 1,
 		},
 	}
@@ -28,8 +28,8 @@ func TestUnitAttrsValue(t *testing.T) {
 	}
 }
 
-func TestUnitAttrsScan(t *testing.T) {
-	a := make(AttrsLocales)
+func TestUnitFieldScan(t *testing.T) {
+	a := make(FieldTranslations)
 	err := a.Scan([]byte("{\"nl\":{\"attrA\":1,\"attrB\":[\"a\",\"b\"]}}"))
 	if err != nil {
 		t.Errorf("A error occurred while performing a scan. %v", err)

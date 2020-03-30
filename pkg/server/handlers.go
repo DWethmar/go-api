@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/DWethmar/go-api/pkg/contentitem"
+	"github.com/DWethmar/go-api/pkg/contententry"
 	"github.com/gorilla/mux"
 )
 
@@ -13,14 +13,14 @@ type ErrorResponds struct {
 	error string
 }
 
-func (s *Server) HandleContentItemIndex() http.HandlerFunc {
+func (s *Server) HandleEntryIndex() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var data, err = s.contentItem.GetAll()
+		var data, err = s.entries.GetAll()
 
 		if err != nil {
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusInternalServerError)
-			if err == contentitem.ErrNotFound {
+			if err == contententry.ErrNotFound {
 				json.NewEncoder(w).Encode([]string{})
 			} else {
 				json.NewEncoder(w).Encode(err.Error())
@@ -34,13 +34,13 @@ func (s *Server) HandleContentItemIndex() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleContentItemCreate() http.HandlerFunc {
+func (s *Server) HandleEntryCreate() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
-		newContentItem := contentitem.AddContentItem{
-			Attrs: make(contentitem.AttrsLocales),
+		newEntry := contententry.AddEntry{
+			Fields: make(contententry.FieldTranslations),
 		}
-		err := decoder.Decode(&newContentItem)
+		err := decoder.Decode(&newEntry)
 
 		if err != nil {
 			w.Header().Add("Content-Type", "application/json")
@@ -51,7 +51,7 @@ func (s *Server) HandleContentItemCreate() http.HandlerFunc {
 			return
 		}
 
-		v := contentitem.ValidateAddContentItem(newContentItem)
+		v := contententry.ValidateAddEntry(newEntry)
 		if !v.IsValid() {
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
@@ -59,13 +59,13 @@ func (s *Server) HandleContentItemCreate() http.HandlerFunc {
 			return
 		}
 
-		contentItem, err := s.contentItem.Create(newContentItem)
+		entry, err := s.entries.Create(newEntry)
 
 		if err != nil {
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusInternalServerError)
-			if err == contentitem.ErrNotFound {
-				json.NewEncoder(w).Encode("Could not find contentItem.")
+			if err == contententry.ErrNotFound {
+				json.NewEncoder(w).Encode("Could not find Entry.")
 			} else {
 				json.NewEncoder(w).Encode(err.Error())
 			}
@@ -74,14 +74,14 @@ func (s *Server) HandleContentItemCreate() http.HandlerFunc {
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(contentItem)
+		json.NewEncoder(w).Encode(entry)
 	})
 }
 
-func (s *Server) HandleContentItemUpdate() http.HandlerFunc {
+func (s *Server) HandleEntryUpdate() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id, err := contentitem.ParseId(vars["id"])
+		id, err := contententry.ParseId(vars["id"])
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -89,25 +89,25 @@ func (s *Server) HandleContentItemUpdate() http.HandlerFunc {
 		}
 
 		decoder := json.NewDecoder(r.Body)
-		var newContentItem contentitem.ContentItem
-		err = decoder.Decode(&newContentItem)
+		var newEntry contententry.Entry
+		err = decoder.Decode(&newEntry)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		contentItem, err := s.contentItem.GetOne(id)
+		entry, err := s.entries.GetOne(id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		contentItem.Name = newContentItem.Name
-		contentItem.Attrs = newContentItem.Attrs
-		contentItem.UpdatedOn = time.Now()
+		entry.Name = newEntry.Name
+		entry.Fields = newEntry.Fields
+		entry.UpdatedOn = time.Now()
 
-		err = s.contentItem.Update(*contentItem)
+		err = s.entries.Update(*entry)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -115,21 +115,21 @@ func (s *Server) HandleContentItemUpdate() http.HandlerFunc {
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(contentItem)
+		json.NewEncoder(w).Encode(entry)
 	})
 }
 
-func (s *Server) HandleContentItemDelete() http.HandlerFunc {
+func (s *Server) HandleEntryDelete() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id, err := contentitem.ParseId(vars["id"])
+		id, err := contententry.ParseId(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		contentItem, err := s.contentItem.GetOne(id)
+		Entry, err := s.entries.GetOne(id)
 		if err != nil {
-			if err == contentitem.ErrNotFound {
+			if err == contententry.ErrNotFound {
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
@@ -137,31 +137,31 @@ func (s *Server) HandleContentItemDelete() http.HandlerFunc {
 			return
 		}
 
-		err = s.contentItem.Delete(id)
+		err = s.entries.Delete(id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(contentItem)
+		json.NewEncoder(w).Encode(Entry)
 	})
 }
 
-func (s *Server) HandleContentItemSingle() http.HandlerFunc {
+func (s *Server) HandleEntrySingle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id, err := contentitem.ParseId(vars["id"])
+		id, err := contententry.ParseId(vars["id"])
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		contentItem, err := s.contentItem.GetOne(id)
+		Entry, err := s.entries.GetOne(id)
 
 		if err != nil {
-			if err == contentitem.ErrNotFound {
+			if err == contententry.ErrNotFound {
 				w.WriteHeader(http.StatusNotFound)
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -171,6 +171,6 @@ func (s *Server) HandleContentItemSingle() http.HandlerFunc {
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(contentItem)
+		json.NewEncoder(w).Encode(Entry)
 	})
 }

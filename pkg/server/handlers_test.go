@@ -11,15 +11,15 @@ import (
 	"time"
 
 	"github.com/DWethmar/go-api/pkg/config"
-	"github.com/DWethmar/go-api/pkg/contentitem"
+	"github.com/DWethmar/go-api/pkg/contententry"
 	"github.com/DWethmar/go-api/pkg/database"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
-func createTestServer(dbName string) (contentitem.ContentItem, Server) {
-	var repo contentitem.Repository
+func createTestServer(dbName string) (contententry.Entry, Server) {
+	var repo contententry.Repository
 	con := config.LoadEnv()
 
 	if dbName != "" && con.DBHost != "" {
@@ -31,19 +31,19 @@ func createTestServer(dbName string) (contentitem.ContentItem, Server) {
 			panic(err)
 		}
 
-		repo = contentitem.CreatePostgresRepository(db)
+		repo = contententry.CreatePostgresRepository(db)
 	} else {
-		repo = contentitem.CreateMockRepository()
+		repo = contententry.CreateMockRepository()
 	}
 
 	server := Server{
-		contentItem: contentitem.CreateService(repo),
-		router:      mux.NewRouter().StrictSlash(true),
+		entries: contententry.CreateService(repo),
+		router:  mux.NewRouter().StrictSlash(true),
 	}
 
-	contentItem, err := server.contentItem.Create(contentitem.AddContentItem{
+	contentItem, err := server.entries.Create(contententry.AddEntry{
 		Name: "Test",
-		Attrs: contentitem.AttrsLocales{
+		Fields: contententry.FieldTranslations{
 			"nl": {
 				"attr1": "test",
 			},
@@ -51,7 +51,7 @@ func createTestServer(dbName string) (contentitem.ContentItem, Server) {
 	})
 
 	if err != nil {
-		panic("Could not create contentitem.")
+		panic("Could not create contententry.")
 	}
 
 	server.routes()
@@ -59,7 +59,7 @@ func createTestServer(dbName string) (contentitem.ContentItem, Server) {
 	return *contentItem, server
 }
 
-func TestIntergrationHandleContentItemIndex(t *testing.T) {
+func TestIntergrationEntryIndex(t *testing.T) {
 	contentItem, server := createTestServer("test_one")
 	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
@@ -85,14 +85,14 @@ func TestIntergrationHandleContentItemIndex(t *testing.T) {
 	}
 }
 
-func TestIntergrationHandleContentItemCreate(t *testing.T) {
+func TestIntergrationEntryCreate(t *testing.T) {
 	now := time.Now()
 	_, server := createTestServer("test_two")
 
-	addContentItem := contentitem.AddContentItem{
+	addEntry := contententry.AddEntry{
 		Name: "name",
-		Attrs: contentitem.AttrsLocales{
-			"nl": contentitem.Attrs{
+		Fields: contententry.FieldTranslations{
+			"nl": contententry.Fields{
 				"attrA": "Value",
 				"attrB": 1,
 				"attrC": []string{"one", "two", "three"},
@@ -100,7 +100,7 @@ func TestIntergrationHandleContentItemCreate(t *testing.T) {
 		},
 	}
 
-	body, _ := json.Marshal(addContentItem)
+	body, _ := json.Marshal(addEntry)
 	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
 	rr := httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
@@ -115,41 +115,43 @@ func TestIntergrationHandleContentItemCreate(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	addedContentitem := contentitem.ContentItem{}
-	err := json.Unmarshal(rr.Body.Bytes(), &addedContentitem)
+	addedEntry := contententry.Entry{}
+	err := json.Unmarshal(rr.Body.Bytes(), &addedEntry)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
 
-	if now.After(addedContentitem.CreatedOn) {
-		t.Errorf("handler returned invalid createdOn: got %v excepted CreatedOn to be smaller then %v", addedContentitem.CreatedOn, now)
+	if now.After(addedEntry.CreatedOn) {
+		t.Errorf("handler returned invalid createdOn: got %v excepted CreatedOn to be smaller then %v", addedEntry.CreatedOn, now)
 	}
 
-	if now.After(addedContentitem.UpdatedOn) {
-		t.Errorf("handler returned invalid updatedOn: got %v excepted UpdatedOn to be smaller then  %v", addedContentitem.UpdatedOn, now)
+	if now.After(addedEntry.UpdatedOn) {
+		t.Errorf("handler returned invalid updatedOn: got %v excepted UpdatedOn to be smaller then  %v", addedEntry.UpdatedOn, now)
 	}
 
-	eAttr, err := json.Marshal(addContentItem.Attrs)
+	eAttr, err := json.Marshal(addEntry.Fields)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
-	gAttr, err := json.Marshal(addedContentitem.Attrs)
+
+	gAttr, err := json.Marshal(addedEntry.Fields)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
+
 	if string(eAttr) != string(gAttr) {
-		t.Errorf("handler returned unexpected Attrs: got %v want %v", addContentItem.Attrs, addedContentitem.Attrs)
+		t.Errorf("handler returned unexpected fields: excpected %v received %v", addEntry.Fields, addedEntry.Fields)
 	}
 }
 
-func TestIntergrationHandleContentItemUpdate(t *testing.T) {
+func TestIntergrationEntryUpdate(t *testing.T) {
 	now := time.Now()
 	_, server := createTestServer("test_two")
 
-	addContentItem := contentitem.AddContentItem{
+	addEntry := contententry.AddEntry{
 		Name: "test",
-		Attrs: contentitem.AttrsLocales{
-			"nl": contentitem.Attrs{
+		Fields: contententry.FieldTranslations{
+			"nl": contententry.Fields{
 				"attrA": "Value A",
 				"attrB": 1,
 				"attrC": []string{"one", "two", "three"},
@@ -157,7 +159,7 @@ func TestIntergrationHandleContentItemUpdate(t *testing.T) {
 		},
 	}
 
-	body, _ := json.Marshal(addContentItem)
+	body, _ := json.Marshal(addEntry)
 	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
 	rr := httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
@@ -174,20 +176,20 @@ func TestIntergrationHandleContentItemUpdate(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	addedContentitem := contentitem.ContentItem{}
-	err := json.Unmarshal(rr.Body.Bytes(), &addedContentitem)
+	addedEntry := contententry.Entry{}
+	err := json.Unmarshal(rr.Body.Bytes(), &addedEntry)
 	if err != nil {
 		t.Errorf("Error while parsing body for added content-item %v", err)
 		return
 	}
 
-	addedContentitem.Attrs = contentitem.AttrsLocales{
-		"nl": contentitem.Attrs{
+	addedEntry.Fields = contententry.FieldTranslations{
+		"nl": contententry.Fields{
 			"attrA": "Value B",
 			"attrB": 1,
 			"attrC": []string{"three", "four", "five"},
 		},
-		"en": contentitem.Attrs{
+		"en": contententry.Fields{
 			"attrD": "Value C",
 			"attrE": 1,
 			"attrF": []string{"one", "two", "three"},
@@ -196,13 +198,13 @@ func TestIntergrationHandleContentItemUpdate(t *testing.T) {
 
 	now = time.Now()
 
-	body, _ = json.Marshal(addedContentitem)
-	req = httptest.NewRequest("POST", fmt.Sprintf("/%v", addedContentitem.ID), bytes.NewBuffer(body))
+	body, _ = json.Marshal(addedEntry)
+	req = httptest.NewRequest("POST", fmt.Sprintf("/%v", addedEntry.ID), bytes.NewBuffer(body))
 	rr = httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
 
-	updatedContentitem := contentitem.ContentItem{}
-	err = json.Unmarshal(rr.Body.Bytes(), &updatedContentitem)
+	updatedEntry := contententry.Entry{}
+	err = json.Unmarshal(rr.Body.Bytes(), &updatedEntry)
 	if err != nil {
 		t.Errorf("Error while parsing body for updated content-item: %v", err)
 		return
@@ -213,36 +215,36 @@ func TestIntergrationHandleContentItemUpdate(t *testing.T) {
 		return
 	}
 
-	if !addedContentitem.CreatedOn.Equal(updatedContentitem.CreatedOn) {
-		t.Errorf("handler returned invalid createdOn: got %v excepted CreatedOn to equal %v", updatedContentitem.CreatedOn, addedContentitem.CreatedOn)
+	if !addedEntry.CreatedOn.Equal(updatedEntry.CreatedOn) {
+		t.Errorf("handler returned invalid createdOn: got %v excepted CreatedOn to equal %v", updatedEntry.CreatedOn, addedEntry.CreatedOn)
 	}
 
-	if now.Before(addedContentitem.UpdatedOn) {
-		t.Errorf("handler returned invalid createdOn: got %v excepted UpdatedOn to be larger then %v", addedContentitem.CreatedOn, updatedContentitem.CreatedOn)
+	if now.Before(addedEntry.UpdatedOn) {
+		t.Errorf("handler returned invalid createdOn: got %v excepted UpdatedOn to be larger then %v", updatedEntry.CreatedOn, addedEntry.CreatedOn)
 	}
 
-	eAttr, err := json.Marshal(addedContentitem.Attrs)
+	eAttr, err := json.Marshal(addedEntry.Fields)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
 
-	gAttr, err := json.Marshal(updatedContentitem.Attrs)
+	gAttr, err := json.Marshal(updatedEntry.Fields)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
 
 	if string(eAttr) != string(gAttr) {
-		t.Errorf("handler returned unexpected Attrs: got %v want %v", addContentItem.Attrs, addedContentitem.Attrs)
+		t.Errorf("handler returned unexpected fields: got %v want %v", addedEntry.Fields, addedEntry.Fields)
 	}
 }
 
-func TestIntergrationHandleContentItemDelete(t *testing.T) {
+func TestIntergrationEntryDelete(t *testing.T) {
 	_, server := createTestServer("test_two")
 
-	addContentItem := contentitem.AddContentItem{
+	addContentItem := contententry.AddEntry{
 		Name: "test",
-		Attrs: contentitem.AttrsLocales{
-			"nl": contentitem.Attrs{
+		Fields: contententry.FieldTranslations{
+			"nl": contententry.Fields{
 				"attrA": "Value A",
 				"attrB": 1,
 				"attrC": []string{"one", "two", "three"},
@@ -266,15 +268,15 @@ func TestIntergrationHandleContentItemDelete(t *testing.T) {
 		return
 	}
 
-	addedContentitem := contentitem.ContentItem{}
-	err := json.Unmarshal(rr.Body.Bytes(), &addedContentitem)
+	addEntry := contententry.Entry{}
+	err := json.Unmarshal(rr.Body.Bytes(), &addEntry)
 	if err != nil {
 		t.Errorf("Error while parsing body for added content-item %v", err)
 		return
 	}
 
 	body, _ = json.Marshal(addContentItem)
-	req = httptest.NewRequest("DELETE", fmt.Sprintf("/%v", addedContentitem.ID), bytes.NewBuffer(body))
+	req = httptest.NewRequest("DELETE", fmt.Sprintf("/%v", addEntry.ID), bytes.NewBuffer(body))
 	rr = httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
 
@@ -283,7 +285,7 @@ func TestIntergrationHandleContentItemDelete(t *testing.T) {
 		return
 	}
 
-	req = httptest.NewRequest("GET", fmt.Sprintf("/%v", addedContentitem.ID), nil)
+	req = httptest.NewRequest("GET", fmt.Sprintf("/%v", addEntry.ID), nil)
 	rr = httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
 
@@ -293,13 +295,13 @@ func TestIntergrationHandleContentItemDelete(t *testing.T) {
 	}
 }
 
-func TestIntergrationHandleContentItemGetOne(t *testing.T) {
+func TestIntergrationEntrySingle(t *testing.T) {
 	_, server := createTestServer("test_two")
 
-	addContentItem := contentitem.AddContentItem{
+	addEntry := contententry.AddEntry{
 		Name: "test",
-		Attrs: contentitem.AttrsLocales{
-			"nl": contentitem.Attrs{
+		Fields: contententry.FieldTranslations{
+			"nl": contententry.Fields{
 				"attrA": "Value A",
 				"attrB": 1,
 				"attrC": []string{"one", "two", "three"},
@@ -307,7 +309,7 @@ func TestIntergrationHandleContentItemGetOne(t *testing.T) {
 		},
 	}
 
-	body, _ := json.Marshal(addContentItem)
+	body, _ := json.Marshal(addEntry)
 	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
 	rr := httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
@@ -323,14 +325,14 @@ func TestIntergrationHandleContentItemGetOne(t *testing.T) {
 		return
 	}
 
-	addedContentitem := contentitem.ContentItem{}
-	err := json.Unmarshal(rr.Body.Bytes(), &addedContentitem)
+	addedEntry := contententry.Entry{}
+	err := json.Unmarshal(rr.Body.Bytes(), &addedEntry)
 	if err != nil {
 		t.Errorf("Error while parsing body for added content-item %v", err)
 		return
 	}
 
-	req = httptest.NewRequest("GET", fmt.Sprintf("/%v", addedContentitem.ID), nil)
+	req = httptest.NewRequest("GET", fmt.Sprintf("/%v", addedEntry.ID), nil)
 	rr = httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
 
@@ -339,17 +341,17 @@ func TestIntergrationHandleContentItemGetOne(t *testing.T) {
 		return
 	}
 
-	eAttr, err := json.Marshal(addContentItem.Attrs)
+	eAttr, err := json.Marshal(addEntry.Fields)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
 
-	gAttr, err := json.Marshal(addedContentitem.Attrs)
+	gAttr, err := json.Marshal(addedEntry.Fields)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
 	}
 
 	if string(eAttr) != string(gAttr) {
-		t.Errorf("handler returned unexpected Attrs: got %v want %v", addContentItem.Attrs, addedContentitem.Attrs)
+		t.Errorf("handler returned unexpected fields: got %v want %v", addEntry.Fields, addedEntry.Fields)
 	}
 }

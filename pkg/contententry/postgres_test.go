@@ -1,4 +1,4 @@
-package contentitem
+package contententry
 
 import "testing"
 

@@ -1,4 +1,4 @@
-CREATE TABLE public.content_item
+CREATE TABLE public.content_entry
 (
     id VARCHAR (36) PRIMARY KEY,
     name VARCHAR (50),
@@ -13,10 +13,10 @@ CREATE TABLE public.content_item
     **/
 );
 
-CREATE TABLE public.content_item_translation
+CREATE TABLE public.content_entry_translation
 (
-    content_item_id VARCHAR (36) REFERENCES content_item(id) ON DELETE CASCADE,
+    content_entry_id VARCHAR (36) REFERENCES content_entry(id) ON DELETE CASCADE,
     locale VARCHAR (50),
-    attrs jsonb NOT NULL,
-    PRIMARY KEY (content_item_id, locale)
+    fields jsonb NOT NULL,
+    PRIMARY KEY (content_entry_id, locale)
 );

@@ -1,4 +1,4 @@
-package contentitem
+package contententry
 
 import (
 	"encoding/json"
@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-var mock = ContentItem{
+var mock = Entry{
 	ID:   createNewId(),
 	Name: "wow",
-	Attrs: AttrsLocales{
-		"nl": Attrs{
+	Fields: FieldTranslations{
+		"nl": Fields{
 			"attr1": 1,
 			"attr2": "attribute string value",
 			"attr3": []int{1, 2, 3},
@@ -64,13 +64,13 @@ func TestUnitMockAdd(t *testing.T) {
 		return
 	}
 
-	createdContentItem, err := c.GetOne(mock.ID)
+	createdContentEntry, err := c.GetOne(mock.ID)
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
 	}
 
-	b, err := json.Marshal(createdContentItem)
+	b, err := json.Marshal(createdContentEntry)
 	if err != nil {
 		t.Errorf("Unexpected error")
 		return
@@ -85,28 +85,28 @@ func TestUnitMockUpdate(t *testing.T) {
 	c := CreateMockRepository()
 	c.Add(mock)
 
-	createdContentItem, err := c.GetOne(mock.ID)
+	createdEntry, err := c.GetOne(mock.ID)
 	if err != nil {
 		t.Errorf("Unexpected error")
 		return
 	}
 
-	updateContentItem := *createdContentItem
-	updateContentItem.Attrs["nl"]["attr1"] = "new value!"
+	updateEntry := *createdEntry
+	updateEntry.Fields["nl"]["attr1"] = "new value!"
 
-	err = c.Update(updateContentItem)
+	err = c.Update(updateEntry)
 	if err != nil {
-		t.Errorf("Unexpected error while updating element")
+		t.Errorf("Unexpected error while updating entry")
 		return
 	}
 
-	updatedContentItem, err := c.GetOne(mock.ID)
+	updatedEntry, err := c.GetOne(mock.ID)
 	if err != nil {
 		t.Errorf("Unexpected error")
 		return
 	}
 
-	if updatedContentItem.Attrs["nl"]["attr1"] != "new value!" {
-		t.Errorf("Expected Attrs.nl.attr1 to be \"new value!\"")
+	if updatedEntry.Fields["nl"]["attr1"] != "new value!" {
+		t.Errorf("Expected fields.nl.attr1 to be \"new value!\"")
 	}
 }
