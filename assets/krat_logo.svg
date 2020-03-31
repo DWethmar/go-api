@@ -8,8 +8,11 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="752.82812"
-   height="869.29108"
+   inkscape:export-ydpi="6.3800001"
+   inkscape:export-xdpi="6.3800001"
+   inkscape:export-filename="/home/denniswethmar/go/src/github.com/dwethmar/go-api/assets/krat_logo.png"
+   width="199.18578mm"
+   height="229.99992mm"
    viewBox="0 0 199.18578 229.99992"
    version="1.1"
    id="svg8"
@@ -29,6 +32,26 @@
          offset="1"
          id="stop34" />
     </linearGradient>
+    <inkscape:path-effect
+       background_color="#ffffffff"
+       background="false"
+       hide_mask="false"
+       invert="false"
+       uri="false"
+       lpeversion="1"
+       is_visible="true"
+       id="path-effect930"
+       effect="powermask" />
+    <inkscape:path-effect
+       background_color="#ffffffff"
+       background="false"
+       hide_mask="false"
+       invert="false"
+       uri="false"
+       lpeversion="1"
+       is_visible="true"
+       id="path-effect920"
+       effect="powermask" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient36"
