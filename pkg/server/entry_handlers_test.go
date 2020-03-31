@@ -59,95 +59,14 @@ func createTestServer(dbName string) (contententry.Entry, Server) {
 	return *contentItem, server
 }
 
-func TestIntergrationInvalidIds(t *testing.T) {
-	now := time.Now()
-	_, server := createTestServer("test_two")
-
-	addEntry := contententry.AddEntry{
-		Name: "test",
-		Fields: contententry.FieldTranslations{
-			"nl": contententry.Fields{
-				"attrA": "Value A",
-			},
-		},
-	}
-
-	body, _ := json.Marshal(addEntry)
-	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
+func BenchmarkEntryIndex(b *testing.B) {
+	_, server := createTestServer("test_one")
+	b.ResetTimer()
+	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
-
-	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("handler returned wrong status code: received %v expected %v on %v", status, http.StatusCreated, req.RequestURI)
-		return
-	}
-
-	// Check the response content-type is what we expect.
-	if rType := rr.Header().Get("Content-Type"); rType != "application/json" {
-		t.Errorf("content type header does not match: got %v want %v", rType, "application/json")
-		return
-	}
-
-	// Check the response body is what we expect.
-	addedEntry := contententry.Entry{}
-	if err := json.Unmarshal(rr.Body.Bytes(), &addedEntry); err != nil {
-		t.Errorf("Error while parsing body for added content-item %v", err)
-		return
-	}
-
-	addedEntry.Fields = contententry.FieldTranslations{
-		"nl": contententry.Fields{
-			"attrA": "Value B",
-			"attrB": 1,
-			"attrC": []string{"three", "four", "five"},
-		},
-		"en": contententry.Fields{
-			"attrD": "Value C",
-			"attrE": 1,
-			"attrF": []string{"one", "two", "three"},
-		},
-	}
-
-	now = time.Now()
-
-	body, _ = json.Marshal(addedEntry)
-	req = httptest.NewRequest("POST", fmt.Sprintf("/%v", addedEntry.ID), bytes.NewBuffer(body))
-	rr = httptest.NewRecorder()
-	server.ServeHTTP(rr, req)
-
-	updatedEntry := contententry.Entry{}
-	if err := json.Unmarshal(rr.Body.Bytes(), &updatedEntry); err != nil {
-		t.Errorf("Error while parsing body for updated content-item: %v", err)
-		return
-	}
-
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: received %v expected %v on %v", status, http.StatusCreated, req.RequestURI)
-		return
-	}
-
-	if !addedEntry.CreatedOn.Equal(updatedEntry.CreatedOn) {
-		t.Errorf("handler returned invalid createdOn: got %v excepted CreatedOn to equal %v", updatedEntry.CreatedOn, addedEntry.CreatedOn)
-	}
-
-	if now.Before(addedEntry.UpdatedOn) {
-		t.Errorf("handler returned invalid createdOn: got %v excepted UpdatedOn to be larger then %v", updatedEntry.CreatedOn, addedEntry.CreatedOn)
-	}
-
-	eAttr, err := json.Marshal(addedEntry.Fields)
-	if err != nil {
-		t.Errorf("Error while parsing body %v", err)
-	}
-
-	gAttr, err := json.Marshal(updatedEntry.Fields)
-	if err != nil {
-		t.Errorf("Error while parsing body %v", err)
-	}
-
-	if string(eAttr) != string(gAttr) {
-		t.Errorf("handler returned unexpected fields: got %v want %v", addedEntry.Fields, addedEntry.Fields)
-	}
 }
+
 func TestIntergrationEntryIndex(t *testing.T) {
 	contentItem, server := createTestServer("test_one")
 	req := httptest.NewRequest("GET", "/", nil)
@@ -169,7 +88,7 @@ func TestIntergrationEntryIndex(t *testing.T) {
 		t.Errorf("Error while parsing body %v", err)
 	}
 
-	if expected := fmt.Sprintf("[%s]\n", string(c)); rr.Body.String() != expected {
+	if expected := fmt.Sprintf("[%s]", string(c)); rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: \n excpected: %v \n received:%v", expected, strings.TrimSuffix(rr.Body.String(), "\n"))
 	}
 }
@@ -299,7 +218,7 @@ func TestIntergrationEntryUpdate(t *testing.T) {
 		return
 	}
 
-	if status := rr.Code; status != http.StatusOK {
+	if status := rr.Code; status != http.StatusCreated {
 		t.Errorf("handler returned wrong status code: received %v expected %v on %v", status, http.StatusCreated, req.RequestURI)
 		return
 	}
@@ -328,45 +247,11 @@ func TestIntergrationEntryUpdate(t *testing.T) {
 }
 
 func TestIntergrationEntryDelete(t *testing.T) {
-	_, server := createTestServer("test_two")
+	contentItem, server := createTestServer("test_two")
 
-	addContentItem := contententry.AddEntry{
-		Name: "test",
-		Fields: contententry.FieldTranslations{
-			"nl": contententry.Fields{
-				"attrA": "Value A",
-				"attrB": 1,
-				"attrC": []string{"one", "two", "three"},
-			},
-		},
-	}
-
-	body, _ := json.Marshal(addContentItem)
-	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
+	body, _ := json.Marshal(contentItem)
+	req := httptest.NewRequest("DELETE", fmt.Sprintf("/%v", contentItem.ID), bytes.NewBuffer(body))
 	rr := httptest.NewRecorder()
-	server.ServeHTTP(rr, req)
-
-	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("handler returned wrong status code: got %v want %v on %v", status, http.StatusCreated, req.RequestURI)
-		return
-	}
-
-	// Check the response content-type is what we expect.
-	if rType := rr.Header().Get("Content-Type"); rType != "application/json" {
-		t.Errorf("content type header does not match: got %v want %v", rType, "application/json")
-		return
-	}
-
-	addEntry := contententry.Entry{}
-	err := json.Unmarshal(rr.Body.Bytes(), &addEntry)
-	if err != nil {
-		t.Errorf("Error while parsing body for added content-item %v", err)
-		return
-	}
-
-	body, _ = json.Marshal(addContentItem)
-	req = httptest.NewRequest("DELETE", fmt.Sprintf("/%v", addEntry.ID), bytes.NewBuffer(body))
-	rr = httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
@@ -374,7 +259,7 @@ func TestIntergrationEntryDelete(t *testing.T) {
 		return
 	}
 
-	req = httptest.NewRequest("GET", fmt.Sprintf("/%v", addEntry.ID), nil)
+	req = httptest.NewRequest("GET", fmt.Sprintf("/%v", contentItem.ID), nil)
 	rr = httptest.NewRecorder()
 	server.ServeHTTP(rr, req)
 

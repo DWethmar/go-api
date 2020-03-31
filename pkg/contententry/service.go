@@ -43,7 +43,9 @@ func (s *service) Create(entry AddEntry) (*Entry, error) {
 		CreatedOn: time.Now(),
 		UpdatedOn: time.Now(),
 	}
+
 	err := s.repo.Add(contentItem)
+
 	if err != nil {
 		return nil, err
 	}

@@ -18,22 +18,15 @@ type ErrorResponds struct {
 
 func (s *Server) HandleEntryIndex() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var data, err = s.entries.GetAll()
+		var entries, err = s.entries.GetAll()
 
 		if err != nil {
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			if err == contententry.ErrNotFound {
-				json.NewEncoder(w).Encode([]string{})
-			} else {
-				json.NewEncoder(w).Encode(err.Error())
-			}
+			fmt.Printf("Error while getting entries: %v", err)
+			request.SendServerError(w, r)
 			return
 		}
 
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(data)
+		request.SendJSON(w, r, entries, http.StatusOK)
 	})
 }
 
@@ -43,37 +36,31 @@ func (s *Server) HandleEntryCreate() http.HandlerFunc {
 		newEntry := contententry.AddEntry{
 			Fields: make(contententry.FieldTranslations),
 		}
+
 		err := decoder.Decode(&newEntry)
 
 		if err != nil {
+			fmt.Printf("Error while decoding entry: %v", err)
 			request.SendServerError(w, r)
 			return
 		}
 
 		v := contententry.ValidateAddEntry(newEntry)
+
 		if !v.IsValid() {
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(v)
+			request.SendBadRequestError(w, r, v)
 			return
 		}
 
 		entry, err := s.entries.Create(newEntry)
 
 		if err != nil {
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			if err == contententry.ErrNotFound {
-				json.NewEncoder(w).Encode("Could not find Entry.")
-			} else {
-				json.NewEncoder(w).Encode(err.Error())
-			}
+			fmt.Printf("Error while creating entry: %v", err)
+			request.SendServerError(w, r)
 			return
 		}
 
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(entry)
+		request.SendJSON(w, r, entry, http.StatusCreated)
 	})
 }
 
@@ -89,13 +76,16 @@ func (s *Server) HandleEntryUpdate() http.HandlerFunc {
 		err = decoder.Decode(&newEntry)
 
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Printf("Error while decoding entry: %v", err)
+			request.SendServerError(w, r)
 			return
 		}
 
 		entry, err := s.entries.GetOne(id)
+
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Printf("Error while getting entry: %v", err)
+			request.SendServerError(w, r)
 			return
 		}
 
@@ -104,41 +94,48 @@ func (s *Server) HandleEntryUpdate() http.HandlerFunc {
 		entry.UpdatedOn = time.Now()
 
 		err = s.entries.Update(*entry)
+
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Printf("Error while updating entry: %v", err)
+			request.SendServerError(w, r)
 			return
 		}
 
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(entry)
+		request.SendJSON(w, r, entry, http.StatusCreated)
 	})
 }
 
 func (s *Server) HandleEntryDelete() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
+
 		if err != nil {
+			fmt.Printf("Error while getting id: %v", err)
 			request.SendServerError(w, r)
 		}
-		Entry, err := s.entries.GetOne(id)
+
+		entry, err := s.entries.GetOne(id)
+
 		if err != nil {
 			if err == contententry.ErrNotFound {
-				w.WriteHeader(http.StatusNotFound)
+				fmt.Printf("Could not find entry: %v", err)
+				request.SendNotFoundError(w, r)
 				return
 			}
-			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Printf("Error while Getting entry: %v %v", err, entry)
+			request.SendServerError(w, r)
 			return
 		}
 
 		err = s.entries.Delete(id)
+
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Printf("Error while deleting entry: %v", err)
+			request.SendServerError(w, r)
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(Entry)
+		request.SendJSON(w, r, entry, http.StatusOK)
 	})
 }
 
@@ -150,19 +147,19 @@ func (s *Server) HandleEntrySingle() http.HandlerFunc {
 			request.SendServerError(w, r)
 		}
 
-		Entry, err := s.entries.GetOne(id)
+		entry, err := s.entries.GetOne(id)
 
 		if err != nil {
 			if err == contententry.ErrNotFound {
-				w.WriteHeader(http.StatusNotFound)
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
+				log.Print(fmt.Sprintf("Entry not found: %v", err))
+				request.SendNotFoundError(w, r)
+				return
 			}
+			log.Print(fmt.Sprintf("Somthing went wrong: %v", err))
+			request.SendServerError(w, r)
 			return
 		}
 
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(Entry)
+		request.SendJSON(w, r, entry, http.StatusOK)
 	})
 }

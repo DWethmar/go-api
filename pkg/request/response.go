@@ -3,6 +3,7 @@ package request
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 )
@@ -11,36 +12,31 @@ type ErrorResponds struct {
 	Error string `json:"error"`
 }
 
-// SendJSON marshals v to a json struct and sends appropriate headers to w
-func SendJSON(w http.ResponseWriter, r *http.Request, v interface{}, statusCode int) error {
+func SendJSON(w http.ResponseWriter, r *http.Request, v interface{}, code int) {
 	w.Header().Add("Content-Type", "application/json")
-
-	err := json.NewDecoder(r.Body).Decode(v)
-	if err == nil {
-		w.WriteHeader(statusCode)
-		json.NewEncoder(w).Encode(v)
-		return nil
+	b, err := json.Marshal(v)
+	if err != nil {
+		log.Print(fmt.Sprintf("Error while encoding JSON: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		io.WriteString(w, `{"error": "Internal server error"}`)
+	} else {
+		w.WriteHeader(code)
+		io.WriteString(w, string(b))
 	}
-	log.Print(fmt.Sprintf("Error while encoding JSON: %v", err))
-	w.WriteHeader(http.StatusInternalServerError)
-	json.NewEncoder(w).Encode(ErrorResponds{
-		Error: http.StatusText(http.StatusInternalServerError),
-	})
-	return err
 }
 
 func SendServerError(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusInternalServerError)
-	json.NewEncoder(w).Encode(ErrorResponds{
+	SendJSON(w, r, ErrorResponds{
 		Error: http.StatusText(http.StatusInternalServerError),
-	})
+	}, http.StatusInternalServerError)
 }
 
-func SendBadRequestError(w http.ResponseWriter, r *http.Request, message string) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(ErrorResponds{
-		Error: message,
-	})
+func SendBadRequestError(w http.ResponseWriter, r *http.Request, v interface{}) {
+	SendJSON(w, r, v, http.StatusBadRequest)
+}
+
+func SendNotFoundError(w http.ResponseWriter, r *http.Request) {
+	SendJSON(w, r, ErrorResponds{
+		Error: "Resource not found.",
+	}, http.StatusNotFound)
 }
