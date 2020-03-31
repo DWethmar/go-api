@@ -2,11 +2,14 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/DWethmar/go-api/pkg/common"
 	"github.com/DWethmar/go-api/pkg/contententry"
-	"github.com/gorilla/mux"
+	"github.com/DWethmar/go-api/pkg/request"
 )
 
 type ErrorResponds struct {
@@ -43,11 +46,7 @@ func (s *Server) HandleEntryCreate() http.HandlerFunc {
 		err := decoder.Decode(&newEntry)
 
 		if err != nil {
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(&ErrorResponds{
-				error: "something went wrong..",
-			})
+			request.SendServerError(w, r)
 			return
 		}
 
@@ -80,12 +79,9 @@ func (s *Server) HandleEntryCreate() http.HandlerFunc {
 
 func (s *Server) HandleEntryUpdate() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := contententry.ParseId(vars["id"])
-
+		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
+			request.SendServerError(w, r)
 		}
 
 		decoder := json.NewDecoder(r.Body)
@@ -121,11 +117,9 @@ func (s *Server) HandleEntryUpdate() http.HandlerFunc {
 
 func (s *Server) HandleEntryDelete() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := contententry.ParseId(vars["id"])
+		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
+			request.SendServerError(w, r)
 		}
 		Entry, err := s.entries.GetOne(id)
 		if err != nil {
@@ -150,12 +144,10 @@ func (s *Server) HandleEntryDelete() http.HandlerFunc {
 
 func (s *Server) HandleEntrySingle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := contententry.ParseId(vars["id"])
-
+		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
+			log.Print(fmt.Sprintf("Error on retreiving ID: %v", err))
+			request.SendServerError(w, r)
 		}
 
 		Entry, err := s.entries.GetOne(id)

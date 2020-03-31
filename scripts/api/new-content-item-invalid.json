@@ -1,10 +1,10 @@
 {
     "name": "New",
-    "attrs": {
+    "fields": {
         "nl": {
             "a": 1,
             "b": "b",
-            "c": "c"
+            "c": null
         }
     }
 }

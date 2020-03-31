@@ -1,6 +1,6 @@
 {
     "name": "New",
-    "attrs": {
+    "fields": {
         "nl": {
             "a": "v1",
             "b": "v2",
