@@ -4,13 +4,6 @@ CREATE TABLE public.content_entry
     name VARCHAR (50),
     created_on timestamptz NOT NULL,
     updated_on timestamptz NOT NULL
-    /* 
-    Added a version number would be nice.
-    version interger NOT NULL
-
-    And with each update increate it. 
-    example:  SET version = version + 1
-    **/
 );
 
 CREATE TABLE public.content_entry_translation

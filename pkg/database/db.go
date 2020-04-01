@@ -9,7 +9,7 @@ type DB struct {
 	*sql.DB
 }
 
-func CreateDB(driverName string, dataSourceName string) (*sql.DB, error) {
+func ConnectDB(driverName string, dataSourceName string) (*sql.DB, error) {
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
 		return nil, err

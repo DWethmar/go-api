@@ -15,7 +15,7 @@ import (
 func main() {
 	fmt.Println("Staring API")
 	driverName, dataSource := config.GetPostgresConnectionInfo(config.LoadEnv())
-	db, _ := database.CreateDB(driverName, dataSource)
+	db, _ := database.ConnectDB(driverName, dataSource)
 	defer db.Close()
 	server := server.CreateServer(db)
 	log.Fatal(http.ListenAndServe(":8080", &server))
