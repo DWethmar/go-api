@@ -1,0 +1,20 @@
+{
+  "name": "go-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:dwethmar/go-api.git",
+  "author": "Dennis Wethmar <denniswethmar@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^3.20.2"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "story": "lerna run story --stream",
+    "prestart": "lerna run libbuild --stream",
+    "start": "lerna run start --stream"
+  }
+}

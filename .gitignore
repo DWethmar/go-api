@@ -2,3 +2,4 @@
 go-api.exe
 tmp
 vendor
+node_modules
