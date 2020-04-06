@@ -13,27 +13,34 @@ type PostgresRepository struct {
 }
 
 var (
+	// TODO Rename content_entry_field to content_entry_fields.
 	getAll = `
 	SELECT 
-	id, 
-	name, 
-	COALESCE(jsonb_object_agg(t.locale, t.fields) FILTER (WHERE t.locale IS NOT NULL), '{}'::JSONB) as fields,
-	created_on, 
-	updated_on
+		id, 
+		name, 
+		COALESCE(
+			jsonb_object_agg(t.locale, t.fields) FILTER (WHERE t.locale IS NOT NULL), 
+			'{}'::JSONB
+		) as fields,
+		created_on, 
+		updated_on
 	FROM public.content_entry c
-	LEFT OUTER JOIN public.content_entry_translation t ON c.id = t.content_entry_id
+	LEFT OUTER JOIN public.content_entry_field t ON c.id = t.content_entry_id
 	GROUP BY c.id
 	ORDER BY updated_on ASC`
 
 	getOne = `
 	SELECT 
-	id, 
-	name, 
-	COALESCE(jsonb_object_agg(t.locale, t.fields) FILTER (WHERE t.locale IS NOT NULL), '{}'::JSONB) as fields,
-	created_on, 
-	updated_on
+		id, 
+		name, 
+		COALESCE(
+			jsonb_object_agg(t.locale, t.fields) FILTER (WHERE t.locale IS NOT NULL), 
+			'{}'::JSONB
+		) as fields,
+		created_on, 
+		updated_on
 	FROM public.content_entry c
-	LEFT OUTER JOIN public.content_entry_translation t ON c.id = t.content_entry_id
+	LEFT OUTER JOIN public.content_entry_field t ON c.id = t.content_entry_id
 	WHERE c.id = $1
 	GROUP BY c.id
 	LIMIT 1`
@@ -43,7 +50,7 @@ var (
 	VALUES ($1, $2, $3, $4)`
 
 	insertEntryTrans = `
-	INSERT INTO public.content_entry_translation(content_entry_id, locale, fields) 
+	INSERT INTO public.content_entry_field(content_entry_id, locale, fields) 
 	VALUES($1, $2, $3)`
 
 	updateEntry = `
@@ -51,11 +58,11 @@ var (
 	WHERE id = $3`
 
 	updateEntryTrans = `
-	UPDATE public.content_entry_translation SET fields = $1
+	UPDATE public.content_entry_field SET fields = $1
 	WHERE content_entry_id = $2 AND locale = $3`
 
 	getEntryLocales = `
-	SELECT locale FROM public.content_entry_translation
+	SELECT locale FROM public.content_entry_field
 	WHERE content_entry_id = $1
 	`
 

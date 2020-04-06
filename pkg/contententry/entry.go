@@ -23,6 +23,12 @@ func ParseId(val string) (ID, error) {
 	return id, nil
 }
 
+// https://medium.com/capital-one-tech/event-sourcing-with-aggregates-in-rust-4022af41cf67
+type Aggregate interface {
+	GetVersion() int
+	Apply(event interface{})
+}
+
 type Entry struct {
 	ID        ID                `json:"id"   db:"id"`
 	Name      string            `json:"name" db:"name"`
