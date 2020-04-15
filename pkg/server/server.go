@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/DWethmar/go-api/pkg/contententry"
+	"github.com/dwethmar/go-api/pkg/contententry"
 	"github.com/gorilla/mux"
 )
 

@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/DWethmar/go-api/pkg/config"
-	"github.com/DWethmar/go-api/pkg/contententry"
-	"github.com/DWethmar/go-api/pkg/database"
+	"github.com/dwethmar/go-api/pkg/config"
+	"github.com/dwethmar/go-api/pkg/contententry"
+	"github.com/dwethmar/go-api/pkg/database"
 	"github.com/gorilla/mux"
 )
 

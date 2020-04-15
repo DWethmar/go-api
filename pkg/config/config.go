@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Config struct {
+type Env struct {
 	DBHost         string
 	DBPort         string
 	DBUser         string
@@ -19,7 +19,7 @@ type Config struct {
 	CreateDBScript string
 }
 
-func LoadEnv() Config {
+func LoadEnv() Env {
 	dbHost := os.Getenv("PQ_HOST")
 	dbPort := os.Getenv("PG_PORT")
 	dbUser := os.Getenv("PQ_USER")
@@ -28,7 +28,7 @@ func LoadEnv() Config {
 	dbDriverName := os.Getenv("DRIVER_NAME")
 	createDBScript := os.Getenv("CREATE_DB_SQL_FILE")
 
-	return Config{
+	return Env{
 		dbHost,
 		dbPort,
 		dbUser,
@@ -41,7 +41,7 @@ func LoadEnv() Config {
 
 var defaultEnvPath = "../.env"
 
-func LoadEnvFile(path ...string) Config {
+func LoadEnvFile(path ...string) Env {
 	if path == nil {
 		path = []string{defaultEnvPath}
 	}
@@ -52,7 +52,7 @@ func LoadEnvFile(path ...string) Config {
 	return LoadEnv()
 }
 
-func GetPostgresConnectionInfo(config Config) (string, string) {
+func GetPostgresConnectionInfo(config Env) (string, string) {
 	cParts := []string{
 		fmt.Sprintf("host=%s", config.DBHost),
 		fmt.Sprintf("port=%s", config.DBPort),

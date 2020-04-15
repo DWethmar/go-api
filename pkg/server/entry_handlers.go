@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/DWethmar/go-api/pkg/common"
-	"github.com/DWethmar/go-api/pkg/contententry"
-	"github.com/DWethmar/go-api/pkg/request"
+	"github.com/dwethmar/go-api/pkg/common"
+	"github.com/dwethmar/go-api/pkg/contententry"
+	"github.com/dwethmar/go-api/pkg/request"
 )
 
 type ErrorResponds struct {

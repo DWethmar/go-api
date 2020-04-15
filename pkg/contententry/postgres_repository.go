@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/DWethmar/go-api/pkg/database"
+	"github.com/dwethmar/go-api/pkg/database"
 )
 
 type PostgresRepository struct {
@@ -13,7 +13,6 @@ type PostgresRepository struct {
 }
 
 var (
-	// TODO Rename content_entry_field to content_entry_fields.
 	getAll = `
 	SELECT 
 		id, 
@@ -70,10 +69,6 @@ var (
 	DELETE FROM public.content_entry WHERE id = $1
 	`
 )
-
-func deleteTranslationStatement() {
-
-}
 
 func (repo *PostgresRepository) GetAll() ([]*Entry, error) {
 	rows, err := repo.db.Query(getAll)

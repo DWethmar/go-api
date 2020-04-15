@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DWethmar/go-api/pkg/contententry"
+	"github.com/dwethmar/go-api/pkg/contententry"
 
 	_ "github.com/lib/pq"
 )

@@ -5,7 +5,6 @@ set -u
 
 SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-
 PQ_HOST="localhost"
 PG_PORT=5433
 PQ_DB_NAME="testdb"

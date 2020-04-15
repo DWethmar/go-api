@@ -1,5 +1,6 @@
 .env
-go-api.exe
+api.exe
+api
 tmp
 vendor
 node_modules
