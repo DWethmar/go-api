@@ -7,7 +7,7 @@ COPY ./ /go/src/github.com/DWethmar/go-api
 WORKDIR /go/src/github.com/DWethmar/go-api
 
 RUN go get ./
-RUN go build
+RUN go build cmd/api/
 
 CMD if [ ${APP_ENV} = production ]; \
 	then \
