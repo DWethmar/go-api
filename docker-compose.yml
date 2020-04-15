@@ -2,25 +2,6 @@
 version: '3.5'
 
 services:
-  # app:
-  #   build: .
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - postgres
-  #   links:
-  #     - postgres
-  #   volumes:
-  #     - .:/go/src/github.com/DWethmar/go-api
-  #   environment:
-  #     APP_ENV: "development"
-  #     PQ_HOST: "postgres"
-  #     PG_PORT: 5432
-  #     PQ_USER: "postgres"
-  #     PQ_PASSWORD: "postgres"
-  #     PQ_DB_NAME: "go-api"      
-  #     DRIVER_NAME: "postgres"      
-
   postgres:
     container_name: postgres_container
     image: postgres

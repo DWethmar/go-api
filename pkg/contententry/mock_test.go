@@ -110,3 +110,28 @@ func TestUnitMockUpdate(t *testing.T) {
 		t.Errorf("Expected fields.nl.attr1 to be \"new value!\"")
 	}
 }
+
+func TestUnitMockDelete(t *testing.T) {
+	c := CreateMockRepository()
+	c.Add(mock)
+
+	createdEntry, err := c.GetOne(mock.ID)
+	if err != nil {
+		t.Errorf("Unexpected error")
+		return
+	}
+
+	err = c.Delete(createdEntry.ID)
+	if err != nil {
+		t.Errorf("Unexpected error while deleting entry")
+		return
+	}
+
+	_, err = c.GetOne(mock.ID)
+	if err != nil {
+		if err != ErrNotFound {
+			t.Errorf("Unexpected entry")
+		}
+		return
+	}
+}

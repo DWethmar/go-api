@@ -35,7 +35,7 @@ func (repo *MockRepository) Update(entry Entry) error {
 func (repo *MockRepository) Delete(id ID) error {
 	for i, n := range repo.items {
 		if id == n.ID {
-			repo.items = append(repo.items[:i], repo.items[i:]...)
+			repo.items = append(repo.items[:i], repo.items[i+1:]...)
 			return nil
 		}
 	}
