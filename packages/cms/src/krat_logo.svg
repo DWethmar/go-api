@@ -8,9 +8,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:export-ydpi="6.3800001"
-   inkscape:export-xdpi="6.3800001"
-   inkscape:export-filename="/home/denniswethmar/go/src/github.com/dwethmar/go-api/assets/krat_logo.png"
+   inkscape:export-ydpi="12.751914"
+   inkscape:export-xdpi="12.751914"
+   inkscape:export-filename="/home/denniswethmar/go/src/github.com/dwethmar/go-api/packages/cms/src/krat_logo.png"
    width="199.18578mm"
    height="229.99992mm"
    viewBox="0 0 199.18578 229.99992"
@@ -32,26 +32,6 @@
          offset="1"
          id="stop34" />
     </linearGradient>
-    <inkscape:path-effect
-       background_color="#ffffffff"
-       background="false"
-       hide_mask="false"
-       invert="false"
-       uri="false"
-       lpeversion="1"
-       is_visible="true"
-       id="path-effect930"
-       effect="powermask" />
-    <inkscape:path-effect
-       background_color="#ffffffff"
-       background="false"
-       hide_mask="false"
-       invert="false"
-       uri="false"
-       lpeversion="1"
-       is_visible="true"
-       id="path-effect920"
-       effect="powermask" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient36"
@@ -70,11 +50,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.79494494"
-     inkscape:cx="127.55146"
-     inkscape:cy="445.29026"
+     inkscape:zoom="1.3543441"
+     inkscape:cx="401.32555"
+     inkscape:cy="349.73634"
      inkscape:document-units="mm"
-     inkscape:current-layer="svg8"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="1920"
@@ -96,7 +76,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -110,8 +90,9 @@
        inkscape:connector-curvature="0"
        id="path842"
        style="fill:#cbe2b0;fill-opacity:1;fill-rule:evenodd;stroke-width:0.293317"
-       d="M 106.22917,32.140673 6.6362873,89.640523 106.22917,147.14037 205.82206,89.640523 Z"
-       inkscape:label="TOP" />
+       d="M 106.22917,32.140673 6.6362738,89.640523 106.22917,147.14037 205.82206,89.640523 Z"
+       inkscape:label="TOP"
+       sodipodi:nodetypes="ccccc" />
     <path
        inkscape:connector-curvature="0"
        id="path844"
@@ -120,7 +101,7 @@
        inkscape:label="RIGHT" />
     <path
        inkscape:label="LEFT"
-       d="M 6.8924138,89.640523 106.48531,147.14037 V 262.14059 L 6.8924138,204.64074 Z"
+       d="M 6.6362738,89.640523 106.22917,147.14037 V 262.14059 L 6.6362738,204.64074 Z"
        style="fill:#f6d186;fill-opacity:1;fill-rule:evenodd;stroke-width:0.293317"
        id="path882"
        inkscape:connector-curvature="0" />
