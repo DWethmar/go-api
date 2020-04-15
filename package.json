@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "story": "lerna run story --stream",
-    "prestart": "lerna run libbuild --stream",
-    "start": "lerna run start --stream"
+    "prestart": "lerna run build --stream",
+    "start": "yarn workspace my-app start"
   }
 }

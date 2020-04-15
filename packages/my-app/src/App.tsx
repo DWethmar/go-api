@@ -1,7 +1,10 @@
 import React from 'react';
-import { Hello } from "@go-api/my-monorepo-ui-lib"
+import { Hello, Bye } from "@go-api/elements"
 import logo from './krat_logo.svg';
+
 import './App.css';
+
+import "@go-api/my-monorepo-ui-lib/lib/index.css"
 
 function App() {
   return (
@@ -10,6 +13,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
       </header>
       <Hello></Hello>
+      <Bye></Bye>
     </div>
   );
 }

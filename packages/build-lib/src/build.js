@@ -3,13 +3,12 @@
 const rollup = require("rollup");
 const rollupTypescript = require("rollup-plugin-typescript2");
 const __typescript = require("typescript");
-const sass = require('rollup-plugin-sass')
+const sass = require("rollup-plugin-sass");
 
 const commonjs = require("@rollup/plugin-commonjs");
 const resolve = require("@rollup/plugin-node-resolve");
 const excludeDependenciesFromBundle = require("rollup-plugin-exclude-dependencies-from-bundle");
 
-// see below for details on the options
 const inputOptions = {
   input: "src/index.ts",
   plugins: [
