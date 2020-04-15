@@ -16,6 +16,7 @@
     "clean-lib": "./src/clean.js"
   },
   "dependencies": {
+    "@go-api/models": "^0.0.0",
     "rollup-plugin-typescript2": "^0.27.0"
   }
 }

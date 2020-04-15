@@ -1,0 +1,33 @@
+{
+  "name": "@go-api/sdk",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Dennis Wethmar <denniswethmar@gmail.com>",
+  "homepage": "https://github.com/dwethmar/go-api#readme",
+  "license": "MIT",
+  "main": "lib/sdk.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dwethmar/go-api.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/dwethmar/go-api/issues"
+  },
+  "dependencies": {
+    "@go-api/build-lib": "^1.0.0",
+    "@go-api/models": "^0.0.0"
+  }
+}

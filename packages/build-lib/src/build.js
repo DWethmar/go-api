@@ -10,7 +10,7 @@ const resolve = require("@rollup/plugin-node-resolve");
 const excludeDependenciesFromBundle = require("rollup-plugin-exclude-dependencies-from-bundle");
 
 const inputOptions = {
-  input: "src/index.ts",
+  input: "lib/index.ts",
   plugins: [
     excludeDependenciesFromBundle(),
     rollupTypescript({
@@ -27,11 +27,11 @@ const inputOptions = {
 
 const outputOptions = [
   {
-    file: "./lib/index.js",
+    file: "./dist/index.js",
     format: "cjs",
   },
   {
-    file: "./lib/index.es.js",
+    file: "./dist/index.es.js",
     format: "es",
   },
 ];

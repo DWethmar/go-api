@@ -1,0 +1,30 @@
+{
+  "name": "@go-api/models",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Dennis Wethmar <denniswethmar@gmail.com>",
+  "homepage": "https://github.com/dwethmar/go-api#readme",
+  "license": "MIT",
+  "main": "lib/models.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dwethmar/go-api.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "npx rimraf dist"
+  },
+  "bugs": {
+    "url": "https://github.com/dwethmar/go-api/issues"
+  }
+}

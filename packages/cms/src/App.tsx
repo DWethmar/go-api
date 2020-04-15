@@ -2,7 +2,7 @@ import React from 'react';
 import { Hello, Bye } from "@go-api/elements"
 import logo from './krat_logo.svg';
 
-import "@go-api/elements/lib/index.css";
+import "@go-api/elements/dist/index.css";
 
 import './App.css';
 

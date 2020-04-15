@@ -20,12 +20,12 @@ type Env struct {
 }
 
 func LoadEnv() Env {
-	dbHost := os.Getenv("PQ_HOST")
-	dbPort := os.Getenv("PG_PORT")
-	dbUser := os.Getenv("PQ_USER")
-	dbPassword := os.Getenv("PQ_PASSWORD")
-	dbName := os.Getenv("PQ_DB_NAME")
-	dbDriverName := os.Getenv("DRIVER_NAME")
+	dbHost := os.Getenv("API_PQ_HOST")
+	dbPort := os.Getenv("API_PG_PORT")
+	dbUser := os.Getenv("API_PQ_USER")
+	dbPassword := os.Getenv("API_PQ_PASSWORD")
+	dbName := os.Getenv("API_PQ_DB_NAME")
+	dbDriverName := os.Getenv("API_DRIVER_NAME")
 	createDBScript := os.Getenv("CREATE_DB_SQL_FILE")
 
 	return Env{
