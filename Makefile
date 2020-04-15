@@ -11,6 +11,8 @@ BINARY_UNIX=$(BINARY_NAME)_unix
 all: test build
 build: 
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/
+watch:
+	modd
 test: 
 	$(GOTEST) -v ./...
 benchmark:
@@ -23,8 +25,7 @@ run:
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/ 
 	./$(BINARY_NAME)
 deps:
-	$(GOGET) github.com/markbates/goth
-	$(GOGET) github.com/markbates/pop
+	env GO111MODULE=on $(GOGET) github.com/cortesi/modd/cmd/modd
 
 # Cross compilation
 build-linux:
