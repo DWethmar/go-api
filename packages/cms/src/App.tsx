@@ -2,9 +2,9 @@ import React from 'react';
 import { Hello, Bye } from "@go-api/elements"
 import logo from './krat_logo.svg';
 
-import './App.css';
+import "@go-api/elements/lib/index.css";
 
-import "@go-api/my-monorepo-ui-lib/lib/index.css"
+import './App.css';
 
 function App() {
   return (

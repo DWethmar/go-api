@@ -12,7 +12,8 @@
     "typescript": "^3.8.3"
   },
   "bin": {
-    "build-lib": "./src/build.js"
+    "build-lib": "./src/build.js",
+    "clean-lib": "./src/clean.js"
   },
   "dependencies": {
     "rollup-plugin-typescript2": "^0.27.0"

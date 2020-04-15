@@ -7,8 +7,8 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "story": "start-storybook",
-    "libbuild": "tsc && tsc --build tsconfig.esm.json",
-    "build": "build-lib"
+    "build": "build-lib",
+    "clean": "clean-lib"
   },
   "peerDependencies": {
     "react": "^16.13.1",
