@@ -1,0 +1,9 @@
+{
+  "exclude": ["node_modules", "dist", "**/*.story*", "**/*.spec*"],
+  "include": ["lib"],
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "declaration": true
+  }
+}

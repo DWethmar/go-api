@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@go-api/models": "^0.0.0",
+    "@go-api/sdk": "^0.0.0",
     "rollup-plugin-typescript2": "^0.27.0"
   }
 }

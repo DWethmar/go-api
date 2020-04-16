@@ -1,11 +1,13 @@
 {
   "name": "@go-api/models",
   "version": "0.0.0",
-  "description": "> TODO: description",
+  "description": "Models describing the go-api.",
   "author": "Dennis Wethmar <denniswethmar@gmail.com>",
   "homepage": "https://github.com/dwethmar/go-api#readme",
   "license": "MIT",
-  "main": "lib/models.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -26,5 +28,8 @@
   },
   "bugs": {
     "url": "https://github.com/dwethmar/go-api/issues"
+  },
+  "dependencies": {
+    "@go-api/build-lib": "^1.0.0"
   }
 }

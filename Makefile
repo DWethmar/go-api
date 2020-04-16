@@ -21,9 +21,12 @@ clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 	rm -f $(BINARY_UNIX)
+cert:
+	mkdir -p cert
+	openssl req -newkey rsa:2048 -nodes -keyout cert/server.key -x509 -days 365 -out cert/server.crt
 run:
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/ 
-	./$(BINARY_NAME)
+	./$(BINARY_NAME) -http 1
 deps:
 	env GO111MODULE=on $(GOGET) github.com/cortesi/modd/cmd/modd
 

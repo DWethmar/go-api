@@ -39,7 +39,7 @@ func LoadEnv() Env {
 	}
 }
 
-var defaultEnvPath = "../.env"
+var defaultEnvPath = ".env"
 
 func LoadEnvFile(path ...string) Env {
 	if path == nil {
