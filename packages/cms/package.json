@@ -5,7 +5,6 @@
   "dependencies": {
     "@go-api/build-lib": "^1.0.0",
     "@go-api/elements": "*",
-    "@go-api/models": "^0.0.0",
     "@go-api/sdk": "^0.0.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",

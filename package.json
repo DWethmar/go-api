@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "story": "lerna run story --stream",
+    "build": "lerna run build --stream",
     "prestart": "lerna run build --stream",
     "start": "yarn workspace cms start"
   }

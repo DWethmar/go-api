@@ -1,2 +1,4 @@
+export { Entry } from "./models/entry";
+export { Locale } from "./models/locale";
 
-export { Client } from "./client";
+export { Client, createClient } from "./client";

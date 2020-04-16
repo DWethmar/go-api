@@ -1,8 +1,0 @@
-{
-  "exclude": ["node_modules", "dist", "**/*.story*", "**/*.spec*"],
-  "include": ["lib"],
-  "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true
-  }
-}

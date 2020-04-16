@@ -18,6 +18,15 @@ type ErrorResponds struct {
 
 func (s *Server) HandleEntryIndex() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		if (*r).Method == "OPTIONS" {
+			return
+		}
+
 		var entries, err = s.entries.GetAll()
 
 		if err != nil {
