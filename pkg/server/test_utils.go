@@ -16,7 +16,7 @@ func withTestServer(fn func(contententry.Entry, Server)) {
 
 	var db *sql.DB
 	var repo contententry.Repository
-	con := config.LoadEnv()
+	con := config.LoadApiEnv()
 
 	if con.DBName != "" && con.DBHost != "" && con.CreateDBScript != "" {
 		dbName := con.DBName

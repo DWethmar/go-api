@@ -1,41 +1,52 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
-	"gopkg.in/oauth2.v3/errors"
-	"gopkg.in/oauth2.v3/manage"
-	"gopkg.in/oauth2.v3/server"
-	"gopkg.in/oauth2.v3/store"
+	"github.com/gorilla/mux"
 )
 
-func main() {
-	manager := manage.NewDefaultManager()
-	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
+// CORS Middleware
+func CORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-	manager.MustTokenStorage(store.NewMemoryTokenStore())
+		// Set headers
+		headers := w.Header()
+		headers.Add("Access-Control-Allow-Credentials", "true")
+		headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
+		headers.Add("Vary", "Origin")
+		headers.Add("Vary", "Access-Control-Request-Method")
+		headers.Add("Vary", "Access-Control-Request-Headers")
+		headers.Add("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, token")
+		headers.Add("Access-Control-Allow-Methods", "GET, POST,OPTIONS")
 
-	clientStore := store.NewClientStore()
-	manager.MapClientStorage(clientStore)
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 
-	srv := server.NewDefaultServer(manager)
-	srv.SetAllowGetAccessRequest(true)
-	srv.SetClientInfoHandler(server.ClientFormHandler)
-	manager.SetRefreshTokenCfg(manage.DefaultRefreshTokenCfg)
+		fmt.Println("ok")
 
-	srv.SetInternalErrorHandler(func(err error) (re *errors.Response) {
-		log.Println("Internal Error:", err.Error())
+		// Next
+		next.ServeHTTP(w, r)
 		return
 	})
+}
 
-	srv.SetResponseErrorHandler(func(re *errors.Response) {
-		log.Println("Response Error:", re.Error.Error())
-	})
+func main() {
+	fmt.Println("Starting API.")
 
-	http.HandleFunc("/protected", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, I'm protected"))
-	})
+	r := mux.NewRouter()
 
-	log.Fatal(http.ListenAndServe(":9096", nil))
+	r.Use(CORS)
+
+	r.HandleFunc("/signin", Signin)
+	r.HandleFunc("/welcome", Welcome)
+	r.HandleFunc("/refresh", Refresh)
+
+	http.Handle("/", r)
+
+	// Apply the CORS middleware to our top-level router, with the defaults.
+	http.ListenAndServe(":8000", r)
 }

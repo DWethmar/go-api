@@ -27,6 +27,9 @@ cert:
 run:
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/ 
 	./$(BINARY_NAME) -http 1
+run-auth:
+	$(GOBUILD) -v -o auth ./cmd/auth/ 
+	./auth
 deps:
 	env GO111MODULE=on $(GOGET) github.com/cortesi/modd/cmd/modd
 
