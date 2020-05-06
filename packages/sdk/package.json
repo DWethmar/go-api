@@ -9,10 +9,10 @@
   "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "directories": {
-    "lib": "lib"
+    "dist": "dist"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "publishConfig": {
     "registry": "https://registry.yarnpkg.com"
