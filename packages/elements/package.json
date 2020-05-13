@@ -19,9 +19,7 @@
   },
   "dependencies": {
     "@go-api/build-lib": "^1.0.0",
-    "@go-api/models": "^0.0.0",
     "@go-api/sdk": "^0.0.0",
-    "build": "^0.1.4",
     "rollup-plugin-exclude-dependencies-from-bundle": "^1.1.8"
   }
 }

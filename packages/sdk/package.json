@@ -29,7 +29,6 @@
     "url": "https://github.com/dwethmar/go-api/issues"
   },
   "dependencies": {
-    "@go-api/build-lib": "^1.0.0",
-    "@go-api/models": "^0.0.0"
+    "@go-api/build-lib": "^1.0.0"
   }
 }
