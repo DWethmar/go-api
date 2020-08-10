@@ -13,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var httpVersion = flag.Int("http", 2, "HTTP version")
+var port = flag.Int("port", 8080, "Run on port")
 
 func main() {
 	flag.Parse()
@@ -33,9 +33,7 @@ func main() {
 
 	server := server.CreateServer(db)
 
-	srv := &http.Server{Addr: ":8080", Handler: &server}
-	log.Printf("Serving on :8080 with http %v", *httpVersion)
-	// log.Fatal(srv.ListenAndServeTLS("cert/server.crt", "cert/server.key"))
+	srv := &http.Server{Addr: fmt.Sprintf(":%v", port), Handler: &server}
+	log.Printf("Serving on :%v", port)
 	log.Fatal(srv.ListenAndServe())
-	// 	log.Fatal(http.ListenAndServeTLS(":8080", "cert/server.crt", "cert/server.key", &server))
 }

@@ -11,6 +11,7 @@ BINARY_UNIX=$(BINARY_NAME)_unix
 all: test build
 build: 
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/
+	yarn lerna run build
 watch:
 	modd
 test: 
@@ -26,7 +27,7 @@ cert:
 	openssl req -newkey rsa:2048 -nodes -keyout cert/server.key -x509 -days 365 -out cert/server.crt
 run:
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/ 
-	./$(BINARY_NAME) -http 1
+	./$(BINARY_NAME) -port 8080
 run-auth:
 	$(GOBUILD) -v -o auth ./cmd/auth/ 
 	./auth
