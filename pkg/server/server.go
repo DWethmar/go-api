@@ -34,10 +34,11 @@ func CreateServer(store *store.Store) Server {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	})
 
-	s.router.Use(cors.Handler)
-	s.router.Mount("/api", Router(store))
-
 	s.router.Use(logging)
+	s.router.Use(cors.Handler)
+	
+	s.router.Mount("/", Router(store))
+
 	return s
 }
 

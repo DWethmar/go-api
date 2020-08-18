@@ -10,7 +10,11 @@ import (
 func Router(store *store.Store) chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/content", handler.HandleEntryIndex(store))
+	r.Get("/", handler.HandleEntryIndex(store))
+	r.Get("/{id}", requireEntryId(handler.HandleEntrySingle(store)))
+	r.Delete("/{id}", requireEntryId(handler.HandleEntryDelete(store)))
+	r.Post("/{id}", requireEntryId(handler.HandleEntryUpdate(store)))
+	r.Post("/", handler.HandleEntryCreate(store))
 
 	return r
 }
