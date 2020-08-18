@@ -7,7 +7,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/config"
 	"github.com/dwethmar/go-api/pkg/contententry"
 	"github.com/dwethmar/go-api/pkg/database"
-	"github.com/gorilla/mux"
+	"github.com/dwethmar/go-api/pkg/store"
 )
 
 var dbCounter = 0
@@ -16,7 +16,7 @@ func withTestServer(fn func(contententry.Entry, Server)) {
 
 	var db *sql.DB
 	var repo contententry.Repository
-	con := config.LoadApiEnv()
+	con := config.LoadConfig()
 
 	if con.DBName != "" && con.DBHost != "" && con.CreateDBScript != "" {
 		dbName := con.DBName
@@ -65,12 +65,13 @@ func withTestServer(fn func(contententry.Entry, Server)) {
 		repo = contententry.CreateMockRepository()
 	}
 
-	server := Server{
-		entries: contententry.CreateService(repo),
-		router:  mux.NewRouter().StrictSlash(true),
-	}
+	store := store.CreateStoreWithOption(store.CreateStoreOption{
+		EntryRepo: repo,
+	})
 
-	contentItem, err := server.entries.Create(contententry.AddEntry{
+	server := CreateServer(store)
+
+	contentItem, err := store.Entries.Create(contententry.AddEntry{
 		Name: "Test",
 		Fields: contententry.FieldTranslations{
 			"nl": {
@@ -82,8 +83,6 @@ func withTestServer(fn func(contententry.Entry, Server)) {
 	if err != nil {
 		panic("Could not create contententry.")
 	}
-
-	server.routes()
 
 	fn(*contentItem, server)
 }

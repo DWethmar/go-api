@@ -1,26 +1,42 @@
 package server
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+	"runtime"
 
-	"github.com/dwethmar/go-api/pkg/contententry"
-	"github.com/gorilla/mux"
+	"github.com/dwethmar/go-api/pkg/store"
+	"github.com/go-chi/chi"
+	cors "github.com/go-chi/cors"
 )
 
 type Server struct {
-	entries contententry.Service
-	router  *mux.Router
+	store  *store.Store
+	router *chi.Mux
 }
 
-func CreateServer(db *sql.DB) Server {
+func CreateServer(store *store.Store) Server {
 	s := Server{
-		entries: contententry.CreateService(contententry.CreatePostgresRepository(db)),
-		router:  mux.NewRouter().StrictSlash(true),
+		store:  store,
+		router: chi.NewRouter(),
 	}
-	s.routes()
+
+	n := runtime.NumCPU()
+	runtime.GOMAXPROCS(n)
+
+	cors := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // you can add routes here www.example.com
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	})
+
+	s.router.Use(cors.Handler)
+	s.router.Mount("/api", Router(store))
+
 	s.router.Use(logging)
 	return s
 }

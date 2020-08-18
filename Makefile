@@ -11,7 +11,7 @@ BINARY_UNIX=$(BINARY_NAME)_unix
 all: test build
 build: 
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/
-	yarn lerna run build
+	# yarn lerna run build
 watch:
 	modd
 test: 

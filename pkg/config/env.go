@@ -10,7 +10,7 @@ import (
 
 var defaultEnvPath = ".env"
 
-func LoadEnvFile(path ...string) ApiEnv {
+func LoadEnvFile(path ...string) Config {
 	if path == nil {
 		path = []string{defaultEnvPath}
 	}
@@ -18,10 +18,10 @@ func LoadEnvFile(path ...string) ApiEnv {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	return LoadApiEnv()
+	return LoadConfig()
 }
 
-func GetPostgresConnectionInfo(env ApiEnv) (string, string) {
+func GetPostgresConnectionInfo(env Config) (string, string) {
 	cParts := []string{
 		fmt.Sprintf("host=%s", env.DBHost),
 		fmt.Sprintf("port=%s", env.DBPort),

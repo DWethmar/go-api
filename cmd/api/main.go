@@ -9,6 +9,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/config"
 	"github.com/dwethmar/go-api/pkg/database"
 	"github.com/dwethmar/go-api/pkg/server"
+	"github.com/dwethmar/go-api/pkg/store"
 
 	_ "github.com/lib/pq"
 )
@@ -31,7 +32,8 @@ func main() {
 
 	defer db.Close()
 
-	server := server.CreateServer(db)
+	store := store.CreateStore(db)
+	server := server.CreateServer(store)
 
 	srv := &http.Server{Addr: fmt.Sprintf(":%v", port), Handler: &server}
 	log.Printf("Serving on :%v", port)

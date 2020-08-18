@@ -1,4 +1,4 @@
-package server
+package handler
 
 import (
 	"encoding/json"
@@ -10,13 +10,14 @@ import (
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/contententry"
 	"github.com/dwethmar/go-api/pkg/request"
+	"github.com/dwethmar/go-api/pkg/store"
 )
 
 type ErrorResponds struct {
 	error string
 }
 
-func (s *Server) HandleEntryIndex() http.HandlerFunc {
+func HandleEntryIndex(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -27,7 +28,7 @@ func (s *Server) HandleEntryIndex() http.HandlerFunc {
 			return
 		}
 
-		var entries, err = s.entries.GetAll()
+		var entries, err = s.Entries.GetAll()
 
 		if err != nil {
 			fmt.Printf("Error while getting entries: %v", err)
@@ -39,7 +40,7 @@ func (s *Server) HandleEntryIndex() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleEntryCreate() http.HandlerFunc {
+func HandleEntryCreate(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		newEntry := contententry.AddEntry{
@@ -61,7 +62,7 @@ func (s *Server) HandleEntryCreate() http.HandlerFunc {
 			return
 		}
 
-		entry, err := s.entries.Create(newEntry)
+		entry, err := s.Entries.Create(newEntry)
 
 		if err != nil {
 			fmt.Printf("Error while creating entry: %v", err)
@@ -73,7 +74,7 @@ func (s *Server) HandleEntryCreate() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleEntryUpdate() http.HandlerFunc {
+func HandleEntryUpdate(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
@@ -90,7 +91,7 @@ func (s *Server) HandleEntryUpdate() http.HandlerFunc {
 			return
 		}
 
-		entry, err := s.entries.GetOne(id)
+		entry, err := s.Entries.GetOne(id)
 
 		if err != nil {
 			fmt.Printf("Error while getting entry: %v", err)
@@ -102,7 +103,7 @@ func (s *Server) HandleEntryUpdate() http.HandlerFunc {
 		entry.Fields = newEntry.Fields
 		entry.UpdatedOn = time.Now()
 
-		err = s.entries.Update(*entry)
+		err = s.Entries.Update(*entry)
 
 		if err != nil {
 			fmt.Printf("Error while updating entry: %v", err)
@@ -114,7 +115,7 @@ func (s *Server) HandleEntryUpdate() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleEntryDelete() http.HandlerFunc {
+func HandleEntryDelete(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 
@@ -123,7 +124,7 @@ func (s *Server) HandleEntryDelete() http.HandlerFunc {
 			request.SendServerError(w, r)
 		}
 
-		entry, err := s.entries.GetOne(id)
+		entry, err := s.Entries.GetOne(id)
 
 		if err != nil {
 			if err == contententry.ErrNotFound {
@@ -136,7 +137,7 @@ func (s *Server) HandleEntryDelete() http.HandlerFunc {
 			return
 		}
 
-		err = s.entries.Delete(id)
+		err = s.Entries.Delete(id)
 
 		if err != nil {
 			fmt.Printf("Error while deleting entry: %v", err)
@@ -148,7 +149,7 @@ func (s *Server) HandleEntryDelete() http.HandlerFunc {
 	})
 }
 
-func (s *Server) HandleEntrySingle() http.HandlerFunc {
+func HandleEntrySingle(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
@@ -156,7 +157,7 @@ func (s *Server) HandleEntrySingle() http.HandlerFunc {
 			request.SendServerError(w, r)
 		}
 
-		entry, err := s.entries.GetOne(id)
+		entry, err := s.Entries.GetOne(id)
 
 		if err != nil {
 			if err == contententry.ErrNotFound {

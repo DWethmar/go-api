@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-type ApiEnv struct {
+type Config struct {
 	DBHost         string
 	DBPort         string
 	DBUser         string
@@ -14,7 +14,7 @@ type ApiEnv struct {
 	CreateDBScript string
 }
 
-func LoadApiEnv() ApiEnv {
+func LoadConfig() Config {
 	dbHost := os.Getenv("API_PQ_HOST")
 	dbPort := os.Getenv("API_PG_PORT")
 	dbUser := os.Getenv("API_PQ_USER")
@@ -23,7 +23,7 @@ func LoadApiEnv() ApiEnv {
 	dbDriverName := os.Getenv("API_DRIVER_NAME")
 	createDBScript := os.Getenv("CREATE_DB_SQL_FILE")
 
-	return ApiEnv{
+	return Config{
 		dbHost,
 		dbPort,
 		dbUser,
