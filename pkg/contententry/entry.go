@@ -9,13 +9,15 @@ import (
 	"github.com/google/uuid"
 )
 
+// ID is the type that is used as the identifier for content entries.
 type ID = uuid.UUID
 
-func createNewId() ID {
+func createNewID() ID {
 	return uuid.New()
 }
 
-func ParseId(val string) (ID, error) {
+// ParseID test and returns a ID if a string is a valid value.
+func ParseID(val string) (ID, error) {
 	id, err := uuid.Parse(val)
 	if err != nil {
 		return uuid.Nil, err
@@ -23,12 +25,7 @@ func ParseId(val string) (ID, error) {
 	return id, nil
 }
 
-// https://medium.com/capital-one-tech/event-sourcing-with-aggregates-in-rust-4022af41cf67
-type Aggregate interface {
-	GetVersion() int
-	Apply(event interface{})
-}
-
+// Entry model
 type Entry struct {
 	ID        ID                `json:"id"   db:"id"`
 	Name      string            `json:"name" db:"name"`
@@ -37,23 +34,25 @@ type Entry struct {
 	Fields    FieldTranslations `json:"fields" db:"fields"`
 }
 
+// AddEntry model
 type AddEntry struct {
 	Name   string            `json:"name"`
 	Fields FieldTranslations `json:"fields"`
 }
 
-// https://www.alexedwards.net/blog/using-postgresql-jsonb
+// FieldTranslations model
 type FieldTranslations map[string]Fields
 
+// Fields model
 type Fields map[string]interface{}
 
-// Make the Fields struct implement the driver.Valuer interface. This method
+// Value make the Fields struct implement the driver.Valuer interface. This method
 // simply returns the JSON-encoded representation of the struct.
 func (a FieldTranslations) Value() (driver.Value, error) {
 	return json.Marshal(a)
 }
 
-// Make the Fields struct implement the sql.Scanner interface. This method
+// Scan makes the Fields struct implement the sql.Scanner interface. This method
 // simply decodes a JSON-encoded value into the struct fields.
 func (a *FieldTranslations) Scan(value interface{}) error {
 	b, ok := value.([]byte)
@@ -63,12 +62,19 @@ func (a *FieldTranslations) Scan(value interface{}) error {
 	return json.Unmarshal(b, &a)
 }
 
+// Value make the Fields struct implement the driver.Valuer interface. This method
+// simply returns the JSON-encoded representation of the struct.
 func (a Fields) Value() (driver.Value, error) {
 	return json.Marshal(a)
 }
 
+// CreateEntry creates a new entry.
 func CreateEntry() Entry {
 	return Entry{
-		Fields: FieldTranslations{},
+		ID:        createNewID(),
+		Name:      "",
+		CreatedOn: time.Now(),
+		UpdatedOn: time.Now(),
+		Fields:    FieldTranslations{},
 	}
 }

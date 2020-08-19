@@ -8,6 +8,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/database"
 )
 
+// PostgresRepository repository for operating on entry data.
 type PostgresRepository struct {
 	db *sql.DB
 }
@@ -122,7 +123,7 @@ func (repo *PostgresRepository) GetOne(id ID) (*Entry, error) {
 		panic(err)
 	}
 
-	entry.ID, err = ParseId(i)
+	entry.ID, err = ParseID(i)
 
 	if err != nil {
 		return nil, errors.New("Could not parse ID")

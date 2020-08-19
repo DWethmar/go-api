@@ -5,12 +5,12 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
-BINARY_NAME=api
+BINARY_NAME=server
 BINARY_UNIX=$(BINARY_NAME)_unix
 
 all: test build
 build: 
-	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/
+	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/server/
 	# yarn lerna run build
 watch:
 	modd
@@ -22,11 +22,11 @@ clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 	rm -f $(BINARY_UNIX)
-cert:
-	mkdir -p cert
-	openssl req -newkey rsa:2048 -nodes -keyout cert/server.key -x509 -days 365 -out cert/server.crt
+# cert:
+# 	mkdir -p cert
+# 	openssl req -newkey rsa:2048 -nodes -keyout cert/server.key -x509 -days 365 -out cert/server.crt
 run:
-	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/api/ 
+	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/server/ 
 	./$(BINARY_NAME) -port 8080
 run-auth:
 	$(GOBUILD) -v -o auth ./cmd/auth/ 
