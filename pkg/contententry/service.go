@@ -37,7 +37,7 @@ func (s *service) Create(entry AddEntry) (*Entry, error) {
 		entry.Fields = make(FieldTranslations)
 	}
 	var contentItem = Entry{
-		ID:        createNewId(),
+		ID:        createNewID(),
 		Name:      entry.Name,
 		Fields:    entry.Fields,
 		CreatedOn: time.Now(),

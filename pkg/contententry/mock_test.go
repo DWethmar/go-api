@@ -8,7 +8,7 @@ import (
 )
 
 var mock = Entry{
-	ID:   createNewId(),
+	ID:   createNewID(),
 	Name: "wow",
 	Fields: FieldTranslations{
 		"nl": Fields{

@@ -13,7 +13,7 @@ import (
 // RequireEntryID requires that a id is provided in the url.
 func RequireEntryID(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := contententry.ParseId(chi.URLParam(r, "id"))
+		id, err := contententry.ParseID(chi.URLParam(r, "id"))
 
 		if err != nil {
 			request.SendBadRequestError(w, r, "invalid ID")
