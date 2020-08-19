@@ -1,4 +1,4 @@
-package middleware
+package store
 
 import (
 	"database/sql"
@@ -6,15 +6,15 @@ import (
 
 	"github.com/dwethmar/go-api/pkg/config"
 	"github.com/dwethmar/go-api/pkg/database"
-	"github.com/dwethmar/go-api/pkg/store"
 )
 
 var dbCounter = 0
 
-func withStore(fn func(*store.Store)) {
+// WithStore passes a store to the provided function.
+func WithStore(fn func(*Store)) {
 
 	var db *sql.DB
-	var myStore *store.Store
+	var myStore *Store
 	con := config.LoadConfig()
 
 	if con.DBName != "" && con.DBHost != "" && con.CreateDBScript != "" {
@@ -45,7 +45,7 @@ func withStore(fn func(*store.Store)) {
 		database.ExecSQLFileDatabase(db, con.CreateDBScript)
 
 		fmt.Println("Using postgres repository for test server.")
-		myStore = store.CreateStore(db)
+		myStore = CreateStore(db)
 
 		defer func() {
 			db.Close()
@@ -61,7 +61,7 @@ func withStore(fn func(*store.Store)) {
 
 	} else {
 		fmt.Println("Using mock repository for test server.")
-		myStore = store.CreateMockStore()
+		myStore = CreateMockStore()
 	}
 
 	fn(myStore)

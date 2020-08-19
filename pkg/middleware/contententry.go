@@ -18,8 +18,8 @@ type ErrorResponds struct {
 	error string
 }
 
-// HandleEntryIndex get list of entries
-func HandleEntryIndex(s *store.Store) http.HandlerFunc {
+// EntryIndex get list of entries
+func EntryIndex(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -42,8 +42,8 @@ func HandleEntryIndex(s *store.Store) http.HandlerFunc {
 	})
 }
 
-// HandleEntryCreate creates a new entry from post data.
-func HandleEntryCreate(s *store.Store) http.HandlerFunc {
+// CreateEntry creates a new entry from post data.
+func CreateEntry(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		newEntry := contententry.AddEntry{
@@ -77,8 +77,8 @@ func HandleEntryCreate(s *store.Store) http.HandlerFunc {
 	})
 }
 
-// HandleEntryUpdate updates an existing entry from post data.
-func HandleEntryUpdate(s *store.Store) http.HandlerFunc {
+// UpdateEntry updates an existing entry from post data.
+func UpdateEntry(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
@@ -115,12 +115,12 @@ func HandleEntryUpdate(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		request.SendJSON(w, r, entry, http.StatusCreated)
+		request.SendJSON(w, r, entry, http.StatusOK)
 	})
 }
 
-// HandleEntryDelete deletes an entry by entry id.
-func HandleEntryDelete(s *store.Store) http.HandlerFunc {
+// DeleteEntry deletes an entry by entry id.
+func DeleteEntry(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 
