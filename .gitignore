@@ -1,6 +1,5 @@
 .server
 api.exe
-api
 tmp
 vendor
 node_modules
