@@ -33,7 +33,9 @@ func main() {
 
 	server := api.CreateServer(api.Routes(store.CreateStore(db)))
 
-	srv := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: &server}
+	// srv := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: &server}
+	srv := &http.Server{Addr: ":8080", Handler: &server}
+
 	log.Printf("Serving on :%d", port)
 	log.Fatal(srv.ListenAndServe())
 }
