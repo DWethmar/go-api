@@ -1,17 +1,17 @@
 version: "3.5"
 
 services:
-  api-server:
-    container_name: api_server
-    image: .
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: go-api
-      PGDATA: /data/postgres
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
+  # api-server:
+  #   container_name: api_server
+  #   image: .
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  #     POSTGRES_DB: go-api
+  #     PGDATA: /data/postgres
+  #   ports:
+  #     - "8080:8080"
+  #   restart: unless-stopped
 
   api-db:
     container_name: api_db_container
