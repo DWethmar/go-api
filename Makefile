@@ -13,7 +13,6 @@ all: test build
 build: 
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/server/
 buildArm: 
-	$(GOMOD) verify
 	env GOOS=linux GOARCH=arm GOARM=5 $(GOBUILD) -v -o $(BINARY_NAME) ./cmd/server/
 watch:
 	modd

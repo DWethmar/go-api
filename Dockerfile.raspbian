@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine AS build_base
+FROM golang:1.15-alpine AS go-builder
 
 RUN apk add git gcc g++ make
 
@@ -18,7 +18,7 @@ RUN make buildArm
 FROM alpine:3.9 
 RUN apk add ca-certificates
 
-COPY --from=build_base WORKDIR /go/src/github.com/dwethmar/server /app/
+COPY --from=go-builder /go/src/github.com/dwethmar/server /app/
 
 # This container exposes port 8080 to the outside world
 EXPOSE 8080
