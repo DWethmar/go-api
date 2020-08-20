@@ -24,6 +24,8 @@ func main() {
 	env := config.LoadEnvFile()
 	driverName, dataSource := config.GetPostgresConnectionInfo(env)
 
+	fmt.Println("connection: %v ------- %v ", driverName, dataSource)
+
 	db, err := database.ConnectDB(driverName, dataSource)
 
 	if err != nil {
