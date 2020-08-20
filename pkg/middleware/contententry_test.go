@@ -27,7 +27,7 @@ func areFieldsEqual(a, b contententry.FieldTranslations) (bool, error) {
 		return false, err
 	}
 
-	return string(ar) != string(br), nil
+	return string(ar) == string(br), nil
 }
 
 func areEntriesEqual(a, b contententry.Entry) (bool, error) {
@@ -41,7 +41,7 @@ func areEntriesEqual(a, b contententry.Entry) (bool, error) {
 		return false, err
 	}
 
-	return string(ar) != string(br), nil
+	return string(ar) == string(br), nil
 }
 
 func TestEntryIndex(t *testing.T) {
@@ -72,7 +72,7 @@ func TestEntryIndex(t *testing.T) {
 	entries := []*contententry.Entry{}
 	rr := httptest.NewRecorder()
 
-	store.WithStore(func(store *store.Store) {
+	store.WithTestStore(func(store *store.Store) {
 		for _, newEntry := range addItems {
 			entry, _ := store.Entries.Create(newEntry)
 			entries = append(entries, entry)
@@ -116,7 +116,7 @@ func TestCreateEntry(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	store.WithStore(func(store *store.Store) {
+	store.WithTestStore(func(store *store.Store) {
 		handler := http.HandlerFunc(CreateEntry(store))
 		handler.ServeHTTP(rr, req)
 	})
@@ -142,7 +142,7 @@ func TestCreateEntry(t *testing.T) {
 		t.Errorf("handler returned invalid updatedOn: received %v, excepted UpdatedOn to be smaller then  %v", addedEntry.UpdatedOn, now)
 	}
 
-	if equal, err := areFieldsEqual(addEntry.Fields, addedEntry.Fields); equal || err != nil {
+	if equal, err := areFieldsEqual(addEntry.Fields, addedEntry.Fields); !equal || err != nil {
 		if err != nil {
 			t.Error(err)
 		} else {
@@ -152,8 +152,7 @@ func TestCreateEntry(t *testing.T) {
 }
 
 func TestUpdateEntry(t *testing.T) {
-
-	store.WithStore(func(store *store.Store) {
+	store.WithTestStore(func(store *store.Store) {
 		addedEntry, _ := store.Entries.Create(contententry.AddEntry{
 			Name: "name",
 			Fields: contententry.FieldTranslations{
@@ -208,7 +207,7 @@ func TestUpdateEntry(t *testing.T) {
 			return
 		}
 
-		if equal, err := areFieldsEqual(updateEntry.Fields, updatedEntry.Fields); equal || err != nil {
+		if equal, err := areFieldsEqual(updateEntry.Fields, updatedEntry.Fields); !equal || err != nil {
 			if err != nil {
 				t.Error(err)
 			} else {
@@ -218,50 +217,54 @@ func TestUpdateEntry(t *testing.T) {
 	})
 }
 
-// func TestDeleteEntry(t *testing.T) {
+func TestDeleteEntry(t *testing.T) {
 
-// 	store.WithStore(func(store *store.Store) {
-// 		addedEntry, _ := store.Entries.Create(contententry.AddEntry{
-// 			Name: "name",
-// 			Fields: contententry.FieldTranslations{
-// 				"nl": contententry.Fields{
-// 					"attrA": "Value",
-// 					"attrB": 1,
-// 					"attrC": []string{"one", "two", "three"},
-// 				},
-// 			},
-// 		})
+	store.WithTestStore(func(store *store.Store) {
+		addedEntry, _ := store.Entries.Create(contententry.AddEntry{
+			Name: "name",
+			Fields: contententry.FieldTranslations{
+				"nl": contententry.Fields{
+					"attrA": "Value",
+					"attrB": 1,
+					"attrC": []string{"one", "two", "three"},
+				},
+			},
+		})
 
-// 		body, _ := json.Marshal(addedEntry)
-// 		req := httptest.NewRequest("DELETE", fmt.Sprintf("/%s", addedEntry.ID), bytes.NewBuffer(body))
-// 		rr := httptest.NewRecorder()
-// 		handler := http.HandlerFunc(DeleteEntry(store))
-// 		handler.ServeHTTP(rr, req)
+		req := httptest.NewRequest("DELETE", fmt.Sprintf("/%s", addedEntry.ID), nil)
 
-// 		if status := rr.Code; status != http.StatusCreated {
-// 			t.Errorf("handler returned wrong status code: received %v expected %v on %v", status, http.StatusCreated, req.RequestURI)
-// 			return
-// 		}
+		ctx := req.Context()
+		ctx = common.WithUUID(ctx, addedEntry.ID)
+		req = req.WithContext(ctx)
 
-// 		// Check the response content-type is what we expect.
-// 		if rType := rr.Header().Get("Content-Type"); rType != "application/json" {
-// 			t.Errorf("content type header does not match: received %v want %v", rType, "application/json")
-// 			return
-// 		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(DeleteEntry(store))
+		handler.ServeHTTP(rr, req)
 
-// 		deletedEntry := contententry.Entry{}
-// 		err := json.Unmarshal(rr.Body.Bytes(), &deletedEntry)
-// 		if err != nil {
-// 			t.Errorf("Error while parsing body for deleted entry %v", err)
-// 			return
-// 		}
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: received %v expected %v on %v", status, http.StatusOK, req.RequestURI)
+			return
+		}
 
-// 		if equal, err := areEntriesEqual(*addedEntry, deletedEntry); equal || err != nil {
-// 			if err != nil {
-// 				t.Error(err)
-// 			} else {
-// 				t.Errorf("Entries are not equal. left: %v right %v", addedEntry, deletedEntry)
-// 			}
-// 		}
-// 	})
-// }
+		// Check the response content-type is what we expect.
+		if rType := rr.Header().Get("Content-Type"); rType != "application/json" {
+			t.Errorf("content type header does not match: received %v want %v", rType, "application/json")
+			return
+		}
+
+		deletedEntry := contententry.Entry{}
+		err := json.Unmarshal(rr.Body.Bytes(), &deletedEntry)
+		if err != nil {
+			t.Errorf("Error while parsing body for deleted entry %v", err)
+			return
+		}
+
+		if equal, err := areEntriesEqual(*addedEntry, deletedEntry); !equal || err != nil {
+			if err != nil {
+				t.Error(err)
+			} else {
+				t.Errorf("Entries are not equal. left: %v right %v", addedEntry, deletedEntry)
+			}
+		}
+	})
+}

@@ -10,8 +10,8 @@ import (
 
 var dbCounter = 0
 
-// WithStore passes a store to the provided function.
-func WithStore(fn func(*Store)) {
+// WithTestStore passes a store to the provided function.
+func WithTestStore(fn func(*Store)) {
 
 	var db *sql.DB
 	var myStore *Store
@@ -42,7 +42,7 @@ func WithStore(fn func(*Store)) {
 			panic(err)
 		}
 
-		database.ExecSQLFileDatabase(db, con.CreateDBScript)
+		database.ExecSQLFile(db, con.CreateDBScript)
 
 		fmt.Println("Using postgres repository for test server.")
 		myStore = CreateStore(db)
