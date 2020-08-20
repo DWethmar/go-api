@@ -20,11 +20,10 @@ func main() {
 	flag.Parse()
 
 	fmt.Println("Staring API")
+	log.Printf("Using port :%v", port)
 
 	env := config.LoadEnvFile()
 	driverName, dataSource := config.GetPostgresConnectionInfo(env)
-
-	fmt.Printf("connection: %v ------- %v ", driverName, dataSource)
 
 	db, err := database.ConnectDB(driverName, dataSource)
 	if err != nil {
