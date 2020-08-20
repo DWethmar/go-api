@@ -27,7 +27,6 @@ func main() {
 	fmt.Printf("connection: %v ------- %v ", driverName, dataSource)
 
 	db, err := database.ConnectDB(driverName, dataSource)
-
 	if err != nil {
 		panic(err)
 	}

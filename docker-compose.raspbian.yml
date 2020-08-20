@@ -12,11 +12,10 @@ services:
       API_PQ_PASSWORD: ${API_PQ_PASSWORD}
       API_PQ_DB_NAME: ${API_PQ_DB_NAME}
       API_DRIVER_NAME: ${API_DRIVER_NAME}
-
     ports:
       - "8080:8080"
     restart: unless-stopped
-    links:
+    depends_on:
       - postgres
 
   postgres:
@@ -24,7 +23,7 @@ services:
     environment:
       POSTGRES_USER: ${API_PQ_USER:-postgres}
       POSTGRES_PASSWORD: ${API_PQ_PASSWORD:-postgres}
-      POSTGRES_DB: go-api
+      POSTGRES_DB: ${API_PQ_DB_NAME}
       PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
@@ -32,11 +31,6 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
-    networks:
-      - backend
-
-networks:
-  backend:
   
   # pgadmin:
   #   image: dpage/pgadmin4
