@@ -1,6 +1,6 @@
 FROM golang:1.15-alpine AS build_base
 
-RUN apk add git make gcc
+RUN apk add git gcc g++
 
 WORKDIR $GOPATH/src/github.com/dwethmar/go-api
 
