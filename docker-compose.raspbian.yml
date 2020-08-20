@@ -1,9 +1,10 @@
-version: "3.5"
+version: "3.8"
 
 services:
   api-server:
-    container_name: api_server
-    image: ./Dockerfile.raspbian
+    build:
+      context: .
+      dockerfile: Dockerfile.raspbian
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -11,6 +12,8 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+    link:
+      - postgres
 
   postgres:
     image: postgres
