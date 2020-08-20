@@ -1,6 +1,6 @@
 FROM golang:1.15-alpine AS build_base
 
-RUN apk add git
+RUN apk add git make
 
 WORKDIR $GOPATH/src/github.com/dwethmar/go-api
 
@@ -11,10 +11,8 @@ RUN go mod verify
 
 COPY . .
 
-RUN go get ./cmd/server
-
 # Build the Go app
-RUN go build -o ./ ./cmd/server
+RUN make buildArm
 
 # Start fresh from a smaller image
 FROM alpine:3.9 

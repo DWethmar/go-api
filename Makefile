@@ -5,7 +5,7 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
-GOINSTALL=$(GOCMD) install
+GOMOD=$(GOCMD) mod
 BINARY_NAME=server
 BINARY_UNIX=$(BINARY_NAME)_unix
 
@@ -13,10 +13,7 @@ all: test build
 build: 
 	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/server/
 buildArm: 
-	# Download all the dependencies
-	$(GOGET) -d -v ./...
-	# Install the package
-	$(GOINSTALL) install -v ./...
+	$(GOMOD) verify
 	env GOOS=linux GOARCH=arm GOARM=5 $(GOBUILD) -v -o $(BINARY_NAME) ./cmd/server/
 watch:
 	modd
