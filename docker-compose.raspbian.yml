@@ -13,7 +13,7 @@ services:
       API_PQ_DB_NAME: ${API_PQ_DB_NAME}
       API_DRIVER_NAME: ${API_DRIVER_NAME}
     ports:
-      - "8080:8080"
+      - "80:8080"
     depends_on:
       - postgres
 
