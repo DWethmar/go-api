@@ -16,12 +16,12 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${API_PQ_USER:-postgres}
+      POSTGRES_PASSWORD: ${API_PQ_PASSWORD:-postgres}
       POSTGRES_DB: go-api
       PGDATA: /data/postgres
     volumes:
-      - postgres:/data/api-postgres
+      - postgres:/data/postgres
       - ./scripts/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
