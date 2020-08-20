@@ -20,7 +20,6 @@ func main() {
 	flag.Parse()
 
 	fmt.Println("Staring API")
-	log.Printf("Using port :%v", port)
 
 	env := config.LoadEnvFile()
 	driverName, dataSource := config.GetPostgresConnectionInfo(env)
@@ -35,6 +34,6 @@ func main() {
 	server := api.CreateServer(api.Routes(store.CreateStore(db)))
 
 	srv := &http.Server{Addr: fmt.Sprintf(":%v", port), Handler: &server}
-	log.Printf("Serving on :%v", port)
+	log.Printf("Serving on :%d", port)
 	log.Fatal(srv.ListenAndServe())
 }

@@ -14,7 +14,6 @@ services:
       API_DRIVER_NAME: ${API_DRIVER_NAME}
     ports:
       - "8080:8080"
-    restart: unless-stopped
     depends_on:
       - postgres
 
