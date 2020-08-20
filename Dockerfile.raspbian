@@ -1,13 +1,21 @@
 FROM golang:1.15
 
-ARG app_env
-ENV APP_ENV $app_env
+# Set the Current Working Directory inside the container
+WORKDIR $GOPATH/src/github.com/dwethmar/go-api
 
-COPY ./ /go/src/github.com/dwethmar/go-api
-WORKDIR /go/src/github.com/dwethmar/go-api
+# Copy everything from the current directory to the PWD (Present Working Directory) inside the container
+COPY . .
+
+# Download all the dependencies
+RUN go get -d -v ./cmd/server
+
+# Install the package
+RUN go install -v ./cmd/server
 
 RUN make buildArm
 
-RUN ./server
-
+# This container exposes port 8080 to the outside world
 EXPOSE 8080
+
+# Run the executable
+CMD ["go-sample-app"]
