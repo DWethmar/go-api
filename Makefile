@@ -37,5 +37,5 @@ deps:
 build-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_UNIX) -v
 
-build-docker:
+build-docker-arm:
 	docker build -t go-api -f Dockerfile.raspbian .
