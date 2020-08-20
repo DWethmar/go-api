@@ -58,7 +58,7 @@ func CreateEntry(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		v := contententry.ValidateAddEntry(newEntry)
+		v := newEntry.Validate()
 
 		if !v.IsValid() {
 			request.SendBadRequestError(w, r, v)
@@ -86,12 +86,18 @@ func UpdateEntry(s *store.Store) http.HandlerFunc {
 		}
 
 		decoder := json.NewDecoder(r.Body)
-		var newEntry contententry.Entry
-		err = decoder.Decode(&newEntry)
+		var updateEntry contententry.Entry
+		err = decoder.Decode(&updateEntry)
 
 		if err != nil {
 			fmt.Printf("Error while decoding entry: %v", err)
 			request.SendServerError(w, r)
+			return
+		}
+
+		v := updateEntry.Validate()
+		if !v.IsValid() {
+			request.SendBadRequestError(w, r, v)
 			return
 		}
 
@@ -103,8 +109,8 @@ func UpdateEntry(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		entry.Name = newEntry.Name
-		entry.Fields = newEntry.Fields
+		entry.Name = updateEntry.Name
+		entry.Fields = updateEntry.Fields
 		entry.UpdatedOn = time.Now()
 
 		err = s.Entries.Update(*entry)

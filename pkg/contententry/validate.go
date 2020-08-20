@@ -28,7 +28,7 @@ func (v *validationResult) IsValid() bool {
 	return true
 }
 
-func ValidateAddEntry(addEntry AddEntry) validationResult {
+func (addEntry *AddEntry) Validate() validationResult {
 	e := CreateValidationResult()
 
 	nameErr := ValidateName(addEntry.Name)
@@ -37,7 +37,7 @@ func ValidateAddEntry(addEntry AddEntry) validationResult {
 	}
 
 	for locale, fields := range addEntry.Fields {
-		attrErRors := ValidateAttr(fields)
+		attrErRors := ValidateFields(fields)
 
 		for attr, error := range attrErRors {
 			if e.Errors.Fields[locale] == nil {
@@ -51,7 +51,7 @@ func ValidateAddEntry(addEntry AddEntry) validationResult {
 	return e
 }
 
-func ValidateContentItem(entry Entry) validationResult {
+func (entry *Entry) Validate() validationResult {
 	e := CreateValidationResult()
 
 	nameErr := ValidateName(entry.Name)
@@ -61,7 +61,7 @@ func ValidateContentItem(entry Entry) validationResult {
 	}
 
 	for locale, fields := range entry.Fields {
-		attrErRors := ValidateAttr(fields)
+		attrErRors := ValidateFields(fields)
 
 		for attr, error := range attrErRors {
 			e.Errors.Fields[locale][attr] = error.Error()
@@ -78,7 +78,7 @@ func ValidateName(name string) error {
 	return nil
 }
 
-func ValidateAttr(fields Fields) map[string]error {
+func ValidateFields(fields Fields) map[string]error {
 	var e = make(map[string]error)
 
 	validTypes := []reflect.Kind{

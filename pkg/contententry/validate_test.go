@@ -16,7 +16,7 @@ func TestUnitFieldValues(t *testing.T) {
 		},
 	}
 
-	if errors := ValidateAttr(c["nl"]); len(errors) > 0 {
+	if errors := ValidateFields(c["nl"]); len(errors) > 0 {
 		for key, err := range errors {
 			fmt.Printf("Validation error on attr %v %+v\n", key, err)
 		}
@@ -50,7 +50,7 @@ func TestUnitInvalidFieldValues(t *testing.T) {
 		},
 	}
 
-	if errors := ValidateAttr(c["nl"]); len(errors) == 2 {
+	if errors := ValidateFields(c["nl"]); len(errors) == 2 {
 		for attr, err := range errors {
 			if err != ErrUnsupportedFieldValue {
 				if err != ErrUnsupportedFieldSliceValue {
@@ -59,7 +59,7 @@ func TestUnitInvalidFieldValues(t *testing.T) {
 			}
 		}
 	} else {
-		t.Errorf("Expected %v errors but received %v errors.", 2, len(errors))
+		t.Errorf("Expected %d errors but received %d errors.", 2, len(errors))
 
 		for attr, err := range errors {
 			fmt.Printf("%v: %v\n", attr, err)
