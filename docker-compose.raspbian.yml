@@ -6,9 +6,13 @@ services:
       context: .
       dockerfile: Dockerfile.raspbian
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: postgres
+      API_PQ_HOST: ${API_PQ_HOST}
+      API_PG_PORT: ${API_PG_PORT}
+      API_PQ_USER: ${API_PQ_USER}
+      API_PQ_PASSWORD: ${API_PQ_PASSWORD}
+      API_PQ_DB_NAME: ${API_PQ_DB_NAME}
+      API_DRIVER_NAME: ${API_DRIVER_NAME}
+
     ports:
       - "8080:8080"
     restart: unless-stopped
