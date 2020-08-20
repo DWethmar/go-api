@@ -24,4 +24,4 @@ COPY --from=go-builder /go/src/github.com/dwethmar/go-api/server /app/
 EXPOSE 8080
 
 # Run the binary program produced by `go install`
-CMD ["/app/server"]
+CMD ["/app/server --port 8080"]
