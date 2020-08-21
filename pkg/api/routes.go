@@ -9,14 +9,14 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// Routes returns the api routes handler
-func Routes(store *services.Store) http.Handler {
+// EntryRoutes returns the api routes handler
+func EntryRoutes(store *services.Store) http.Handler {
 	r := chi.NewRouter()
 
 	r.Get("/", middleware.EntryIndex(store))
-	r.Get("/{id}", middleware.RequireEntryID(middleware.HandleEntrySingle(store)))
-	r.Delete("/{id}", middleware.RequireEntryID(middleware.DeleteEntry(store)))
-	r.Post("/{id}", middleware.RequireEntryID(middleware.UpdateEntry(store)))
+	r.Get("/{id}", RequireEntryID(middleware.HandleEntrySingle(store)))
+	r.Delete("/{id}", RequireEntryID(middleware.DeleteEntry(store)))
+	r.Post("/{id}", RequireEntryID(middleware.UpdateEntry(store)))
 	r.Post("/", middleware.CreateEntry(store))
 
 	return r

@@ -1,4 +1,4 @@
-CREATE TABLE public.content_entry
+CREATE TABLE public.entry
 (
     id VARCHAR (36) PRIMARY KEY,
     name VARCHAR (50),
@@ -6,10 +6,12 @@ CREATE TABLE public.content_entry
     updated_on timestamptz NOT NULL
 );
 
-CREATE TABLE public.content_entry_translation
+CREATE TABLE public.entry_translation
 (
-    content_entry_id VARCHAR (36) REFERENCES content_entry(id) ON DELETE CASCADE,
+    entry_id VARCHAR (36) REFERENCES entry(id) ON DELETE CASCADE,
     locale VARCHAR (50),
     fields jsonb NOT NULL,
-    PRIMARY KEY (content_entry_id, locale)
+    PRIMARY KEY (entry_id, locale)
 );
+
+

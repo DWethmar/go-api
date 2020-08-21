@@ -26,8 +26,8 @@ var (
 		) as fields,
 		created_on, 
 		updated_on
-	FROM public.content_entry c
-	LEFT OUTER JOIN public.content_entry_translation t ON c.id = t.content_entry_id
+	FROM public.entry c
+	LEFT OUTER JOIN public.entry_translation t ON c.id = t.entry_id
 	GROUP BY c.id
 	ORDER BY updated_on ASC`
 
@@ -41,35 +41,35 @@ var (
 		) as fields,
 		created_on, 
 		updated_on
-	FROM public.content_entry c
-	LEFT OUTER JOIN public.content_entry_translation t ON c.id = t.content_entry_id
+	FROM public.entry c
+	LEFT OUTER JOIN public.entry_translation t ON c.id = t.entry_id
 	WHERE c.id = $1
 	GROUP BY c.id
 	LIMIT 1`
 
 	insertEntry = `
-	INSERT INTO public.content_entry (id, name, created_on, updated_on)
+	INSERT INTO public.entry (id, name, created_on, updated_on)
 	VALUES ($1, $2, $3, $4)`
 
 	insertEntryTrans = `
-	INSERT INTO public.content_entry_translation(content_entry_id, locale, fields) 
+	INSERT INTO public.entry_translation(entry_id, locale, fields) 
 	VALUES($1, $2, $3)`
 
 	updateEntry = `
-	UPDATE public.content_entry SET (name, updated_on) = ($1, $2)
+	UPDATE public.entry SET (name, updated_on) = ($1, $2)
 	WHERE id = $3`
 
 	updateEntryTrans = `
-	UPDATE public.content_entry_translation SET fields = $1
-	WHERE content_entry_id = $2 AND locale = $3`
+	UPDATE public.entry_translation SET fields = $1
+	WHERE entry_id = $2 AND locale = $3`
 
 	getEntryLocales = `
-	SELECT locale FROM public.content_entry_translation
-	WHERE content_entry_id = $1
+	SELECT locale FROM public.entry_translation
+	WHERE entry_id = $1
 	`
 
 	deleteentry = `
-	DELETE FROM public.content_entry WHERE id = $1
+	DELETE FROM public.entry WHERE id = $1
 	`
 )
 

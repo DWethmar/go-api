@@ -14,8 +14,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var port = flag.Int("port", 8080, "Run on port")
-
 func main() {
 	flag.Parse()
 
@@ -31,11 +29,8 @@ func main() {
 
 	defer db.Close()
 
-	server := api.CreateServer(api.Routes(services.CreateStore(db)))
-
-	// srv := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: &server}
+	server := api.CreateServer(api.EntryRoutes(services.CreateStore(db)))
 	srv := &http.Server{Addr: ":8080", Handler: &server}
-
-	log.Printf("Serving on :%d", port)
+	log.Printf("Serving on :8080")
 	log.Fatal(srv.ListenAndServe())
 }
