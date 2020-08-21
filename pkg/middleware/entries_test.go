@@ -16,6 +16,20 @@ import (
 
 var defaultLocale = "nl"
 
+func areEntryValidationErrorsEqual(a, b models.EntryValidationError) (bool, error) {
+	ar, err := json.Marshal(a)
+	if err != nil {
+		return false, err
+	}
+
+	br, err := json.Marshal(b)
+	if err != nil {
+		return false, err
+	}
+
+	return string(ar) == string(br), nil
+}
+
 func areFieldsEqual(a, b models.FieldTranslations) (bool, error) {
 	ar, err := json.Marshal(a)
 	if err != nil {
@@ -147,6 +161,54 @@ func TestCreateEntry(t *testing.T) {
 			t.Error(err)
 		} else {
 			t.Errorf("Fields are not equal. left: %v right %v", addEntry.Fields, addedEntry.Fields)
+		}
+	}
+}
+
+func TestCreateInvalidEntry(t *testing.T) {
+	addEntry := models.AddEntry{
+		Name: "name",
+		Fields: models.FieldTranslations{
+			"nl": models.Fields{
+				"attrA": "Value",
+				"attrB": 1,
+				"attrC": nil,
+			},
+		},
+	}
+
+	validationErr := models.CreateEntryValidationError()
+	validationErr.Errors.Fields["nl"] = make(map[string]string)
+	validationErr.Errors.Fields["nl"]["attrC"] = models.ErrUnsupportedFieldValue.Error()
+
+	body, _ := json.Marshal(addEntry)
+	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
+
+	rr := httptest.NewRecorder()
+
+	services.WithTestStore(func(store *services.Store) {
+		handler := http.HandlerFunc(CreateEntry(store))
+		handler.ServeHTTP(rr, req)
+	})
+
+	// Check the status code is what we expect.
+	if status := rr.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: received %v, excepted %v",
+			status, http.StatusBadRequest)
+	}
+
+	// Check the response body is what we expect.
+	receivedValidationError := models.EntryValidationError{}
+	err := json.Unmarshal(rr.Body.Bytes(), &receivedValidationError)
+	if err != nil {
+		t.Errorf("Error while parsing body %v", err)
+	}
+
+	if equal, err := areEntryValidationErrorsEqual(receivedValidationError, validationErr); !equal || err != nil {
+		if err != nil {
+			t.Error(err)
+		} else {
+			t.Errorf("Fields are not equal. left: %v right %v", receivedValidationError, validationErr)
 		}
 	}
 }

@@ -92,6 +92,9 @@ func validate(entry *UpdateEntry) error {
 		fieldErrors := validateFields(fields)
 
 		for fieldName, err := range fieldErrors {
+			if vErr.Errors.Fields[locale] == nil {
+				vErr.Errors.Fields[locale] = make(map[string]string)
+			}
 			vErr.Errors.Fields[locale][fieldName] = err.Error()
 		}
 	}
@@ -111,6 +114,7 @@ func validateName(name string) error {
 	return nil
 }
 
+// CreateEntryValidationError create new validation error.
 func CreateEntryValidationError() EntryValidationError {
 	vErr := EntryValidationError{}
 	vErr.Errors.Fields = make(map[string]map[string]string)
