@@ -10,8 +10,8 @@ import (
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/models"
 	"github.com/dwethmar/go-api/pkg/request"
+	"github.com/dwethmar/go-api/pkg/services"
 	"github.com/dwethmar/go-api/pkg/services/entries"
-	"github.com/dwethmar/go-api/pkg/store"
 )
 
 // ErrorResponds is the default error responds.
@@ -20,7 +20,7 @@ type ErrorResponds struct {
 }
 
 // EntryIndex get list of entries
-func EntryIndex(s *store.Store) http.HandlerFunc {
+func EntryIndex(s *services.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -44,7 +44,7 @@ func EntryIndex(s *store.Store) http.HandlerFunc {
 }
 
 // CreateEntry creates a new entry from post data.
-func CreateEntry(s *store.Store) http.HandlerFunc {
+func CreateEntry(s *services.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		newEntry := models.AddEntry{
@@ -77,7 +77,7 @@ func CreateEntry(s *store.Store) http.HandlerFunc {
 }
 
 // UpdateEntry updates an existing entry from post data.
-func UpdateEntry(s *store.Store) http.HandlerFunc {
+func UpdateEntry(s *services.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
@@ -124,7 +124,7 @@ func UpdateEntry(s *store.Store) http.HandlerFunc {
 }
 
 // DeleteEntry deletes an entry by entry id.
-func DeleteEntry(s *store.Store) http.HandlerFunc {
+func DeleteEntry(s *services.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 
@@ -159,7 +159,7 @@ func DeleteEntry(s *store.Store) http.HandlerFunc {
 }
 
 // HandleEntrySingle gets an single entry by entry id.
-func HandleEntrySingle(s *store.Store) http.HandlerFunc {
+func HandleEntrySingle(s *services.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {

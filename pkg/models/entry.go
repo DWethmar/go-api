@@ -15,11 +15,9 @@ var (
 	ErrUnsupportedFieldSliceValue = errors.New("This array contains one or more unsupported values.")
 )
 
-type ID = common.UUID
-
 // Entry model
 type Entry struct {
-	ID        ID                `json:"id"   db:"id"`
+	ID        common.UUID       `json:"id"   db:"id"`
 	Name      string            `json:"name" db:"name"`
 	CreatedOn time.Time         `json:"createdOn" db:"created_on"`
 	UpdatedOn time.Time         `json:"updatedOn" db:"updated_on"`

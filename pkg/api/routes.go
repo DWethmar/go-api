@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/dwethmar/go-api/pkg/middleware"
-	"github.com/dwethmar/go-api/pkg/store"
+	"github.com/dwethmar/go-api/pkg/services"
 
 	"github.com/go-chi/chi"
 )
 
 // Routes returns the api routes handler
-func Routes(store *store.Store) http.Handler {
+func Routes(store *services.Store) http.Handler {
 	r := chi.NewRouter()
 
 	r.Get("/", middleware.EntryIndex(store))

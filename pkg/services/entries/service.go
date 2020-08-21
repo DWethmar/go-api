@@ -7,6 +7,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/models"
 )
 
+// Service entry service
 type Service interface {
 	GetOne(common.UUID) (*models.Entry, error)
 	GetAll() ([]*models.Entry, error)

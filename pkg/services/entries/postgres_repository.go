@@ -27,7 +27,7 @@ var (
 		created_on, 
 		updated_on
 	FROM public.content_entry c
-	LEFT OUTER JOIN public.content_entry_field t ON c.id = t.content_entry_id
+	LEFT OUTER JOIN public.content_entry_translation t ON c.id = t.content_entry_id
 	GROUP BY c.id
 	ORDER BY updated_on ASC`
 
@@ -42,7 +42,7 @@ var (
 		created_on, 
 		updated_on
 	FROM public.content_entry c
-	LEFT OUTER JOIN public.content_entry_field t ON c.id = t.content_entry_id
+	LEFT OUTER JOIN public.content_entry_translation t ON c.id = t.content_entry_id
 	WHERE c.id = $1
 	GROUP BY c.id
 	LIMIT 1`
@@ -52,7 +52,7 @@ var (
 	VALUES ($1, $2, $3, $4)`
 
 	insertEntryTrans = `
-	INSERT INTO public.content_entry_field(content_entry_id, locale, fields) 
+	INSERT INTO public.content_entry_translation(content_entry_id, locale, fields) 
 	VALUES($1, $2, $3)`
 
 	updateEntry = `
@@ -60,11 +60,11 @@ var (
 	WHERE id = $3`
 
 	updateEntryTrans = `
-	UPDATE public.content_entry_field SET fields = $1
+	UPDATE public.content_entry_translation SET fields = $1
 	WHERE content_entry_id = $2 AND locale = $3`
 
 	getEntryLocales = `
-	SELECT locale FROM public.content_entry_field
+	SELECT locale FROM public.content_entry_translation
 	WHERE content_entry_id = $1
 	`
 
@@ -73,6 +73,7 @@ var (
 	`
 )
 
+// GetAll get all entries.
 func (repo *PostgresRepository) GetAll() ([]*models.Entry, error) {
 	rows, err := repo.db.Query(getAll)
 
@@ -105,6 +106,7 @@ func (repo *PostgresRepository) GetAll() ([]*models.Entry, error) {
 	return entrys, nil
 }
 
+// GetOne get one entry.
 func (repo *PostgresRepository) GetOne(id common.UUID) (*models.Entry, error) {
 	entry := models.CreateEntry()
 	row := repo.db.QueryRow(getOne, id)
@@ -134,6 +136,7 @@ func (repo *PostgresRepository) GetOne(id common.UUID) (*models.Entry, error) {
 	return &entry, nil
 }
 
+// Add add one entry.
 func (repo *PostgresRepository) Add(entry models.Entry) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
@@ -190,6 +193,7 @@ func (repo *PostgresRepository) getLocales(id common.UUID) ([]string, error) {
 	return locales, nil
 }
 
+// Update updates entry.
 func (repo *PostgresRepository) Update(entry models.Entry) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
@@ -248,11 +252,13 @@ func (repo *PostgresRepository) Update(entry models.Entry) error {
 	return err
 }
 
+// Delete deletes entry
 func (repo *PostgresRepository) Delete(id common.UUID) error {
 	_, err := repo.db.Exec(deleteentry, id)
 	return err
 }
 
+// CreatePostgresRepository create repo
 func CreatePostgresRepository(db *sql.DB) *PostgresRepository {
 	return &PostgresRepository{
 		db,

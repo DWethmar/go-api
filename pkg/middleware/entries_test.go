@@ -11,7 +11,7 @@ import (
 
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/models"
-	"github.com/dwethmar/go-api/pkg/store"
+	"github.com/dwethmar/go-api/pkg/services"
 )
 
 var defaultLocale = "nl"
@@ -72,7 +72,7 @@ func TestEntryIndex(t *testing.T) {
 	entries := []*models.Entry{}
 	rr := httptest.NewRecorder()
 
-	store.WithTestStore(func(store *store.Store) {
+	services.WithTestStore(func(store *services.Store) {
 		for _, newEntry := range addItems {
 			entry, _ := store.Entries.Create(newEntry)
 			entries = append(entries, entry)
@@ -116,7 +116,7 @@ func TestCreateEntry(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	store.WithTestStore(func(store *store.Store) {
+	services.WithTestStore(func(store *services.Store) {
 		handler := http.HandlerFunc(CreateEntry(store))
 		handler.ServeHTTP(rr, req)
 	})
@@ -152,7 +152,7 @@ func TestCreateEntry(t *testing.T) {
 }
 
 func TestUpdateEntry(t *testing.T) {
-	store.WithTestStore(func(store *store.Store) {
+	services.WithTestStore(func(store *services.Store) {
 		addedEntry, _ := store.Entries.Create(models.AddEntry{
 			Name: "name",
 			Fields: models.FieldTranslations{
@@ -218,8 +218,7 @@ func TestUpdateEntry(t *testing.T) {
 }
 
 func TestDeleteEntry(t *testing.T) {
-
-	store.WithTestStore(func(store *store.Store) {
+	services.WithTestStore(func(store *services.Store) {
 		addedEntry, _ := store.Entries.Create(models.AddEntry{
 			Name: "name",
 			Fields: models.FieldTranslations{

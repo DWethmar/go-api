@@ -9,7 +9,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/api"
 	"github.com/dwethmar/go-api/pkg/config"
 	"github.com/dwethmar/go-api/pkg/database"
-	"github.com/dwethmar/go-api/pkg/store"
+	"github.com/dwethmar/go-api/pkg/services"
 
 	_ "github.com/lib/pq"
 )
@@ -31,7 +31,7 @@ func main() {
 
 	defer db.Close()
 
-	server := api.CreateServer(api.Routes(store.CreateStore(db)))
+	server := api.CreateServer(api.Routes(services.CreateStore(db)))
 
 	// srv := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: &server}
 	srv := &http.Server{Addr: ":8080", Handler: &server}
