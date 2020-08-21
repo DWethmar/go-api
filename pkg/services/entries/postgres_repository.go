@@ -5,7 +5,9 @@ import (
 	"errors"
 	"log"
 
+	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/database"
+	"github.com/dwethmar/go-api/pkg/models"
 )
 
 // PostgresRepository repository for operating on entry data.
@@ -71,7 +73,7 @@ var (
 	`
 )
 
-func (repo *PostgresRepository) GetAll() ([]*Entry, error) {
+func (repo *PostgresRepository) GetAll() ([]*models.Entry, error) {
 	rows, err := repo.db.Query(getAll)
 
 	if err != nil {
@@ -79,10 +81,10 @@ func (repo *PostgresRepository) GetAll() ([]*Entry, error) {
 	}
 
 	defer rows.Close()
-	entrys := make([]*Entry, 0)
+	entrys := make([]*models.Entry, 0)
 
 	for rows.Next() {
-		entry := &Entry{}
+		entry := &models.Entry{}
 		err := rows.Scan(
 			&entry.ID,
 			&entry.Name,
@@ -103,8 +105,8 @@ func (repo *PostgresRepository) GetAll() ([]*Entry, error) {
 	return entrys, nil
 }
 
-func (repo *PostgresRepository) GetOne(id ID) (*Entry, error) {
-	entry := CreateEntry()
+func (repo *PostgresRepository) GetOne(id common.UUID) (*models.Entry, error) {
+	entry := models.CreateEntry()
 	row := repo.db.QueryRow(getOne, id)
 
 	var i string
@@ -123,7 +125,7 @@ func (repo *PostgresRepository) GetOne(id ID) (*Entry, error) {
 		panic(err)
 	}
 
-	entry.ID, err = ParseID(i)
+	entry.ID, err = common.ParseUUID(i)
 
 	if err != nil {
 		return nil, errors.New("Could not parse ID")
@@ -132,7 +134,7 @@ func (repo *PostgresRepository) GetOne(id ID) (*Entry, error) {
 	return &entry, nil
 }
 
-func (repo *PostgresRepository) Add(entry Entry) error {
+func (repo *PostgresRepository) Add(entry models.Entry) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
 			insertEntry,
@@ -166,7 +168,7 @@ func (repo *PostgresRepository) Add(entry Entry) error {
 	return err
 }
 
-func (repo *PostgresRepository) getLocales(id ID) ([]string, error) {
+func (repo *PostgresRepository) getLocales(id common.UUID) ([]string, error) {
 	rows, err := repo.db.Query(getEntryLocales, id)
 
 	if err != nil {
@@ -188,7 +190,7 @@ func (repo *PostgresRepository) getLocales(id ID) ([]string, error) {
 	return locales, nil
 }
 
-func (repo *PostgresRepository) Update(entry Entry) error {
+func (repo *PostgresRepository) Update(entry models.Entry) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
 			updateEntry,
@@ -246,7 +248,7 @@ func (repo *PostgresRepository) Update(entry Entry) error {
 	return err
 }
 
-func (repo *PostgresRepository) Delete(id ID) error {
+func (repo *PostgresRepository) Delete(id common.UUID) error {
 	_, err := repo.db.Exec(deleteentry, id)
 	return err
 }

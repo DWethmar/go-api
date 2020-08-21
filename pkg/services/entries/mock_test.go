@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/dwethmar/go-api/pkg/common"
+	"github.com/dwethmar/go-api/pkg/models"
 )
 
-var mock = Entry{
-	ID:   createNewID(),
+var mock = models.Entry{
+	ID:   common.CreateNewUUID(),
 	Name: "wow",
-	Fields: FieldTranslations{
-		"nl": Fields{
+	Fields: models.FieldTranslations{
+		"nl": models.Fields{
 			"attr1": 1,
 			"attr2": "attribute string value",
 			"attr3": []int{1, 2, 3},

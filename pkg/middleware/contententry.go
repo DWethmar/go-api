@@ -10,8 +10,8 @@ import (
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/models"
 	"github.com/dwethmar/go-api/pkg/request"
-	"github.com/dwethmar/go-api/pkg/store"
 	"github.com/dwethmar/go-api/pkg/services/entries"
+	"github.com/dwethmar/go-api/pkg/store"
 )
 
 // ErrorResponds is the default error responds.
@@ -136,7 +136,7 @@ func DeleteEntry(s *store.Store) http.HandlerFunc {
 		entry, err := s.Entries.GetOne(id)
 
 		if err != nil {
-			if err == models.ErrNotFound {
+			if err == entries.ErrNotFound {
 				fmt.Printf("Could not find entry: %v", err)
 				request.SendNotFoundError(w, r)
 				return

@@ -1,13 +1,18 @@
 package entries
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/dwethmar/go-api/pkg/common"
+	"github.com/dwethmar/go-api/pkg/models"
+)
 
 var ErrNotFound = errors.New("Entry or entries not found")
 
 type Repository interface {
-	GetAll() ([]*Entry, error)
-	GetOne(id ID) (*Entry, error)
-	Add(contentItem Entry) error
-	Update(contentItem Entry) error
-	Delete(id ID) error
+	GetAll() ([]*models.Entry, error)
+	GetOne(id common.UUID) (*models.Entry, error)
+	Add(contentItem models.Entry) error
+	Update(contentItem models.Entry) error
+	Delete(id common.UUID) error
 }
