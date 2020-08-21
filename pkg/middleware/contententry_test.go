@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
-	"github.com/dwethmar/go-api/pkg/contententry"
+	"github.com/dwethmar/go-api/pkg/models"
 	"github.com/dwethmar/go-api/pkg/store"
 )
 
 var defaultLocale = "nl"
 
-func areFieldsEqual(a, b contententry.FieldTranslations) (bool, error) {
+func areFieldsEqual(a, b models.FieldTranslations) (bool, error) {
 	ar, err := json.Marshal(a)
 	if err != nil {
 		return false, err
@@ -30,7 +30,7 @@ func areFieldsEqual(a, b contententry.FieldTranslations) (bool, error) {
 	return string(ar) == string(br), nil
 }
 
-func areEntriesEqual(a, b contententry.Entry) (bool, error) {
+func areEntriesEqual(a, b models.Entry) (bool, error) {
 	ar, err := json.Marshal(a)
 	if err != nil {
 		return false, err
@@ -45,19 +45,19 @@ func areEntriesEqual(a, b contententry.Entry) (bool, error) {
 }
 
 func TestEntryIndex(t *testing.T) {
-	addItems := []contententry.AddEntry{
+	addItems := []models.AddEntry{
 		{
 			Name: "Test1",
-			Fields: contententry.FieldTranslations{
-				defaultLocale: contententry.Fields{
+			Fields: models.FieldTranslations{
+				defaultLocale: models.Fields{
 					"attrA": 1,
 				},
 			},
 		},
 		{
 			Name: "Test2",
-			Fields: contententry.FieldTranslations{
-				defaultLocale: contententry.Fields{
+			Fields: models.FieldTranslations{
+				defaultLocale: models.Fields{
 					"attrA": 1,
 				},
 			},
@@ -69,7 +69,7 @@ func TestEntryIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	entries := []*contententry.Entry{}
+	entries := []*models.Entry{}
 	rr := httptest.NewRecorder()
 
 	store.WithTestStore(func(store *store.Store) {
@@ -100,10 +100,10 @@ func TestEntryIndex(t *testing.T) {
 func TestCreateEntry(t *testing.T) {
 	now := time.Now()
 
-	addEntry := contententry.AddEntry{
+	addEntry := models.AddEntry{
 		Name: "name",
-		Fields: contententry.FieldTranslations{
-			"nl": contententry.Fields{
+		Fields: models.FieldTranslations{
+			"nl": models.Fields{
 				"attrA": "Value",
 				"attrB": 1,
 				"attrC": []string{"one", "two", "three"},
@@ -128,7 +128,7 @@ func TestCreateEntry(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	addedEntry := contententry.Entry{}
+	addedEntry := models.Entry{}
 	err := json.Unmarshal(rr.Body.Bytes(), &addedEntry)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
@@ -153,10 +153,10 @@ func TestCreateEntry(t *testing.T) {
 
 func TestUpdateEntry(t *testing.T) {
 	store.WithTestStore(func(store *store.Store) {
-		addedEntry, _ := store.Entries.Create(contententry.AddEntry{
+		addedEntry, _ := store.Entries.Create(models.AddEntry{
 			Name: "name",
-			Fields: contententry.FieldTranslations{
-				"nl": contententry.Fields{
+			Fields: models.FieldTranslations{
+				"nl": models.Fields{
 					"attrA": "Value",
 					"attrB": 1,
 					"attrC": []string{"one", "two", "three"},
@@ -164,11 +164,11 @@ func TestUpdateEntry(t *testing.T) {
 			},
 		})
 
-		updateEntry := contententry.Entry{
+		updateEntry := models.Entry{
 			ID:   addedEntry.ID,
 			Name: "updated name",
-			Fields: contententry.FieldTranslations{
-				"nl": contententry.Fields{
+			Fields: models.FieldTranslations{
+				"nl": models.Fields{
 					"attrA": "Value2",
 					"attrB": 2,
 					"attrC": []string{"four", "five", "six"},
@@ -200,7 +200,7 @@ func TestUpdateEntry(t *testing.T) {
 		}
 
 		// Check the response body is what we expect.
-		updatedEntry := contententry.Entry{}
+		updatedEntry := models.Entry{}
 		err := json.Unmarshal(rr.Body.Bytes(), &updatedEntry)
 		if err != nil {
 			t.Errorf("Error while parsing body for added content-item %v", err)
@@ -220,10 +220,10 @@ func TestUpdateEntry(t *testing.T) {
 func TestDeleteEntry(t *testing.T) {
 
 	store.WithTestStore(func(store *store.Store) {
-		addedEntry, _ := store.Entries.Create(contententry.AddEntry{
+		addedEntry, _ := store.Entries.Create(models.AddEntry{
 			Name: "name",
-			Fields: contententry.FieldTranslations{
-				"nl": contententry.Fields{
+			Fields: models.FieldTranslations{
+				"nl": models.Fields{
 					"attrA": "Value",
 					"attrB": 1,
 					"attrC": []string{"one", "two", "three"},
@@ -252,7 +252,7 @@ func TestDeleteEntry(t *testing.T) {
 			return
 		}
 
-		deletedEntry := contententry.Entry{}
+		deletedEntry := models.Entry{}
 		err := json.Unmarshal(rr.Body.Bytes(), &deletedEntry)
 		if err != nil {
 			t.Errorf("Error while parsing body for deleted entry %v", err)

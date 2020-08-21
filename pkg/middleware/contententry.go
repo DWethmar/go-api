@@ -8,9 +8,10 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
-	"github.com/dwethmar/go-api/pkg/contententry"
+	"github.com/dwethmar/go-api/pkg/models"
 	"github.com/dwethmar/go-api/pkg/request"
 	"github.com/dwethmar/go-api/pkg/store"
+	"github.com/dwethmar/go-api/pkg/services/entries"
 )
 
 // ErrorResponds is the default error responds.
@@ -46,8 +47,8 @@ func EntryIndex(s *store.Store) http.HandlerFunc {
 func CreateEntry(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
-		newEntry := contententry.AddEntry{
-			Fields: make(contententry.FieldTranslations),
+		newEntry := models.AddEntry{
+			Fields: make(models.FieldTranslations),
 		}
 
 		err := decoder.Decode(&newEntry)
@@ -58,10 +59,8 @@ func CreateEntry(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		v := newEntry.Validate()
-
-		if !v.IsValid() {
-			request.SendBadRequestError(w, r, v)
+		if err := newEntry.Validate(); err != nil {
+			request.SendBadRequestError(w, r, err)
 			return
 		}
 
@@ -86,7 +85,7 @@ func UpdateEntry(s *store.Store) http.HandlerFunc {
 		}
 
 		decoder := json.NewDecoder(r.Body)
-		var updateEntry contententry.Entry
+		var updateEntry models.UpdateEntry
 		err = decoder.Decode(&updateEntry)
 
 		if err != nil {
@@ -95,9 +94,8 @@ func UpdateEntry(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		v := updateEntry.Validate()
-		if !v.IsValid() {
-			request.SendBadRequestError(w, r, v)
+		if err := updateEntry.Validate(); err != nil {
+			request.SendBadRequestError(w, r, err)
 			return
 		}
 
@@ -138,7 +136,7 @@ func DeleteEntry(s *store.Store) http.HandlerFunc {
 		entry, err := s.Entries.GetOne(id)
 
 		if err != nil {
-			if err == contententry.ErrNotFound {
+			if err == models.ErrNotFound {
 				fmt.Printf("Could not find entry: %v", err)
 				request.SendNotFoundError(w, r)
 				return
@@ -172,7 +170,7 @@ func HandleEntrySingle(s *store.Store) http.HandlerFunc {
 		entry, err := s.Entries.GetOne(id)
 
 		if err != nil {
-			if err == contententry.ErrNotFound {
+			if err == entries.ErrNotFound {
 				log.Print(fmt.Sprintf("Entry not found: %v", err))
 				request.SendNotFoundError(w, r)
 				return

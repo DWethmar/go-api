@@ -1,4 +1,4 @@
-package contententry
+package entries
 
 import (
 	"database/sql"

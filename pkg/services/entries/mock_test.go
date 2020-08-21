@@ -1,4 +1,4 @@
-package contententry
+package entries
 
 import (
 	"encoding/json"
@@ -64,13 +64,13 @@ func TestUnitMockAdd(t *testing.T) {
 		return
 	}
 
-	createdContentEntry, err := c.GetOne(mock.ID)
+	createdEntry, err := c.GetOne(mock.ID)
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
 	}
 
-	b, err := json.Marshal(createdContentEntry)
+	b, err := json.Marshal(createdEntry)
 	if err != nil {
 		t.Errorf("Unexpected error")
 		return

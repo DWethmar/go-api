@@ -1,4 +1,4 @@
-package contententry
+package entries
 
 // MockRepository mock repository for operating on entry data.
 type MockRepository struct {
