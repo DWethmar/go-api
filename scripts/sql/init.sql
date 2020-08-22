@@ -8,10 +8,10 @@ CREATE TABLE public.content
 
 CREATE TABLE public.content_fields_translation
 (
-    contenty_id VARCHAR (36) REFERENCES content(id) ON DELETE CASCADE,
+    content_id VARCHAR (36) REFERENCES content(id) ON DELETE CASCADE,
     locale VARCHAR (50),
     fields jsonb NOT NULL,
-    PRIMARY KEY (contenty_id, locale)
+    PRIMARY KEY (content_id, locale)
 );
 
 CREATE TABLE public.content_model
@@ -31,7 +31,7 @@ CREATE TABLE public.content_model_field
     length smallint,
     created_on timestamptz NOT NULL,
     updated_on timestamptz NOT NULL
-    PRIMARY KEY (content_model_id, field_key)
+    PRIMARY KEY (content_model_id, key)
 );
 
-CREATE INDEX content_model_field_type ON content_model_field (type);
+CREATE INDEX content_model_field_type ON content_model_field(type);
