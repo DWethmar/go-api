@@ -27,7 +27,7 @@ var (
 		created_on, 
 		updated_on
 	FROM public.content c
-	LEFT OUTER JOIN public.content_fields_translation t ON c.id = t.entry_id
+	LEFT OUTER JOIN public.content_document t ON c.id = t.content_id
 	GROUP BY c.id
 	ORDER BY created_on ASC`
 
@@ -42,7 +42,7 @@ var (
 		created_on, 
 		updated_on
 	FROM public.content c
-	LEFT OUTER JOIN public.content_fields_translation t ON c.id = t.entry_id
+	LEFT OUTER JOIN public.content_document t ON c.id = t.content_id
 	WHERE c.id = $1
 	GROUP BY c.id
 	LIMIT 1`
@@ -51,21 +51,21 @@ var (
 	INSERT INTO public.content (id, name, created_on, updated_on)
 	VALUES ($1, $2, $3, $4)`
 
-	insertContentFieldTranslation = `
-	INSERT INTO public.content_fields_translation(entry_id, locale, fields) 
+	insertContentDocument = `
+	INSERT INTO public.content_document(content_id, locale, fields) 
 	VALUES($1, $2, $3)`
 
 	updateContent = `
 	UPDATE public.content SET (name, updated_on) = ($1, $2)
 	WHERE id = $3`
 
-	updateContentFieldTranslation = `
-	UPDATE public.content_fields_translation SET fields = $1
-	WHERE entry_id = $2 AND locale = $3`
+	updateContentDocument = `
+	UPDATE public.content_document SET fields = $1
+	WHERE content_id = $2 AND locale = $3`
 
-	getFieldTranslations = `
-	SELECT locale FROM public.content_fields_translation
-	WHERE entry_id = $1
+	getContentDocument = `
+	SELECT locale FROM public.content_document
+	WHERE content_id = $1
 	`
 
 	deleteContent = `
@@ -153,7 +153,7 @@ func (repo *PostgresRepository) Add(entry models.Content) error {
 
 		for locale, fields := range entry.Fields {
 			_, err = tx.Exec(
-				insertContentFieldTranslation,
+				insertContentDocument,
 				entry.ID,
 				locale,
 				fields,
@@ -172,7 +172,7 @@ func (repo *PostgresRepository) Add(entry models.Content) error {
 }
 
 func (repo *PostgresRepository) getLocales(id common.UUID) ([]string, error) {
-	rows, err := repo.db.Query(getFieldTranslations, id)
+	rows, err := repo.db.Query(getContentDocument, id)
 
 	if err != nil {
 		return nil, err
@@ -223,7 +223,7 @@ func (repo *PostgresRepository) Update(entry models.Content) error {
 			var err error
 			if hasLocale {
 				_, err = tx.Exec(
-					updateContentFieldTranslation,
+					updateContentDocument,
 					fields,
 					entry.ID,
 					locale,
@@ -234,7 +234,7 @@ func (repo *PostgresRepository) Update(entry models.Content) error {
 				}
 			} else {
 				_, err = tx.Exec(
-					insertContentFieldTranslation,
+					insertContentDocument,
 					entry.ID,
 					locale,
 					fields,

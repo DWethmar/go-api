@@ -6,7 +6,7 @@ CREATE TABLE public.content
     updated_on timestamptz NOT NULL
 );
 
-CREATE TABLE public.content_fields_translation
+CREATE TABLE public.content_document
 (
     content_id VARCHAR (36) REFERENCES content(id) ON DELETE CASCADE,
     locale VARCHAR (50),
