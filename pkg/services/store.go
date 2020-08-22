@@ -3,36 +3,36 @@ package services
 import (
 	"database/sql"
 
-	"github.com/dwethmar/go-api/pkg/services/entries"
+	"github.com/dwethmar/go-api/pkg/services/content"
 )
 
 // Store is a collection of services to create, read, update and delete data.
 type Store struct {
-	Entries entries.Service
+	Content content.Service
 }
 
 // CreateStoreOption are used to compose a store with provided services.
 type CreateStoreOption struct {
-	EntryRepo entries.Repository
+	ContentRepo content.Repository
 }
 
 // CreateStoreWithOption creates a store with the provided options.
 func CreateStoreWithOption(options CreateStoreOption) *Store {
 	return &Store{
-		Entries: entries.CreateService(options.EntryRepo),
+		Content: content.CreateService(options.ContentRepo),
 	}
 }
 
 // CreateMockStore creates a store with mock services.
 func CreateMockStore() *Store {
 	return CreateStoreWithOption(CreateStoreOption{
-		EntryRepo: entries.CreateMockRepository(),
+		ContentRepo: content.CreateMockRepository(),
 	})
 }
 
 // CreateStore creates a store with services that use persistsent storage.
 func CreateStore(db *sql.DB) *Store {
 	return CreateStoreWithOption(CreateStoreOption{
-		EntryRepo: entries.CreatePostgresRepository(db),
+		ContentRepo: content.CreatePostgresRepository(db),
 	})
 }

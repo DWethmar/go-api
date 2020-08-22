@@ -15,7 +15,7 @@ type EntryModel struct {
 	Fields    []ContentModelField `json:"fields"`
 }
 
-// EntryModelField EntryModel field model
+// ContentModelField content model field model
 type ContentModelField struct {
 	EntryModelID common.UUID `db:"entry_model_id"`
 	Key          string      `json:"key" db:"key"`

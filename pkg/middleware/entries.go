@@ -11,7 +11,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/models"
 	"github.com/dwethmar/go-api/pkg/request"
 	"github.com/dwethmar/go-api/pkg/services"
-	"github.com/dwethmar/go-api/pkg/services/entries"
+	"github.com/dwethmar/go-api/pkg/services/content"
 )
 
 // ErrorResponds is the default error responds.
@@ -31,7 +31,7 @@ func EntryIndex(s *services.Store) http.HandlerFunc {
 			return
 		}
 
-		var entries, err = s.Entries.GetAll()
+		var entries, err = s.Content.GetAll()
 
 		if err != nil {
 			fmt.Printf("Error while getting entries: %v", err)
@@ -64,7 +64,7 @@ func CreateEntry(s *services.Store) http.HandlerFunc {
 			return
 		}
 
-		entry, err := s.Entries.Create(newEntry)
+		entry, err := s.Content.Create(newEntry)
 
 		if err != nil {
 			fmt.Printf("Error while creating entry: %v", err)
@@ -99,7 +99,7 @@ func UpdateEntry(s *services.Store) http.HandlerFunc {
 			return
 		}
 
-		entry, err := s.Entries.GetOne(id)
+		entry, err := s.Content.GetOne(id)
 
 		if err != nil {
 			fmt.Printf("Error while getting entry: %v", err)
@@ -111,7 +111,7 @@ func UpdateEntry(s *services.Store) http.HandlerFunc {
 		entry.Fields = updateEntry.Fields
 		entry.UpdatedOn = time.Now()
 
-		err = s.Entries.Update(*entry)
+		err = s.Content.Update(*entry)
 
 		if err != nil {
 			fmt.Printf("Error while updating entry: %v", err)
@@ -133,10 +133,10 @@ func DeleteEntry(s *services.Store) http.HandlerFunc {
 			request.SendServerError(w, r)
 		}
 
-		entry, err := s.Entries.GetOne(id)
+		entry, err := s.Content.GetOne(id)
 
 		if err != nil {
-			if err == entries.ErrNotFound {
+			if err == content.ErrNotFound {
 				fmt.Printf("Could not find entry: %v", err)
 				request.SendNotFoundError(w, r)
 				return
@@ -146,7 +146,7 @@ func DeleteEntry(s *services.Store) http.HandlerFunc {
 			return
 		}
 
-		err = s.Entries.Delete(id)
+		err = s.Content.Delete(id)
 
 		if err != nil {
 			fmt.Printf("Error while deleting entry: %v", err)
@@ -167,10 +167,10 @@ func HandleEntrySingle(s *services.Store) http.HandlerFunc {
 			request.SendServerError(w, r)
 		}
 
-		entry, err := s.Entries.GetOne(id)
+		entry, err := s.Content.GetOne(id)
 
 		if err != nil {
-			if err == entries.ErrNotFound {
+			if err == content.ErrNotFound {
 				log.Print(fmt.Sprintf("Entry not found: %v", err))
 				request.SendNotFoundError(w, r)
 				return
