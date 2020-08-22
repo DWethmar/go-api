@@ -30,7 +30,7 @@ CREATE TABLE public.content_model_field
     type VARCHAR (50),
     length smallint,
     created_on timestamptz NOT NULL,
-    updated_on timestamptz NOT NULL
+    updated_on timestamptz NOT NULL,
     PRIMARY KEY (content_model_id, key)
 );
 
