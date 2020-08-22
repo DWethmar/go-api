@@ -88,7 +88,7 @@ func TestEntryIndex(t *testing.T) {
 
 	services.WithTestStore(func(store *services.Store) {
 		for _, newEntry := range addItems {
-			entry, _ := store.Entries.Create(newEntry)
+			entry, _ := store.Content.Create(newEntry)
 			entries = append(entries, entry)
 		}
 
@@ -215,7 +215,7 @@ func TestCreateInvalidEntry(t *testing.T) {
 
 func TestUpdateEntry(t *testing.T) {
 	services.WithTestStore(func(store *services.Store) {
-		addedEntry, _ := store.Entries.Create(models.AddContent{
+		addedEntry, _ := store.Content.Create(models.AddContent{
 			Name: "name",
 			Fields: models.FieldTranslations{
 				"nl": models.Fields{
@@ -281,7 +281,7 @@ func TestUpdateEntry(t *testing.T) {
 
 func TestDeleteEntry(t *testing.T) {
 	services.WithTestStore(func(store *services.Store) {
-		addedEntry, _ := store.Entries.Create(models.AddContent{
+		addedEntry, _ := store.Content.Create(models.AddContent{
 			Name: "name",
 			Fields: models.FieldTranslations{
 				"nl": models.Fields{
