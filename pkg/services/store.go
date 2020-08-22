@@ -19,20 +19,20 @@ type CreateStoreOption struct {
 // CreateStoreWithOption creates a store with the provided options.
 func CreateStoreWithOption(options CreateStoreOption) *Store {
 	return &Store{
-		Content: content.CreateService(options.ContentRepo),
+		Content: content.NewService(options.ContentRepo),
 	}
 }
 
 // CreateMockStore creates a store with mock services.
 func CreateMockStore() *Store {
 	return CreateStoreWithOption(CreateStoreOption{
-		ContentRepo: content.CreateMockRepository(),
+		ContentRepo: content.NewMockRepository(),
 	})
 }
 
 // CreateStore creates a store with services that use persistsent storage.
 func CreateStore(db *sql.DB) *Store {
 	return CreateStoreWithOption(CreateStoreOption{
-		ContentRepo: content.CreatePostgresRepository(db),
+		ContentRepo: content.NewPostgresRepository(db),
 	})
 }

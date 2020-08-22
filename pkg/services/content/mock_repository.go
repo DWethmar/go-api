@@ -53,8 +53,8 @@ func (repo *MockRepository) Delete(id common.UUID) error {
 	return nil
 }
 
-// CreateMockRepository creates new mockservice.
-func CreateMockRepository() Repository {
+// NewMockRepository creates new mockservice.
+func NewMockRepository() Repository {
 	return &MockRepository{
 		items: make([]*models.Content, 0),
 	}

@@ -27,7 +27,7 @@ var mock = models.Content{
 }
 
 func TestUnitMockGetAll(t *testing.T) {
-	c := CreateMockRepository()
+	c := NewMockRepository()
 	c.Add(mock)
 	c.Add(mock)
 
@@ -39,7 +39,7 @@ func TestUnitMockGetAll(t *testing.T) {
 }
 
 func TestUnitMockGetOne(t *testing.T) {
-	c := CreateMockRepository()
+	c := NewMockRepository()
 	c.Add(mock)
 	c.Add(mock)
 
@@ -58,7 +58,7 @@ func TestUnitMockGetOne(t *testing.T) {
 }
 
 func TestUnitMockAdd(t *testing.T) {
-	c := CreateMockRepository()
+	c := NewMockRepository()
 	c.Add(mock)
 
 	a, err := json.Marshal(mock)
@@ -85,7 +85,7 @@ func TestUnitMockAdd(t *testing.T) {
 }
 
 func TestUnitMockUpdate(t *testing.T) {
-	c := CreateMockRepository()
+	c := NewMockRepository()
 	c.Add(mock)
 
 	createdEntry, err := c.GetOne(mock.ID)
@@ -115,7 +115,7 @@ func TestUnitMockUpdate(t *testing.T) {
 }
 
 func TestUnitMockDelete(t *testing.T) {
-	c := CreateMockRepository()
+	c := NewMockRepository()
 	c.Add(mock)
 
 	createdEntry, err := c.GetOne(mock.ID)

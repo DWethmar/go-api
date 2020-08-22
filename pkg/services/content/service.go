@@ -63,7 +63,7 @@ func (s *service) Delete(id common.UUID) error {
 	return err
 }
 
-// CreateService creates a listing service with the necessary dependencies
-func CreateService(r Repository) Service {
+// NewService creates a listing service with the necessary dependencies
+func NewService(r Repository) Service {
 	return &service{r}
 }

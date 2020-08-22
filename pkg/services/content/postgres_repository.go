@@ -258,8 +258,8 @@ func (repo *PostgresRepository) Delete(id common.UUID) error {
 	return err
 }
 
-// CreatePostgresRepository create repo
-func CreatePostgresRepository(db *sql.DB) *PostgresRepository {
+// NewPostgresRepository create repo
+func NewPostgresRepository(db *sql.DB) *PostgresRepository {
 	return &PostgresRepository{
 		db,
 	}

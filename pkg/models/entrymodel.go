@@ -6,8 +6,8 @@ import (
 	"github.com/dwethmar/go-api/pkg/common"
 )
 
-// EntryModel model
-type EntryModel struct {
+// ContentModel model
+type ContentModel struct {
 	ID        common.UUID         `json:"id"   db:"id"`
 	Name      string              `json:"name" db:"name"`
 	CreatedOn time.Time           `json:"createdOn" db:"created_on"`
@@ -26,9 +26,9 @@ type ContentModelField struct {
 	UpdatedOn    time.Time   `json:"updatedOn" db:"updated_on"`
 }
 
-// CreateEntryModel creates new EntryModel
-func CreateEntryModel() EntryModel {
-	return EntryModel{
+// NewContentModel creates new EntryModel
+func NewContentModel() ContentModel {
+	return ContentModel{
 		ID:        common.CreateNewUUID(),
 		Name:      "",
 		CreatedOn: time.Now(),
