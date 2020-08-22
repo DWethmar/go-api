@@ -5,7 +5,7 @@ import (
 )
 
 func TestValidateName(t *testing.T) {
-	c := Entry{
+	c := Content{
 		Name: "This name is to loooooooOooooOOo0000000000000000000000000oooong",
 	}
 

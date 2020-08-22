@@ -1,4 +1,4 @@
-package entries
+package content
 
 import (
 	"time"
@@ -9,10 +9,10 @@ import (
 
 // Service entry service
 type Service interface {
-	GetOne(common.UUID) (*models.Entry, error)
-	GetAll() ([]*models.Entry, error)
-	Update(models.Entry) error
-	Create(models.AddEntry) (*models.Entry, error)
+	GetOne(common.UUID) (*models.Content, error)
+	GetAll() ([]*models.Content, error)
+	Update(models.Content) error
+	Create(models.AddContent) (*models.Content, error)
 	Delete(common.UUID) error
 }
 
@@ -20,28 +20,28 @@ type service struct {
 	repo Repository
 }
 
-func (s *service) GetOne(id common.UUID) (*models.Entry, error) {
+func (s *service) GetOne(id common.UUID) (*models.Content, error) {
 	item, err := s.repo.GetOne(id)
 	return item, err
 }
 
-func (s *service) GetAll() ([]*models.Entry, error) {
+func (s *service) GetAll() ([]*models.Content, error) {
 	items, err := s.repo.GetAll()
 	return items, err
 }
 
-func (s *service) Update(contentItem models.Entry) error {
+func (s *service) Update(contentItem models.Content) error {
 	contentItem.UpdatedOn = time.Now()
 	err := s.repo.Update(contentItem)
 	return err
 }
 
-func (s *service) Create(entry models.AddEntry) (*models.Entry, error) {
+func (s *service) Create(entry models.AddContent) (*models.Content, error) {
 	if entry.Fields == nil {
 		entry.Fields = make(models.FieldTranslations)
 	}
 
-	var contentItem = models.Entry{
+	var contentItem = models.Content{
 		ID:        common.CreateNewUUID(),
 		Name:      entry.Name,
 		Fields:    entry.Fields,

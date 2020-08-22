@@ -1,4 +1,4 @@
-package entries
+package content
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/models"
 )
 
-var mock = models.Entry{
+var mock = models.Content{
 	ID:   common.CreateNewUUID(),
 	Name: "wow",
 	Fields: models.FieldTranslations{

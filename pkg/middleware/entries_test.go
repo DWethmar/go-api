@@ -16,7 +16,7 @@ import (
 
 var defaultLocale = "nl"
 
-func areEntryValidationErrorsEqual(a, b models.EntryValidationError) (bool, error) {
+func areEntryValidationErrorsEqual(a, b models.ErrContentValidation) (bool, error) {
 	ar, err := json.Marshal(a)
 	if err != nil {
 		return false, err
@@ -44,7 +44,7 @@ func areFieldsEqual(a, b models.FieldTranslations) (bool, error) {
 	return string(ar) == string(br), nil
 }
 
-func areEntriesEqual(a, b models.Entry) (bool, error) {
+func areEntriesEqual(a, b models.Content) (bool, error) {
 	ar, err := json.Marshal(a)
 	if err != nil {
 		return false, err
@@ -59,7 +59,7 @@ func areEntriesEqual(a, b models.Entry) (bool, error) {
 }
 
 func TestEntryIndex(t *testing.T) {
-	addItems := []models.AddEntry{
+	addItems := []models.AddContent{
 		{
 			Name: "Test1",
 			Fields: models.FieldTranslations{
@@ -83,7 +83,7 @@ func TestEntryIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	entries := []*models.Entry{}
+	entries := []*models.Content{}
 	rr := httptest.NewRecorder()
 
 	services.WithTestStore(func(store *services.Store) {
@@ -114,7 +114,7 @@ func TestEntryIndex(t *testing.T) {
 func TestCreateEntry(t *testing.T) {
 	now := time.Now()
 
-	addEntry := models.AddEntry{
+	addEntry := models.AddContent{
 		Name: "name",
 		Fields: models.FieldTranslations{
 			"nl": models.Fields{
@@ -142,7 +142,7 @@ func TestCreateEntry(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	addedEntry := models.Entry{}
+	addedEntry := models.Content{}
 	err := json.Unmarshal(rr.Body.Bytes(), &addedEntry)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
@@ -166,7 +166,7 @@ func TestCreateEntry(t *testing.T) {
 }
 
 func TestCreateInvalidEntry(t *testing.T) {
-	addEntry := models.AddEntry{
+	addEntry := models.AddContent{
 		Name: "name",
 		Fields: models.FieldTranslations{
 			"nl": models.Fields{
@@ -177,7 +177,7 @@ func TestCreateInvalidEntry(t *testing.T) {
 		},
 	}
 
-	validationErr := models.CreateEntryValidationError()
+	validationErr := models.CreateContentValidationError()
 	validationErr.Errors.Fields["nl"] = make(map[string]string)
 	validationErr.Errors.Fields["nl"]["attrC"] = models.ErrUnsupportedFieldValue.Error()
 
@@ -198,7 +198,7 @@ func TestCreateInvalidEntry(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	receivedValidationError := models.EntryValidationError{}
+	receivedValidationError := models.ErrContentValidation{}
 	err := json.Unmarshal(rr.Body.Bytes(), &receivedValidationError)
 	if err != nil {
 		t.Errorf("Error while parsing body %v", err)
@@ -215,7 +215,7 @@ func TestCreateInvalidEntry(t *testing.T) {
 
 func TestUpdateEntry(t *testing.T) {
 	services.WithTestStore(func(store *services.Store) {
-		addedEntry, _ := store.Entries.Create(models.AddEntry{
+		addedEntry, _ := store.Entries.Create(models.AddContent{
 			Name: "name",
 			Fields: models.FieldTranslations{
 				"nl": models.Fields{
@@ -226,7 +226,7 @@ func TestUpdateEntry(t *testing.T) {
 			},
 		})
 
-		updateEntry := models.Entry{
+		updateEntry := models.Content{
 			ID:   addedEntry.ID,
 			Name: "updated name",
 			Fields: models.FieldTranslations{
@@ -262,7 +262,7 @@ func TestUpdateEntry(t *testing.T) {
 		}
 
 		// Check the response body is what we expect.
-		updatedEntry := models.Entry{}
+		updatedEntry := models.Content{}
 		err := json.Unmarshal(rr.Body.Bytes(), &updatedEntry)
 		if err != nil {
 			t.Errorf("Error while parsing body for added content-item %v", err)
@@ -281,7 +281,7 @@ func TestUpdateEntry(t *testing.T) {
 
 func TestDeleteEntry(t *testing.T) {
 	services.WithTestStore(func(store *services.Store) {
-		addedEntry, _ := store.Entries.Create(models.AddEntry{
+		addedEntry, _ := store.Entries.Create(models.AddContent{
 			Name: "name",
 			Fields: models.FieldTranslations{
 				"nl": models.Fields{
@@ -313,7 +313,7 @@ func TestDeleteEntry(t *testing.T) {
 			return
 		}
 
-		deletedEntry := models.Entry{}
+		deletedEntry := models.Content{}
 		err := json.Unmarshal(rr.Body.Bytes(), &deletedEntry)
 		if err != nil {
 			t.Errorf("Error while parsing body for deleted entry %v", err)

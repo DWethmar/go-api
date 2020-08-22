@@ -1,4 +1,4 @@
-package entries
+package content
 
 import (
 	"database/sql"
@@ -10,13 +10,13 @@ import (
 	"github.com/dwethmar/go-api/pkg/models"
 )
 
-// PostgresRepository repository for operating on entry data.
+// PostgresRepository repository for operating on content data.
 type PostgresRepository struct {
 	db *sql.DB
 }
 
 var (
-	getAll = `
+	allContent = `
 	SELECT 
 		id, 
 		name, 
@@ -26,12 +26,12 @@ var (
 		) as fields,
 		created_on, 
 		updated_on
-	FROM public.entry c
-	LEFT OUTER JOIN public.entry_translation t ON c.id = t.entry_id
+	FROM public.content c
+	LEFT OUTER JOIN public.content_fields_translation t ON c.id = t.entry_id
 	GROUP BY c.id
-	ORDER BY updated_on ASC`
+	ORDER BY created_on ASC`
 
-	getOne = `
+	singleContent = `
 	SELECT 
 		id, 
 		name, 
@@ -41,51 +41,51 @@ var (
 		) as fields,
 		created_on, 
 		updated_on
-	FROM public.entry c
-	LEFT OUTER JOIN public.entry_translation t ON c.id = t.entry_id
+	FROM public.content c
+	LEFT OUTER JOIN public.content_fields_translation t ON c.id = t.entry_id
 	WHERE c.id = $1
 	GROUP BY c.id
 	LIMIT 1`
 
-	insertEntry = `
-	INSERT INTO public.entry (id, name, created_on, updated_on)
+	insertContent = `
+	INSERT INTO public.content (id, name, created_on, updated_on)
 	VALUES ($1, $2, $3, $4)`
 
-	insertEntryTrans = `
-	INSERT INTO public.entry_translation(entry_id, locale, fields) 
+	insertContentFieldTranslation = `
+	INSERT INTO public.content_fields_translation(entry_id, locale, fields) 
 	VALUES($1, $2, $3)`
 
-	updateEntry = `
-	UPDATE public.entry SET (name, updated_on) = ($1, $2)
+	updateContent = `
+	UPDATE public.content SET (name, updated_on) = ($1, $2)
 	WHERE id = $3`
 
-	updateEntryTrans = `
-	UPDATE public.entry_translation SET fields = $1
+	updateContentFieldTranslation = `
+	UPDATE public.content_fields_translation SET fields = $1
 	WHERE entry_id = $2 AND locale = $3`
 
-	getEntryLocales = `
-	SELECT locale FROM public.entry_translation
+	getFieldTranslations = `
+	SELECT locale FROM public.content_fields_translation
 	WHERE entry_id = $1
 	`
 
-	deleteentry = `
-	DELETE FROM public.entry WHERE id = $1
+	deleteContent = `
+	DELETE FROM public.content WHERE id = $1
 	`
 )
 
 // GetAll get all entries.
-func (repo *PostgresRepository) GetAll() ([]*models.Entry, error) {
-	rows, err := repo.db.Query(getAll)
+func (repo *PostgresRepository) GetAll() ([]*models.Content, error) {
+	rows, err := repo.db.Query(allContent)
 
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
-	entrys := make([]*models.Entry, 0)
+	entrys := make([]*models.Content, 0)
 
 	for rows.Next() {
-		entry := &models.Entry{}
+		entry := &models.Content{}
 		err := rows.Scan(
 			&entry.ID,
 			&entry.Name,
@@ -107,9 +107,9 @@ func (repo *PostgresRepository) GetAll() ([]*models.Entry, error) {
 }
 
 // GetOne get one entry.
-func (repo *PostgresRepository) GetOne(id common.UUID) (*models.Entry, error) {
-	entry := models.CreateEntry()
-	row := repo.db.QueryRow(getOne, id)
+func (repo *PostgresRepository) GetOne(id common.UUID) (*models.Content, error) {
+	entry := models.NewContent()
+	row := repo.db.QueryRow(singleContent, id)
 
 	var i string
 	err := row.Scan(
@@ -133,14 +133,14 @@ func (repo *PostgresRepository) GetOne(id common.UUID) (*models.Entry, error) {
 		return nil, errors.New("Could not parse ID")
 	}
 
-	return &entry, nil
+	return entry, nil
 }
 
 // Add add one entry.
-func (repo *PostgresRepository) Add(entry models.Entry) error {
+func (repo *PostgresRepository) Add(entry models.Content) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
-			insertEntry,
+			insertContent,
 			entry.ID,
 			entry.Name,
 			entry.CreatedOn,
@@ -153,7 +153,7 @@ func (repo *PostgresRepository) Add(entry models.Entry) error {
 
 		for locale, fields := range entry.Fields {
 			_, err = tx.Exec(
-				insertEntryTrans,
+				insertContentFieldTranslation,
 				entry.ID,
 				locale,
 				fields,
@@ -172,7 +172,7 @@ func (repo *PostgresRepository) Add(entry models.Entry) error {
 }
 
 func (repo *PostgresRepository) getLocales(id common.UUID) ([]string, error) {
-	rows, err := repo.db.Query(getEntryLocales, id)
+	rows, err := repo.db.Query(getFieldTranslations, id)
 
 	if err != nil {
 		return nil, err
@@ -194,10 +194,10 @@ func (repo *PostgresRepository) getLocales(id common.UUID) ([]string, error) {
 }
 
 // Update updates entry.
-func (repo *PostgresRepository) Update(entry models.Entry) error {
+func (repo *PostgresRepository) Update(entry models.Content) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
-			updateEntry,
+			updateContent,
 			entry.Name,
 			entry.UpdatedOn,
 			entry.ID,
@@ -223,7 +223,7 @@ func (repo *PostgresRepository) Update(entry models.Entry) error {
 			var err error
 			if hasLocale {
 				_, err = tx.Exec(
-					updateEntryTrans,
+					updateContentFieldTranslation,
 					fields,
 					entry.ID,
 					locale,
@@ -234,7 +234,7 @@ func (repo *PostgresRepository) Update(entry models.Entry) error {
 				}
 			} else {
 				_, err = tx.Exec(
-					insertEntryTrans,
+					insertContentFieldTranslation,
 					entry.ID,
 					locale,
 					fields,
@@ -254,7 +254,7 @@ func (repo *PostgresRepository) Update(entry models.Entry) error {
 
 // Delete deletes entry
 func (repo *PostgresRepository) Delete(id common.UUID) error {
-	_, err := repo.db.Exec(deleteentry, id)
+	_, err := repo.db.Exec(deleteContent, id)
 	return err
 }
 

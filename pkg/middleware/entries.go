@@ -47,7 +47,7 @@ func EntryIndex(s *services.Store) http.HandlerFunc {
 func CreateEntry(s *services.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
-		newEntry := models.AddEntry{
+		newEntry := models.AddContent{
 			Fields: make(models.FieldTranslations),
 		}
 
@@ -85,7 +85,7 @@ func UpdateEntry(s *services.Store) http.HandlerFunc {
 		}
 
 		decoder := json.NewDecoder(r.Body)
-		var updateEntry models.UpdateEntry
+		var updateEntry models.UpdateContent
 		err = decoder.Decode(&updateEntry)
 
 		if err != nil {
