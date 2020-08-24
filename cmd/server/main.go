@@ -9,7 +9,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/api"
 	"github.com/dwethmar/go-api/pkg/config"
 	"github.com/dwethmar/go-api/pkg/database"
-	"github.com/dwethmar/go-api/pkg/services"
+	"github.com/dwethmar/go-api/pkg/store"
 
 	_ "github.com/lib/pq"
 )
@@ -29,7 +29,7 @@ func main() {
 
 	defer db.Close()
 
-	server := api.CreateServer(api.EntryRoutes(services.CreateStore(db)))
+	server := api.CreateServer(api.NewRouter(store.CreateStore(db)))
 	srv := &http.Server{Addr: ":8080", Handler: &server}
 	log.Printf("Serving on :8080")
 	log.Fatal(srv.ListenAndServe())

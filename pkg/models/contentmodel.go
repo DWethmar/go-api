@@ -8,11 +8,11 @@ import (
 
 // ContentModel model
 type ContentModel struct {
-	ID        common.UUID         `json:"id"   db:"id"`
-	Name      string              `json:"name" db:"name"`
-	CreatedOn time.Time           `json:"createdOn" db:"created_on"`
-	UpdatedOn time.Time           `json:"updatedOn" db:"updated_on"`
-	Fields    []ContentModelField `json:"fields"`
+	ID        common.UUID          `json:"id"   db:"id"`
+	Name      string               `json:"name" db:"name"`
+	CreatedOn time.Time            `json:"createdOn" db:"created_on"`
+	UpdatedOn time.Time            `json:"updatedOn" db:"updated_on"`
+	Fields    []*ContentModelField `json:"fields"`
 }
 
 // ContentModelField content model field model
@@ -26,6 +26,12 @@ type ContentModelField struct {
 	UpdatedOn    time.Time   `json:"updatedOn" db:"updated_on"`
 }
 
+// AddContentModel model
+type AddContentModel struct {
+	Name   string               `json:"name" db:"name"`
+	Fields []*ContentModelField `json:"fields"`
+}
+
 // NewContentModel creates new EntryModel
 func NewContentModel() ContentModel {
 	return ContentModel{
@@ -33,5 +39,6 @@ func NewContentModel() ContentModel {
 		Name:      "",
 		CreatedOn: time.Now(),
 		UpdatedOn: time.Now(),
+		Fields:    make([]*ContentModelField, 0),
 	}
 }

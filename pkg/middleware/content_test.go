@@ -11,7 +11,7 @@ import (
 
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/models"
-	"github.com/dwethmar/go-api/pkg/services"
+	"github.com/dwethmar/go-api/pkg/store"
 )
 
 var defaultLocale = "nl"
@@ -58,7 +58,7 @@ func areEntriesEqual(a, b models.Content) (bool, error) {
 	return string(ar) == string(br), nil
 }
 
-func TestEntryIndex(t *testing.T) {
+func TestContentIndex(t *testing.T) {
 	addItems := []models.AddContent{
 		{
 			Name: "Test1",
@@ -86,13 +86,13 @@ func TestEntryIndex(t *testing.T) {
 	entries := []*models.Content{}
 	rr := httptest.NewRecorder()
 
-	services.WithTestStore(func(store *services.Store) {
+	store.WithTestStore(func(store *store.Store) {
 		for _, newEntry := range addItems {
 			entry, _ := store.Content.Create(newEntry)
 			entries = append(entries, entry)
 		}
 
-		handler := http.HandlerFunc(EntryIndex(store))
+		handler := http.HandlerFunc(ContentIndex(store))
 		handler.ServeHTTP(rr, req)
 	})
 
@@ -111,7 +111,7 @@ func TestEntryIndex(t *testing.T) {
 	}
 }
 
-func TestCreateEntry(t *testing.T) {
+func TestCreateContent(t *testing.T) {
 	now := time.Now()
 
 	addEntry := models.AddContent{
@@ -130,8 +130,8 @@ func TestCreateEntry(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	services.WithTestStore(func(store *services.Store) {
-		handler := http.HandlerFunc(CreateEntry(store))
+	store.WithTestStore(func(store *store.Store) {
+		handler := http.HandlerFunc(CreateContent(store))
 		handler.ServeHTTP(rr, req)
 	})
 
@@ -165,7 +165,7 @@ func TestCreateEntry(t *testing.T) {
 	}
 }
 
-func TestCreateInvalidEntry(t *testing.T) {
+func TestCreateInvalidContent(t *testing.T) {
 	addEntry := models.AddContent{
 		Name: "name",
 		Fields: models.FieldTranslations{
@@ -186,8 +186,8 @@ func TestCreateInvalidEntry(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	services.WithTestStore(func(store *services.Store) {
-		handler := http.HandlerFunc(CreateEntry(store))
+	store.WithTestStore(func(store *store.Store) {
+		handler := http.HandlerFunc(CreateContent(store))
 		handler.ServeHTTP(rr, req)
 	})
 
@@ -213,8 +213,8 @@ func TestCreateInvalidEntry(t *testing.T) {
 	}
 }
 
-func TestUpdateEntry(t *testing.T) {
-	services.WithTestStore(func(store *services.Store) {
+func TestUpdateContent(t *testing.T) {
+	store.WithTestStore(func(store *store.Store) {
 		addedEntry, _ := store.Content.Create(models.AddContent{
 			Name: "name",
 			Fields: models.FieldTranslations{
@@ -247,7 +247,7 @@ func TestUpdateEntry(t *testing.T) {
 		ctx = common.WithUUID(ctx, addedEntry.ID)
 		req = req.WithContext(ctx)
 
-		handler := http.HandlerFunc(UpdateEntry(store))
+		handler := http.HandlerFunc(UpdateContent(store))
 		handler.ServeHTTP(rr, req)
 
 		if status := rr.Code; status != http.StatusOK {
@@ -279,8 +279,8 @@ func TestUpdateEntry(t *testing.T) {
 	})
 }
 
-func TestDeleteEntry(t *testing.T) {
-	services.WithTestStore(func(store *services.Store) {
+func TestDeleteContent(t *testing.T) {
+	store.WithTestStore(func(store *store.Store) {
 		addedEntry, _ := store.Content.Create(models.AddContent{
 			Name: "name",
 			Fields: models.FieldTranslations{
@@ -299,7 +299,7 @@ func TestDeleteEntry(t *testing.T) {
 		req = req.WithContext(ctx)
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(DeleteEntry(store))
+		handler := http.HandlerFunc(DeleteContent(store))
 		handler.ServeHTTP(rr, req)
 
 		if status := rr.Code; status != http.StatusOK {

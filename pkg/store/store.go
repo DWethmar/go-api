@@ -1,9 +1,9 @@
-package services
+package store
 
 import (
 	"database/sql"
 
-	"github.com/dwethmar/go-api/pkg/services/content"
+	"github.com/dwethmar/go-api/pkg/content"
 )
 
 // Store is a collection of services to create, read, update and delete data.

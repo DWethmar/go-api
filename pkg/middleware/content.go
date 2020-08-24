@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
+	"github.com/dwethmar/go-api/pkg/content"
 	"github.com/dwethmar/go-api/pkg/models"
 	"github.com/dwethmar/go-api/pkg/request"
-	"github.com/dwethmar/go-api/pkg/services"
-	"github.com/dwethmar/go-api/pkg/services/content"
+	"github.com/dwethmar/go-api/pkg/store"
 )
 
 // ErrorResponds is the default error responds.
@@ -19,8 +19,8 @@ type ErrorResponds struct {
 	error string
 }
 
-// EntryIndex get list of entries
-func EntryIndex(s *services.Store) http.HandlerFunc {
+// ContentIndex get list of entries
+func ContentIndex(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -43,8 +43,8 @@ func EntryIndex(s *services.Store) http.HandlerFunc {
 	})
 }
 
-// CreateEntry creates a new entry from post data.
-func CreateEntry(s *services.Store) http.HandlerFunc {
+// CreateContent creates a new entry from post data.
+func CreateContent(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		newEntry := models.AddContent{
@@ -76,8 +76,8 @@ func CreateEntry(s *services.Store) http.HandlerFunc {
 	})
 }
 
-// UpdateEntry updates an existing entry from post data.
-func UpdateEntry(s *services.Store) http.HandlerFunc {
+// UpdateContent updates an existing entry from post data.
+func UpdateContent(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
@@ -123,8 +123,8 @@ func UpdateEntry(s *services.Store) http.HandlerFunc {
 	})
 }
 
-// DeleteEntry deletes an entry by entry id.
-func DeleteEntry(s *services.Store) http.HandlerFunc {
+// DeleteContent deletes an entry by entry id.
+func DeleteContent(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 
@@ -158,8 +158,8 @@ func DeleteEntry(s *services.Store) http.HandlerFunc {
 	})
 }
 
-// HandleEntrySingle gets an single entry by entry id.
-func HandleEntrySingle(s *services.Store) http.HandlerFunc {
+// GetSingleContent gets an single entry by entry id.
+func GetSingleContent(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
