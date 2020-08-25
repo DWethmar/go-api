@@ -27,7 +27,6 @@ CREATE TABLE public.content
     id VARCHAR (36) PRIMARY KEY,
     content_type_id VARCHAR (36) REFERENCES content_type(id) ON DELETE CASCADE,
     name VARCHAR (50),
-    content_type_id 
     created_on timestamptz NOT NULL,
     updated_on timestamptz NOT NULL
 );
