@@ -21,7 +21,7 @@ func WithTestStore(fn func(*Store)) {
 		dbName := con.DBName
 		con.DBName = ""
 		driver, cs := config.GetPostgresConnectionInfo(con)
-		d, err := database.ConnectDB(driver, cs)
+		d, err := database.NewDB(driver, cs)
 
 		if err != nil {
 			fmt.Printf("Could not connect to database with %v %v", driver, cs)
@@ -36,7 +36,7 @@ func WithTestStore(fn func(*Store)) {
 		db.Close()
 
 		driver, cs = config.GetPostgresConnectionInfo(con)
-		db, err = database.ConnectDB(driver, cs)
+		db, err = database.NewDB(driver, cs)
 		if err != nil {
 			fmt.Printf("Could not connect to database with %v %v", driver, cs)
 			panic(err)
@@ -45,14 +45,14 @@ func WithTestStore(fn func(*Store)) {
 		database.ExecSQLFile(db, con.CreateDBScript)
 
 		fmt.Println("Using postgres repository for test server.")
-		myStore = CreateStore(db)
+		myStore = NewStore(db)
 
 		defer func() {
 			db.Close()
 			dbName := con.DBName
 			con.DBName = ""
 			driver, cs := config.GetPostgresConnectionInfo(con)
-			db, err := database.ConnectDB(driver, cs)
+			db, err := database.NewDB(driver, cs)
 			if err != nil {
 				panic("Could not connect to db to drop it.")
 			}

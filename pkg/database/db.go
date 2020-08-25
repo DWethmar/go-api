@@ -5,11 +5,13 @@ import (
 	"fmt"
 )
 
+// DB model
 type DB struct {
 	*sql.DB
 }
 
-func ConnectDB(driverName string, dataSourceName string) (*sql.DB, error) {
+// NewDB creates new DB
+func NewDB(driverName string, dataSourceName string) (*sql.DB, error) {
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
 		return nil, err

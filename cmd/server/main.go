@@ -22,14 +22,14 @@ func main() {
 	env := config.LoadEnvFile()
 	driverName, dataSource := config.GetPostgresConnectionInfo(env)
 
-	db, err := database.ConnectDB(driverName, dataSource)
+	db, err := database.NewDB(driverName, dataSource)
 	if err != nil {
 		panic(err)
 	}
 
 	defer db.Close()
 
-	server := api.CreateServer(api.NewRouter(store.CreateStore(db)))
+	server := api.CreateServer(api.NewRouter(store.NewStore(db)))
 	srv := &http.Server{Addr: ":8080", Handler: &server}
 	log.Printf("Serving on :8080")
 	log.Fatal(srv.ListenAndServe())

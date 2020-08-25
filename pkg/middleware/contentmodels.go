@@ -8,8 +8,8 @@ import (
 	"github.com/dwethmar/go-api/pkg/store"
 )
 
-// ContentModelIndex get list of entries
-func ContentModelIndex(s *store.Store) http.HandlerFunc {
+// ContentTypeIndex get list of entries
+func ContentTypeIndex(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if (*r).Method == "OPTIONS" {

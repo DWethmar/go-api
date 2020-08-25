@@ -1,4 +1,4 @@
-package contentmodels
+package contenttype
 
 import (
 	"errors"
@@ -12,9 +12,9 @@ var ErrNotFound = errors.New("Entry or entries not found")
 
 // Repository entry repository
 type Repository interface {
-	GetAll() ([]*models.ContentModel, error)
-	GetOne(id common.UUID) (*models.ContentModel, error)
-	Add(contentItem models.ContentModel) error
-	Update(contentItem models.ContentModel) error
-	Delete(id common.UUID) error
+	GetAll() ([]*models.ContentType, error)
+	GetOne(ID common.UUID) (*models.ContentType, error)
+	Add(contentItem models.ContentType) error
+	Update(contentItem models.ContentType) error
+	Delete(ID common.UUID) error
 }

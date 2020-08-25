@@ -2,7 +2,6 @@ package content
 
 import (
 	"database/sql"
-	"errors"
 	"log"
 
 	"github.com/dwethmar/go-api/pkg/common"
@@ -63,7 +62,7 @@ var (
 	UPDATE public.content_document SET fields = $1
 	WHERE content_id = $2 AND locale = $3`
 
-	getContentDocument = `
+	getContentLocales = `
 	SELECT locale FROM public.content_document
 	WHERE content_id = $1
 	`
@@ -107,13 +106,12 @@ func (repo *PostgresRepository) GetAll() ([]*models.Content, error) {
 }
 
 // GetOne get one entry.
-func (repo *PostgresRepository) GetOne(id common.UUID) (*models.Content, error) {
+func (repo *PostgresRepository) GetOne(ID common.UUID) (*models.Content, error) {
 	entry := models.NewContent()
-	row := repo.db.QueryRow(singleContent, id)
+	row := repo.db.QueryRow(singleContent, ID)
 
-	var i string
 	err := row.Scan(
-		&i,
+		&entry.ID,
 		&entry.Name,
 		&entry.Fields,
 		&entry.CreatedOn,
@@ -125,12 +123,6 @@ func (repo *PostgresRepository) GetOne(id common.UUID) (*models.Content, error) 
 			return nil, ErrNotFound
 		}
 		panic(err)
-	}
-
-	entry.ID, err = common.ParseUUID(i)
-
-	if err != nil {
-		return nil, errors.New("Could not parse ID")
 	}
 
 	return entry, nil
@@ -171,8 +163,8 @@ func (repo *PostgresRepository) Add(entry models.Content) error {
 	return err
 }
 
-func (repo *PostgresRepository) getLocales(id common.UUID) ([]string, error) {
-	rows, err := repo.db.Query(getContentDocument, id)
+func (repo *PostgresRepository) getLocales(ID common.UUID) ([]string, error) {
+	rows, err := repo.db.Query(getContentLocales, ID)
 
 	if err != nil {
 		return nil, err
@@ -253,8 +245,8 @@ func (repo *PostgresRepository) Update(entry models.Content) error {
 }
 
 // Delete deletes entry
-func (repo *PostgresRepository) Delete(id common.UUID) error {
-	_, err := repo.db.Exec(deleteContent, id)
+func (repo *PostgresRepository) Delete(ID common.UUID) error {
+	_, err := repo.db.Exec(deleteContent, ID)
 	return err
 }
 

@@ -22,11 +22,11 @@ func ContentRoutes(store *store.Store) http.Handler {
 	return r
 }
 
-// ContentModelsRoutes returns the api routes handler
-func ContentModelsRoutes(store *store.Store) http.Handler {
+// ContentTypesRoutes returns the api routes handler
+func ContentTypesRoutes(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", middleware.ContentModelIndex(store))
+	r.Get("/", middleware.ContentTypeIndex(store))
 
 	return r
 }
@@ -36,7 +36,7 @@ func NewRouter(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
 	r.Mount("/content", ContentRoutes(store))
-	r.Mount("/model", ContentModelsRoutes(store))
+	r.Mount("/model", ContentTypesRoutes(store))
 
 	return r
 }

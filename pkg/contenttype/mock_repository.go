@@ -1,4 +1,4 @@
-package contentmodels
+package contenttype
 
 import (
 	"sync"
@@ -9,12 +9,12 @@ import (
 
 // MockRepository mock repository for operating on entry data.
 type MockRepository struct {
-	items []*models.ContentModel
+	items []*models.ContentType
 	mux   *sync.Mutex
 }
 
 // GetAll get all content models.
-func (repo *MockRepository) GetAll() ([]*models.ContentModel, error) {
+func (repo *MockRepository) GetAll() ([]*models.ContentType, error) {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
@@ -22,7 +22,7 @@ func (repo *MockRepository) GetAll() ([]*models.ContentModel, error) {
 }
 
 // GetOne get one content model.
-func (repo *MockRepository) GetOne(id common.UUID) (*models.ContentModel, error) {
+func (repo *MockRepository) GetOne(id common.UUID) (*models.ContentType, error) {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
@@ -35,7 +35,7 @@ func (repo *MockRepository) GetOne(id common.UUID) (*models.ContentModel, error)
 }
 
 // Add add new entry.
-func (repo *MockRepository) Add(entry models.ContentModel) error {
+func (repo *MockRepository) Add(entry models.ContentType) error {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
@@ -44,13 +44,13 @@ func (repo *MockRepository) Add(entry models.ContentModel) error {
 }
 
 // Update Updates entry.
-func (repo *MockRepository) Update(entry models.ContentModel) error {
+func (repo *MockRepository) Update(entry models.ContentType) error {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
 	for i, n := range repo.items {
 		if entry.ID == n.ID {
-			repo.items = append(repo.items[:i], append([]*models.ContentModel{&entry}, repo.items[i:]...)...)
+			repo.items = append(repo.items[:i], append([]*models.ContentType{&entry}, repo.items[i:]...)...)
 			return nil
 		}
 	}
@@ -74,6 +74,7 @@ func (repo *MockRepository) Delete(id common.UUID) error {
 // NewMockRepository creates new mockservice.
 func NewMockRepository() Repository {
 	return &MockRepository{
-		items: make([]*models.ContentModel, 0),
+		items: make([]*models.ContentType, 0),
+		mux:   &sync.Mutex{},
 	}
 }

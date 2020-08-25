@@ -70,16 +70,17 @@ func validateFields(fields Fields) map[string]error {
 		}
 
 		valid := isValidType(kind)
+
 		if !valid {
 			if kind == reflect.Slice {
 
-				s := reflect.ValueOf(value)
+				slice := reflect.ValueOf(value)
 
-				for i := 0; i < s.Len(); i++ {
-					z := s.Index(i).Interface()
-					k := reflect.TypeOf(z).Kind()
+				for i := 0; i < slice.Len(); i++ {
+					interf := slice.Index(i).Interface()
+					kind := reflect.TypeOf(interf).Kind()
 
-					if !isValidType(k) {
+					if !isValidType(kind) {
 						e[attr] = ErrUnsupportedFieldSliceValue
 						break
 					}

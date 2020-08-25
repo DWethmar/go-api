@@ -13,8 +13,8 @@ var ErrNotFound = errors.New("Entry or entries not found")
 // Repository entry repository
 type Repository interface {
 	GetAll() ([]*models.Content, error)
-	GetOne(id common.UUID) (*models.Content, error)
+	GetOne(ID common.UUID) (*models.Content, error)
 	Add(contentItem models.Content) error
 	Update(contentItem models.Content) error
-	Delete(id common.UUID) error
+	Delete(ID common.UUID) error
 }
