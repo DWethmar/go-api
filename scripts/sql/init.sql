@@ -1,5 +1,5 @@
 
-CREATE TABLE public.content_model
+CREATE TABLE public.content_type
 (
     id VARCHAR (36) PRIMARY KEY,
     name VARCHAR (50),
@@ -7,27 +7,27 @@ CREATE TABLE public.content_model
     updated_on timestamptz NOT NULL
 );
 
-CREATE TABLE public.content_model_field
+CREATE TABLE public.content_type_field
 (
     id VARCHAR (36) PRIMARY KEY,
-    content_model_id VARCHAR (36) REFERENCES content_model(id) ON DELETE CASCADE,
+    content_type_id VARCHAR (36) REFERENCES content_type(id) ON DELETE CASCADE,
     key VARCHAR (50),  
     name VARCHAR (50),
     type VARCHAR (50),
     length smallint,
     created_on timestamptz NOT NULL,
     updated_on timestamptz NOT NULL,
-    UNIQUE (content_model_id, key)
+    UNIQUE (content_type_id, key)
 );
 
-CREATE INDEX content_model_field_type ON content_model_field(type);
+CREATE INDEX content_type_field_type ON content_type_field(type);
 
 CREATE TABLE public.content
 (
     id VARCHAR (36) PRIMARY KEY,
-    content_model_id VARCHAR (36) REFERENCES content_model(id) ON DELETE CASCADE,
+    content_type_id VARCHAR (36) REFERENCES content_type(id) ON DELETE CASCADE,
     name VARCHAR (50),
-    content_model_id 
+    content_type_id 
     created_on timestamptz NOT NULL,
     updated_on timestamptz NOT NULL
 );

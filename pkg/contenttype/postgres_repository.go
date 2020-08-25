@@ -20,7 +20,7 @@ var (
 		name, 
 		created_on, 
 		updated_on
-	FROM public.content_model c
+	FROM public.content_type c
 	ORDER BY created_on ASC`
 
 	allContentTypeFields = `
@@ -32,7 +32,7 @@ var (
 		length, 
 		created_on, 
 		updated_on
-	FROM public.content_model_field c
+	FROM public.content_type_field c
 	WHERE c.content_model_id = $1
 	ORDER BY created_on ASC`
 
@@ -42,29 +42,29 @@ var (
 		name, 
 		created_on, 
 		updated_on
-	FROM public.content_model c
+	FROM public.content_type c
 	WHERE c.id = $1
 	ORDER BY created_on ASC`
 
 	insertContentType = `
-	INSERT INTO public.content_model (id, name, created_on, updated_on)
+	INSERT INTO public.content_type (id, name, created_on, updated_on)
 	VALUES ($1, $2, $3, $4)`
 
 	insertContentTypeField = `
-	INSERT INTO public.content_model_field (id, content_model_id, key, name, type, length, created_on, updated_on)
+	INSERT INTO public.content_type_field (id, content_model_id, key, name, type, length, created_on, updated_on)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	updateContent = `
-	UPDATE public.content_model SET (name, updated_on) = ($1, $2)
+	UPDATE public.content_type SET (name, updated_on) = ($1, $2)
 	WHERE id = $3`
 
 	updateContentTypeField = `
-	UPDATE public.content_model_field (name, length, updated_on)
+	UPDATE public.content_type_field (name, length, updated_on)
 	VALUES ($1, $2, $3)
 	WHERE id = $3`
 
 	deleteContentType = `
-	DELETE FROM public.content_model WHERE id = $1
+	DELETE FROM public.content_type WHERE id = $1
 	`
 )
 
