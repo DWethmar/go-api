@@ -5,7 +5,6 @@ import (
 
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/database"
-	"github.com/dwethmar/go-api/pkg/models"
 )
 
 // PostgresRepository repository for operating on content data.
@@ -68,7 +67,7 @@ var (
 	`
 )
 
-func (repo *PostgresRepository) getFields(contentModelID common.UUID) ([]*models.ContentTypeField, error) {
+func (repo *PostgresRepository) getFields(contentModelID common.ID) ([]*Field, error) {
 	rows, err := repo.db.Query(
 		allContentTypeFields,
 		contentModelID,
@@ -79,10 +78,10 @@ func (repo *PostgresRepository) getFields(contentModelID common.UUID) ([]*models
 	}
 
 	defer rows.Close()
-	entries := make([]*models.ContentTypeField, 0)
+	entries := make([]*Field, 0)
 
 	for rows.Next() {
-		entry := &models.ContentTypeField{}
+		entry := &Field{}
 		err := rows.Scan(
 			&entry.EntryModelID,
 			&entry.Key,
@@ -105,8 +104,8 @@ func (repo *PostgresRepository) getFields(contentModelID common.UUID) ([]*models
 	return entries, nil
 }
 
-// GetAll get all entries.
-func (repo *PostgresRepository) GetAll() ([]*models.ContentType, error) {
+// List get all entries.
+func (repo *PostgresRepository) List() ([]*ContentType, error) {
 	rows, err := repo.db.Query(allContentType)
 
 	if err != nil {
@@ -114,10 +113,10 @@ func (repo *PostgresRepository) GetAll() ([]*models.ContentType, error) {
 	}
 
 	defer rows.Close()
-	entries := make([]*models.ContentType, 0)
+	entries := make([]*ContentType, 0)
 
 	for rows.Next() {
-		entry := &models.ContentType{}
+		entry := &ContentType{}
 		err := rows.Scan(
 			&entry.ID,
 			&entry.Name,
@@ -145,9 +144,9 @@ func (repo *PostgresRepository) GetAll() ([]*models.ContentType, error) {
 	return entries, nil
 }
 
-// GetOne get one entry.
-func (repo *PostgresRepository) GetOne(ID common.UUID) (*models.ContentType, error) {
-	entry := &models.ContentType{}
+// Get entry.
+func (repo *PostgresRepository) Get(ID common.ID) (*ContentType, error) {
+	entry := &ContentType{}
 	row := repo.db.QueryRow(singleContentType, ID)
 
 	err := row.Scan(
@@ -174,25 +173,25 @@ func (repo *PostgresRepository) GetOne(ID common.UUID) (*models.ContentType, err
 	return entry, nil
 }
 
-// Add add one entry.
-func (repo *PostgresRepository) Add(entry models.ContentType) error {
+// Create entry.
+func (repo *PostgresRepository) Create(c *ContentType) (common.ID, error) {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := tx.Exec(
 			insertContentType,
-			entry.ID,
-			entry.Name,
-			entry.CreatedOn,
-			entry.UpdatedOn,
+			c.ID,
+			c.Name,
+			c.CreatedOn,
+			c.UpdatedOn,
 		)
 
 		if err != nil {
 			return err
 		}
 
-		for _, field := range entry.Fields {
+		for _, field := range c.Fields {
 			_, err = tx.Exec(
 				insertContentTypeField,
-				entry.ID,
+				c.ID,
 				field.Key,
 				field.Name,
 				field.Length,
@@ -208,26 +207,26 @@ func (repo *PostgresRepository) Add(entry models.ContentType) error {
 		return err
 	})
 
-	return err
+	return c.ID, err
 }
 
 // Update updates entry.
-func (repo *PostgresRepository) Update(entry models.ContentType) error {
+func (repo *PostgresRepository) Update(c *ContentType) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := tx.Exec(
 			updateContent,
-			entry.Name,
-			entry.UpdatedOn,
-			entry.ID,
+			c.Name,
+			c.UpdatedOn,
+			c.ID,
 		)
 
 		if err != nil {
 			return err
 		}
 
-		fields, err := repo.getFields(entry.ID)
+		fields, err := repo.getFields(c.ID)
 
-		for _, field := range entry.Fields {
+		for _, field := range c.Fields {
 			exists := hasField(field.Key, fields)
 
 			if exists {
@@ -236,7 +235,7 @@ func (repo *PostgresRepository) Update(entry models.ContentType) error {
 					field.Name,
 					field.Length,
 					field.UpdatedOn,
-					entry.ID,
+					c.ID,
 				)
 
 				if err != nil {
@@ -245,7 +244,7 @@ func (repo *PostgresRepository) Update(entry models.ContentType) error {
 			} else {
 				_, err = tx.Exec(
 					insertContentTypeField,
-					entry.ID,
+					c.ID,
 					field.ID,
 					field.Key,
 					field.Name,
@@ -267,12 +266,12 @@ func (repo *PostgresRepository) Update(entry models.ContentType) error {
 }
 
 // Delete deletes entry
-func (repo *PostgresRepository) Delete(ID common.UUID) error {
+func (repo *PostgresRepository) Delete(ID common.ID) error {
 	_, err := repo.db.Exec(deleteContentType, ID)
 	return err
 }
 
-func hasField(key string, fields []*models.ContentTypeField) bool {
+func hasField(key string, fields []*Field) bool {
 	for _, field := range fields {
 		if key == field.Key {
 			return true

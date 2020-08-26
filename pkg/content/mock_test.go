@@ -7,14 +7,13 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
-	"github.com/dwethmar/go-api/pkg/models"
 )
 
-var mock = models.Content{
-	ID:   common.CreateNewUUID(),
+var mock = Content{
+	ID:   common.NewID(),
 	Name: "wow",
-	Fields: models.FieldTranslations{
-		"nl": models.Fields{
+	Fields: FieldTranslations{
+		"nl": Fields{
 			"attr1": 1,
 			"attr2": "attribute string value",
 			"attr3": []int{1, 2, 3},
@@ -28,10 +27,10 @@ var mock = models.Content{
 
 func TestUnitMockGetAll(t *testing.T) {
 	c := NewMockRepository()
-	c.Add(mock)
-	c.Add(mock)
+	c.Create(&mock)
+	c.Create(&mock)
 
-	items, _ := c.GetAll()
+	items, _ := c.List()
 
 	if len(items) != 2 {
 		t.Errorf("Expected 2 items but received %v", len(items))
@@ -40,10 +39,10 @@ func TestUnitMockGetAll(t *testing.T) {
 
 func TestUnitMockGetOne(t *testing.T) {
 	c := NewMockRepository()
-	c.Add(mock)
-	c.Add(mock)
+	c.Create(&mock)
+	c.Create(&mock)
 
-	item, err := c.GetOne(mock.ID)
+	item, err := c.Get(mock.ID)
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
@@ -53,13 +52,14 @@ func TestUnitMockGetOne(t *testing.T) {
 	}
 
 	if item.ID != mock.ID {
-		t.Errorf("Expected item with id %v but recieved %v", mock.ID, item.ID)
+		t.Errorf("Expected item with id %v but received %v", mock.ID, item.ID)
 	}
 }
 
 func TestUnitMockAdd(t *testing.T) {
 	c := NewMockRepository()
-	c.Add(mock)
+	c.Create(&mock)
+	c.Create(&mock)
 
 	a, err := json.Marshal(mock)
 	if err != nil {
@@ -67,7 +67,7 @@ func TestUnitMockAdd(t *testing.T) {
 		return
 	}
 
-	createdEntry, err := c.GetOne(mock.ID)
+	createdEntry, err := c.Get(mock.ID)
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
@@ -86,9 +86,10 @@ func TestUnitMockAdd(t *testing.T) {
 
 func TestUnitMockUpdate(t *testing.T) {
 	c := NewMockRepository()
-	c.Add(mock)
+	c.Create(&mock)
+	c.Create(&mock)
 
-	createdEntry, err := c.GetOne(mock.ID)
+	createdEntry, err := c.Get(mock.ID)
 	if err != nil {
 		t.Errorf("Unexpected error")
 		return
@@ -97,13 +98,13 @@ func TestUnitMockUpdate(t *testing.T) {
 	updateEntry := *createdEntry
 	updateEntry.Fields["nl"]["attr1"] = "new value!"
 
-	err = c.Update(updateEntry)
+	err = c.Update(&updateEntry)
 	if err != nil {
 		t.Errorf("Unexpected error while updating entry")
 		return
 	}
 
-	updatedEntry, err := c.GetOne(mock.ID)
+	updatedEntry, err := c.Get(mock.ID)
 	if err != nil {
 		t.Errorf("Unexpected error")
 		return
@@ -116,9 +117,9 @@ func TestUnitMockUpdate(t *testing.T) {
 
 func TestUnitMockDelete(t *testing.T) {
 	c := NewMockRepository()
-	c.Add(mock)
+	c.Create(&mock)
 
-	createdEntry, err := c.GetOne(mock.ID)
+	createdEntry, err := c.Get(mock.ID)
 	if err != nil {
 		t.Errorf("Unexpected error")
 		return
@@ -130,7 +131,7 @@ func TestUnitMockDelete(t *testing.T) {
 		return
 	}
 
-	_, err = c.GetOne(mock.ID)
+	_, err = c.Get(mock.ID)
 	if err != nil {
 		if err != ErrNotFound {
 			t.Errorf("Unexpected entry")

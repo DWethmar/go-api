@@ -6,7 +6,6 @@ import (
 
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/database"
-	"github.com/dwethmar/go-api/pkg/models"
 )
 
 // PostgresRepository repository for operating on content data.
@@ -72,8 +71,8 @@ var (
 	`
 )
 
-// GetAll get all entries.
-func (repo *PostgresRepository) GetAll() ([]*models.Content, error) {
+// List entries.
+func (repo *PostgresRepository) List() ([]*Content, error) {
 	rows, err := repo.db.Query(allContent)
 
 	if err != nil {
@@ -81,10 +80,10 @@ func (repo *PostgresRepository) GetAll() ([]*models.Content, error) {
 	}
 
 	defer rows.Close()
-	entrys := make([]*models.Content, 0)
+	entrys := make([]*Content, 0)
 
 	for rows.Next() {
-		entry := &models.Content{}
+		entry := &Content{}
 		err := rows.Scan(
 			&entry.ID,
 			&entry.Name,
@@ -105,9 +104,9 @@ func (repo *PostgresRepository) GetAll() ([]*models.Content, error) {
 	return entrys, nil
 }
 
-// GetOne get one entry.
-func (repo *PostgresRepository) GetOne(ID common.UUID) (*models.Content, error) {
-	entry := models.NewContent()
+// Get one entry.
+func (repo *PostgresRepository) Get(ID common.ID) (*Content, error) {
+	entry := &Content{}
 	row := repo.db.QueryRow(singleContent, ID)
 
 	err := row.Scan(
@@ -128,25 +127,25 @@ func (repo *PostgresRepository) GetOne(ID common.UUID) (*models.Content, error) 
 	return entry, nil
 }
 
-// Add add one entry.
-func (repo *PostgresRepository) Add(entry models.Content) error {
+// Create add one entry.
+func (repo *PostgresRepository) Create(c *Content) (common.ID, error) {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
 			insertContent,
-			entry.ID,
-			entry.Name,
-			entry.CreatedOn,
-			entry.UpdatedOn,
+			c.ID,
+			c.Name,
+			c.CreatedOn,
+			c.UpdatedOn,
 		)
 
 		if err != nil {
 			return err
 		}
 
-		for locale, fields := range entry.Fields {
+		for locale, fields := range c.Fields {
 			_, err = tx.Exec(
 				insertContentDocument,
-				entry.ID,
+				c.ID,
 				locale,
 				fields,
 			)
@@ -160,10 +159,10 @@ func (repo *PostgresRepository) Add(entry models.Content) error {
 		return err
 	})
 
-	return err
+	return c.ID, err
 }
 
-func (repo *PostgresRepository) getLocales(ID common.UUID) ([]string, error) {
+func (repo *PostgresRepository) getLocales(ID common.ID) ([]string, error) {
 	rows, err := repo.db.Query(getContentLocales, ID)
 
 	if err != nil {
@@ -186,25 +185,25 @@ func (repo *PostgresRepository) getLocales(ID common.UUID) ([]string, error) {
 }
 
 // Update updates entry.
-func (repo *PostgresRepository) Update(entry models.Content) error {
+func (repo *PostgresRepository) Update(c *Content) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := repo.db.Exec(
 			updateContent,
-			entry.Name,
-			entry.UpdatedOn,
-			entry.ID,
+			c.Name,
+			c.UpdatedOn,
+			c.ID,
 		)
 
 		if err != nil {
 			return err
 		}
 
-		locales, err := repo.getLocales(entry.ID)
+		locales, err := repo.getLocales(c.ID)
 		if err != nil {
 			return err
 		}
 
-		for locale, fields := range entry.Fields {
+		for locale, fields := range c.Fields {
 			hasLocale := false
 			for _, n := range locales {
 				if locale == n {
@@ -217,7 +216,7 @@ func (repo *PostgresRepository) Update(entry models.Content) error {
 				_, err = tx.Exec(
 					updateContentDocument,
 					fields,
-					entry.ID,
+					c.ID,
 					locale,
 				)
 
@@ -227,7 +226,7 @@ func (repo *PostgresRepository) Update(entry models.Content) error {
 			} else {
 				_, err = tx.Exec(
 					insertContentDocument,
-					entry.ID,
+					c.ID,
 					locale,
 					fields,
 				)
@@ -245,7 +244,7 @@ func (repo *PostgresRepository) Update(entry models.Content) error {
 }
 
 // Delete deletes entry
-func (repo *PostgresRepository) Delete(ID common.UUID) error {
+func (repo *PostgresRepository) Delete(ID common.ID) error {
 	_, err := repo.db.Exec(deleteContent, ID)
 	return err
 }

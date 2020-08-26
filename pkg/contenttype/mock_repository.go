@@ -4,25 +4,24 @@ import (
 	"sync"
 
 	"github.com/dwethmar/go-api/pkg/common"
-	"github.com/dwethmar/go-api/pkg/models"
 )
 
 // MockRepository mock repository for operating on entry data.
 type MockRepository struct {
-	items []*models.ContentType
+	items []*ContentType
 	mux   *sync.Mutex
 }
 
-// GetAll get all content models.
-func (repo *MockRepository) GetAll() ([]*models.ContentType, error) {
+// List get all content content.
+func (repo *MockRepository) List() ([]*ContentType, error) {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
 	return repo.items, nil
 }
 
-// GetOne get one content model.
-func (repo *MockRepository) GetOne(id common.UUID) (*models.ContentType, error) {
+// Get entry.
+func (repo *MockRepository) Get(id common.ID) (*ContentType, error) {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
@@ -34,23 +33,23 @@ func (repo *MockRepository) GetOne(id common.UUID) (*models.ContentType, error) 
 	return nil, ErrNotFound
 }
 
-// Add add new entry.
-func (repo *MockRepository) Add(entry models.ContentType) error {
+// Create adds new entry.
+func (repo *MockRepository) Create(entry *ContentType) (common.ID, error) {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
-	repo.items = append(repo.items, &entry)
-	return nil
+	repo.items = append(repo.items, entry)
+	return entry.ID, nil
 }
 
 // Update Updates entry.
-func (repo *MockRepository) Update(entry models.ContentType) error {
+func (repo *MockRepository) Update(entry *ContentType) error {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
 	for i, n := range repo.items {
 		if entry.ID == n.ID {
-			repo.items = append(repo.items[:i], append([]*models.ContentType{&entry}, repo.items[i:]...)...)
+			repo.items = append(repo.items[:i], append([]*ContentType{entry}, repo.items[i:]...)...)
 			return nil
 		}
 	}
@@ -58,7 +57,7 @@ func (repo *MockRepository) Update(entry models.ContentType) error {
 }
 
 // Delete deletes entry.
-func (repo *MockRepository) Delete(id common.UUID) error {
+func (repo *MockRepository) Delete(id common.ID) error {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
@@ -74,7 +73,7 @@ func (repo *MockRepository) Delete(id common.UUID) error {
 // NewMockRepository creates new mockservice.
 func NewMockRepository() Repository {
 	return &MockRepository{
-		items: make([]*models.ContentType, 0),
+		items: make([]*ContentType, 0),
 		mux:   &sync.Mutex{},
 	}
 }

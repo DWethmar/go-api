@@ -1,10 +1,10 @@
-package middleware
+package handler
 
 import (
 	"fmt"
 	"net/http"
 
-	"github.com/dwethmar/go-api/pkg/request"
+	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/store"
 )
 
@@ -12,18 +12,14 @@ import (
 func ContentTypeIndex(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if (*r).Method == "OPTIONS" {
-			return
-		}
-
-		var entries, err = s.Content.GetAll()
+		var c, err = s.ContentType.List()
 
 		if err != nil {
 			fmt.Printf("Error while getting entries: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		request.SendJSON(w, r, entries, http.StatusOK)
+		common.SendJSON(w, r, c, http.StatusOK)
 	})
 }

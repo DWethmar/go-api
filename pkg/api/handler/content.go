@@ -1,4 +1,4 @@
-package middleware
+package handler
 
 import (
 	"encoding/json"
@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/dwethmar/go-api/pkg/api/request"
+	"github.com/dwethmar/go-api/pkg/api/response"
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/content"
-	"github.com/dwethmar/go-api/pkg/models"
-	"github.com/dwethmar/go-api/pkg/request"
 	"github.com/dwethmar/go-api/pkg/store"
 )
 
@@ -23,56 +23,67 @@ type ErrorResponds struct {
 func ContentIndex(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-		if (*r).Method == "OPTIONS" {
-			return
-		}
-
-		var entries, err = s.Content.GetAll()
+		entries, err := s.Content.List()
 
 		if err != nil {
 			fmt.Printf("Error while getting entries: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		request.SendJSON(w, r, entries, http.StatusOK)
+		var p []*response.Content
+		for _, d := range entries {
+			p = append(p, &response.Content{
+				ID:        d.ID.String(),
+				Name:      d.Name,
+				Fields:    d.Fields,
+				CreatedOn: d.CreatedOn,
+				UpdatedOn: d.UpdatedOn,
+			})
+		}
+
+		common.SendJSON(w, r, p, http.StatusOK)
 	})
 }
 
 // CreateContent creates a new entry from post data.
 func CreateContent(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		decoder := json.NewDecoder(r.Body)
-		newEntry := models.AddContent{
-			Fields: make(models.FieldTranslations),
-		}
 
-		err := decoder.Decode(&newEntry)
+		var input = &request.AddContent{}
+
+		err := json.NewDecoder(r.Body).Decode(&input)
 
 		if err != nil {
 			fmt.Printf("Error while decoding entry: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		if err := newEntry.Validate(); err != nil {
-			request.SendBadRequestError(w, r, err)
-			return
+		c := &content.Content{
+			ID:        common.NewID(),
+			Name:      input.Name,
+			CreatedOn: time.Now(),
+			UpdatedOn: time.Now(),
+			Fields:    input.Fields,
 		}
-
-		entry, err := s.Content.Create(newEntry)
+		c.ID, err = s.Content.Create(c)
 
 		if err != nil {
 			fmt.Printf("Error while creating entry: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		request.SendJSON(w, r, entry, http.StatusCreated)
+		p := &response.Content{
+			ID:        c.ID.String(),
+			Name:      c.Name,
+			Fields:    c.Fields,
+			CreatedOn: c.CreatedOn,
+			UpdatedOn: c.UpdatedOn,
+		}
+
+		common.SendJSON(w, r, p, http.StatusCreated)
 	})
 }
 
@@ -81,45 +92,46 @@ func UpdateContent(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 		}
 
-		decoder := json.NewDecoder(r.Body)
-		var updateEntry models.UpdateContent
-		err = decoder.Decode(&updateEntry)
+		var input = &request.UpdateContent{}
 
+		err = json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			fmt.Printf("Error while decoding entry: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		if err := updateEntry.Validate(); err != nil {
-			request.SendBadRequestError(w, r, err)
-			return
-		}
-
-		entry, err := s.Content.GetOne(id)
-
+		c, err := s.Content.Get(id)
 		if err != nil {
 			fmt.Printf("Error while getting entry: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		entry.Name = updateEntry.Name
-		entry.Fields = updateEntry.Fields
-		entry.UpdatedOn = time.Now()
+		c.Name = input.Name
+		c.Fields = input.Fields
+		c.UpdatedOn = time.Now()
 
-		err = s.Content.Update(*entry)
+		err = s.Content.Update(c)
 
 		if err != nil {
 			fmt.Printf("Error while updating entry: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		request.SendJSON(w, r, entry, http.StatusOK)
+		p := &response.Content{
+			ID:        c.ID.String(),
+			Name:      c.Name,
+			Fields:    c.Fields,
+			CreatedOn: c.CreatedOn,
+			UpdatedOn: c.UpdatedOn,
+		}
+
+		common.SendJSON(w, r, p, http.StatusOK)
 	})
 }
 
@@ -130,19 +142,19 @@ func DeleteContent(s *store.Store) http.HandlerFunc {
 
 		if err != nil {
 			fmt.Printf("Error while getting id: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 		}
 
-		entry, err := s.Content.GetOne(id)
+		c, err := s.Content.Get(id)
 
 		if err != nil {
 			if err == content.ErrNotFound {
 				fmt.Printf("Could not find entry: %v", err)
-				request.SendNotFoundError(w, r)
+				common.SendNotFoundError(w, r)
 				return
 			}
-			fmt.Printf("Error while Getting entry: %v %v", err, entry)
-			request.SendServerError(w, r)
+			fmt.Printf("Error while Getting entry: %v %v", err, c)
+			common.SendServerError(w, r)
 			return
 		}
 
@@ -150,11 +162,19 @@ func DeleteContent(s *store.Store) http.HandlerFunc {
 
 		if err != nil {
 			fmt.Printf("Error while deleting entry: %v", err)
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		request.SendJSON(w, r, entry, http.StatusOK)
+		p := &response.Content{
+			ID:        c.ID.String(),
+			Name:      c.Name,
+			Fields:    c.Fields,
+			CreatedOn: c.CreatedOn,
+			UpdatedOn: c.UpdatedOn,
+		}
+
+		common.SendJSON(w, r, p, http.StatusOK)
 	})
 }
 
@@ -164,22 +184,22 @@ func GetSingleContent(s *store.Store) http.HandlerFunc {
 		id, err := common.UUIDFromContext(r.Context())
 		if err != nil {
 			log.Print(fmt.Sprintf("Error on retreiving ID: %v", err))
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 		}
 
-		entry, err := s.Content.GetOne(id)
+		entry, err := s.Content.Get(id)
 
 		if err != nil {
 			if err == content.ErrNotFound {
 				log.Print(fmt.Sprintf("Entry not found: %v", err))
-				request.SendNotFoundError(w, r)
+				common.SendNotFoundError(w, r)
 				return
 			}
 			log.Print(fmt.Sprintf("Somthing went wrong: %v", err))
-			request.SendServerError(w, r)
+			common.SendServerError(w, r)
 			return
 		}
 
-		request.SendJSON(w, r, entry, http.StatusOK)
+		common.SendJSON(w, r, entry, http.StatusOK)
 	})
 }

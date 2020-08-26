@@ -4,63 +4,52 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
-	"github.com/dwethmar/go-api/pkg/models"
 )
 
 // Service entry service
 type Service interface {
-	GetOne(common.UUID) (*models.Content, error)
-	GetAll() ([]*models.Content, error)
-	Update(models.Content) error
-	Create(models.AddContent) (*models.Content, error)
-	Delete(common.UUID) error
+	Get(common.ID) (*Content, error)
+	List() ([]*Content, error)
+	Update(*Content) error
+	Create(*Content) (common.ID, error)
+	Delete(common.ID) error
 }
 
 type service struct {
 	repo Repository
 }
 
-func (s *service) GetOne(id common.UUID) (*models.Content, error) {
-	item, err := s.repo.GetOne(id)
-	return item, err
+func (s *service) Get(id common.ID) (*Content, error) {
+	return s.repo.Get(id)
 }
 
-func (s *service) GetAll() ([]*models.Content, error) {
-	items, err := s.repo.GetAll()
-	return items, err
+func (s *service) List() ([]*Content, error) {
+	return s.repo.List()
 }
 
-func (s *service) Update(contentItem models.Content) error {
-	contentItem.UpdatedOn = time.Now()
-	err := s.repo.Update(contentItem)
-	return err
+func (s *service) Update(entry *Content) error {
+	entry.UpdatedOn = time.Now()
+	return s.repo.Update(entry)
 }
 
-func (s *service) Create(entry models.AddContent) (*models.Content, error) {
+func (s *service) Create(entry *Content) (common.ID, error) {
 	if entry.Fields == nil {
-		entry.Fields = make(models.FieldTranslations)
+		entry.Fields = make(FieldTranslations)
 	}
 
-	var contentItem = models.Content{
-		ID:        common.CreateNewUUID(),
+	var contentItem = &Content{
+		ID:        common.NewID(),
 		Name:      entry.Name,
 		Fields:    entry.Fields,
 		CreatedOn: time.Now(),
 		UpdatedOn: time.Now(),
 	}
 
-	err := s.repo.Add(contentItem)
-
-	if err != nil {
-		return nil, err
-	}
-	addedContentItem, err := s.GetOne(contentItem.ID)
-	return addedContentItem, err
+	return s.repo.Create(contentItem)
 }
 
-func (s *service) Delete(id common.UUID) error {
-	err := s.repo.Delete(id)
-	return err
+func (s *service) Delete(id common.ID) error {
+	return s.repo.Delete(id)
 }
 
 // NewService creates a listing service with the necessary dependencies

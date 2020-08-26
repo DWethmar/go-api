@@ -3,7 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/dwethmar/go-api/pkg/middleware"
+	"github.com/dwethmar/go-api/pkg/api/handler"
+	"github.com/dwethmar/go-api/pkg/api/middleware"
 	"github.com/dwethmar/go-api/pkg/store"
 
 	"github.com/go-chi/chi"
@@ -13,11 +14,11 @@ import (
 func ContentRoutes(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", middleware.ContentIndex(store))
-	r.Get("/{id}", RequireEntryID(middleware.GetSingleContent(store)))
-	r.Delete("/{id}", RequireEntryID(middleware.DeleteContent(store)))
-	r.Post("/{id}", RequireEntryID(middleware.UpdateContent(store)))
-	r.Post("/", middleware.CreateContent(store))
+	r.Get("/", handler.ContentIndex(store))
+	r.Get("/{id}", middleware.RequireID(handler.GetSingleContent(store)))
+	r.Delete("/{id}", middleware.RequireID(handler.DeleteContent(store)))
+	r.Post("/{id}", middleware.RequireID(handler.UpdateContent(store)))
+	r.Post("/", handler.CreateContent(store))
 
 	return r
 }
@@ -26,7 +27,7 @@ func ContentRoutes(store *store.Store) http.Handler {
 func ContentTypesRoutes(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", middleware.ContentTypeIndex(store))
+	r.Get("/", handler.ContentTypeIndex(store))
 
 	return r
 }
@@ -36,7 +37,7 @@ func NewRouter(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
 	r.Mount("/content", ContentRoutes(store))
-	r.Mount("/model", ContentTypesRoutes(store))
+	r.Mount("/type", ContentTypesRoutes(store))
 
 	return r
 }

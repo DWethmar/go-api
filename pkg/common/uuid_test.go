@@ -6,7 +6,7 @@ import (
 )
 
 func TestParseUUID(t *testing.T) {
-	_, err := ParseUUID("1f7e2926-31a0-4a1a-bc01-88811ff60165")
+	_, err := StringToID("1f7e2926-31a0-4a1a-bc01-88811ff60165")
 
 	if err != nil {
 		t.Error("Unexpected error.", err)
@@ -14,7 +14,7 @@ func TestParseUUID(t *testing.T) {
 }
 
 func TestInvalidParseUUID(t *testing.T) {
-	_, err := ParseUUID("abc")
+	_, err := StringToID("abc")
 
 	if err == nil {
 		t.Error("Expected error.")
@@ -22,11 +22,11 @@ func TestInvalidParseUUID(t *testing.T) {
 }
 
 func TestWithWithUUID(t *testing.T) {
-	ID := CreateNewUUID()
+	ID := NewID()
 
 	req := httptest.NewRequest("DELETE", "/", nil)
 	ctx := req.Context()
-	ctx = WithUUID(ctx, ID)
+	ctx = WithID(ctx, ID)
 
 	IDFromContext, err := UUIDFromContext(ctx)
 

@@ -4,61 +4,53 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
-	"github.com/dwethmar/go-api/pkg/models"
 )
 
 // Service entry service
 type Service interface {
-	GetOne(common.UUID) (*models.ContentType, error)
-	GetAll() ([]*models.ContentType, error)
-	Update(models.ContentType) error
-	Create(models.AddContentType) (*models.ContentType, error)
-	Delete(common.UUID) error
+	Get(common.ID) (*ContentType, error)
+	List() ([]*ContentType, error)
+	Update(*ContentType) error
+	Create(*ContentType) (common.ID, error)
+	Delete(common.ID) error
 }
 
 type service struct {
 	repo Repository
 }
 
-func (s *service) GetOne(id common.UUID) (*models.ContentType, error) {
-	item, err := s.repo.GetOne(id)
+func (s *service) Get(id common.ID) (*ContentType, error) {
+	item, err := s.repo.Get(id)
 	return item, err
 }
 
-func (s *service) GetAll() ([]*models.ContentType, error) {
-	items, err := s.repo.GetAll()
+func (s *service) List() ([]*ContentType, error) {
+	items, err := s.repo.List()
 	return items, err
 }
 
-func (s *service) Update(contentItem models.ContentType) error {
+func (s *service) Update(contentItem *ContentType) error {
 	contentItem.UpdatedOn = time.Now()
-	err := s.repo.Update(contentItem)
-	return err
+	return s.repo.Update(contentItem)
 }
 
-func (s *service) Create(entry models.AddContentType) (*models.ContentType, error) {
+func (s *service) Create(entry *ContentType) (common.ID, error) {
 	if entry.Fields == nil {
-		entry.Fields = make([]*models.ContentTypeField, 0)
+		entry.Fields = make([]*Field, 0)
 	}
 
-	var contentItem = models.ContentType{
-		ID:        common.CreateNewUUID(),
+	var contentItem = &ContentType{
+		ID:        common.NewID(),
 		Name:      entry.Name,
 		Fields:    entry.Fields,
 		CreatedOn: time.Now(),
 		UpdatedOn: time.Now(),
 	}
 
-	err := s.repo.Add(contentItem)
-
-	if err != nil {
-		return nil, err
-	}
-	addedContentItem, err := s.GetOne(contentItem.ID)
-	return addedContentItem, err
+	return s.repo.Create(contentItem)
 }
 
-func (s *service) Delete(id common.UUID) error {
+func (s *service) Delete(id common.ID) error {
 	err := s.repo.Delete(id)
 	return err
 }
