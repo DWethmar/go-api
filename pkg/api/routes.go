@@ -14,7 +14,7 @@ import (
 func ContentRoutes(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", handler.ContentIndex(store))
+	r.Get("/", handler.ListContent(store))
 	r.Get("/{id}", middleware.RequireID(handler.GetSingleContent(store)))
 	r.Delete("/{id}", middleware.RequireID(handler.DeleteContent(store)))
 	r.Post("/{id}", middleware.RequireID(handler.UpdateContent(store)))
@@ -27,7 +27,7 @@ func ContentRoutes(store *store.Store) http.Handler {
 func ContentTypesRoutes(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", handler.ContentTypeIndex(store))
+	r.Get("/", handler.ListContentType(store))
 
 	return r
 }

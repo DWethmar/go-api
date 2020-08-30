@@ -3,12 +3,13 @@ package response
 import (
 	"time"
 
+	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/content"
 )
 
 // Content model
 type Content struct {
-	ID        string                    `json:"id"`
+	ID        common.ID                 `json:"id"`
 	Name      string                    `json:"name"`
 	Fields    content.FieldTranslations `json:"fields"`
 	CreatedOn time.Time                 `json:"createdOn"`

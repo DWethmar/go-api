@@ -90,7 +90,7 @@ func TestContentIndex(t *testing.T) {
 			entries = append(entries, entry)
 		}
 
-		handler := http.HandlerFunc(ContentIndex(store))
+		handler := http.HandlerFunc(ListContent(store))
 		handler.ServeHTTP(rr, req)
 	})
 

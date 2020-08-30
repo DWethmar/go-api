@@ -19,8 +19,8 @@ type ErrorResponds struct {
 	error string
 }
 
-// ContentIndex get list of entries
-func ContentIndex(s *store.Store) http.HandlerFunc {
+// ListContent get list of entries
+func ListContent(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		entries, err := s.Content.List()
@@ -34,7 +34,7 @@ func ContentIndex(s *store.Store) http.HandlerFunc {
 		var p []*response.Content
 		for _, d := range entries {
 			p = append(p, &response.Content{
-				ID:        d.ID.String(),
+				ID:        d.ID,
 				Name:      d.Name,
 				Fields:    d.Fields,
 				CreatedOn: d.CreatedOn,
@@ -76,7 +76,7 @@ func CreateContent(s *store.Store) http.HandlerFunc {
 		}
 
 		p := &response.Content{
-			ID:        c.ID.String(),
+			ID:        c.ID,
 			Name:      c.Name,
 			Fields:    c.Fields,
 			CreatedOn: c.CreatedOn,
@@ -124,7 +124,7 @@ func UpdateContent(s *store.Store) http.HandlerFunc {
 		}
 
 		p := &response.Content{
-			ID:        c.ID.String(),
+			ID:        c.ID,
 			Name:      c.Name,
 			Fields:    c.Fields,
 			CreatedOn: c.CreatedOn,
@@ -167,7 +167,7 @@ func DeleteContent(s *store.Store) http.HandlerFunc {
 		}
 
 		p := &response.Content{
-			ID:        c.ID.String(),
+			ID:        c.ID,
 			Name:      c.Name,
 			Fields:    c.Fields,
 			CreatedOn: c.CreatedOn,
