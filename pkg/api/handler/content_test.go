@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/api/request"
+	"github.com/dwethmar/go-api/pkg/api/response"
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/content"
 	"github.com/dwethmar/go-api/pkg/store"
@@ -72,6 +73,17 @@ func TestContentIndex(t *testing.T) {
 		},
 	}
 
+	var p []*response.Content
+	for _, d := range addItems {
+		p = append(p, &response.Content{
+			ID:        d.ID,
+			Name:      d.Name,
+			Fields:    d.Fields,
+			CreatedOn: d.CreatedOn,
+			UpdatedOn: d.UpdatedOn,
+		})
+	}
+
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -101,7 +113,7 @@ func TestContentIndex(t *testing.T) {
 	assert.Equal(t, rType, "application/json", "Content-Type code should be equal")
 
 	// Check the response body is what we expect.
-	expected, _ := json.Marshal(entries)
+	expected, _ := json.Marshal(p)
 
 	if rr.Body.String() != string(expected) {
 		t.Errorf("handler returned unexpected body: received %v expected %v", rr.Body.String(), string(expected))
