@@ -15,12 +15,12 @@ type Config struct {
 }
 
 func LoadConfig() Config {
-	dbHost := os.Getenv("API_PQ_HOST")
+	dbHost := os.Getenv("POSTGRES_HOST")
 	dbPort := os.Getenv("API_PG_PORT")
-	dbUser := os.Getenv("API_PQ_USER")
-	dbPassword := os.Getenv("API_PQ_PASSWORD")
-	dbName := os.Getenv("API_PQ_DB_NAME")
-	dbDriverName := os.Getenv("API_DRIVER_NAME")
+	dbUser := os.Getenv("POSTGRES_USER")
+	dbPassword := os.Getenv("POSTGRES_PASSWORD")
+	dbName := os.Getenv("POSTGRES_DB_NAME")
+	dbDriverName := os.Getenv("DB_DRIVER_NAME")
 	createDBScript := os.Getenv("CREATE_DB_SQL_FILE")
 
 	return Config{
