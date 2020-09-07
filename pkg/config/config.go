@@ -16,7 +16,7 @@ type Config struct {
 
 func LoadConfig() Config {
 	dbHost := os.Getenv("POSTGRES_HOST")
-	dbPort := os.Getenv("API_PG_PORT")
+	dbPort := os.Getenv("POSTGRES_PORT")
 	dbUser := os.Getenv("POSTGRES_USER")
 	dbPassword := os.Getenv("POSTGRES_PASSWORD")
 	dbName := os.Getenv("POSTGRES_DB_NAME")

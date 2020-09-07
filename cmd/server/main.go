@@ -19,8 +19,8 @@ func main() {
 
 	fmt.Println("Staring API")
 
-	env := config.LoadEnvFile()
-	driverName, dataSource := config.GetPostgresConnectionInfo(env)
+	c := config.LoadEnvFile()
+	driverName, dataSource := config.GetPostgresConnectionInfo(c)
 
 	db, err := database.NewDB(driverName, dataSource)
 	if err != nil {
