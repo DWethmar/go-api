@@ -19,34 +19,6 @@ import (
 
 var defaultLocale = "nl"
 
-func areFieldsEqual(a, b content.FieldTranslations) (bool, error) {
-	ar, err := json.Marshal(a)
-	if err != nil {
-		return false, err
-	}
-
-	br, err := json.Marshal(b)
-	if err != nil {
-		return false, err
-	}
-
-	return string(ar) == string(br), nil
-}
-
-func areEntriesEqual(a, b content.Content) (bool, error) {
-	ar, err := json.Marshal(a)
-	if err != nil {
-		return false, err
-	}
-
-	br, err := json.Marshal(b)
-	if err != nil {
-		return false, err
-	}
-
-	return string(ar) == string(br), nil
-}
-
 func TestContentIndex(t *testing.T) {
 	addItems := []*content.Content{
 		{
