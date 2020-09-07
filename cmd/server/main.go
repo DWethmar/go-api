@@ -24,6 +24,7 @@ func main() {
 
 	db, err := database.NewDB(driverName, dataSource)
 	if err != nil {
+		log.Printf(" %v ------- %v ", driverName, dataSource)
 		panic(err)
 	}
 
