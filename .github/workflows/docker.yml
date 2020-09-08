@@ -26,6 +26,6 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: dwethmar/go-api
-        tags: latest,${{ env.RELEASE_VERSION }}
+        tags: "latest,${{ env.RELEASE_VERSION }}"
         tag_with_ref: true
         add_git_labels: true
