@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -28,26 +27,6 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
-
-	files, err := ioutil.ReadDir("/app")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, f := range files {
-		fmt.Println(f.Name())
-	}
-
-	fmt.Println("-----------------")
-
-	files, err = ioutil.ReadDir("../")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, f := range files {
-		fmt.Println(f.Name())
-	}
 
 	err = database.RunMigrations(db, c.DBName, "file:///app/migrations")
 	if err != nil {
