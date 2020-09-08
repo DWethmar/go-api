@@ -12,7 +12,7 @@ import (
 )
 
 // RunMigrations runs the migration from a folder.
-func RunMigrations(db *sql.DB, dbName, folder string) error {
+func RunMigrations(db *sql.DB, dbName, folder string, version int) error {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 
 	if err != nil {
@@ -29,15 +29,15 @@ func RunMigrations(db *sql.DB, dbName, folder string) error {
 		return err
 	}
 
-	version, dirty, err := m.Version()
+	v, dirty, err := m.Version()
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("migration  current version: %v, dirty: %v", version, dirty)
+	fmt.Printf("migration  current version: %v, dirty: %v", v, dirty)
 
-	m.Steps(2)
+	m.Steps(version)
 
 	return nil
 }

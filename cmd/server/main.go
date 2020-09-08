@@ -28,9 +28,8 @@ func main() {
 	}
 	defer db.Close()
 
-	err = database.RunMigrations(db, c.DBName, "file:///app/migrations")
+	err = database.RunMigrations(db, c.DBName, "file:///app/migrations", 1)
 	if err != nil {
-		// panic(err)
 		fmt.Println(err)
 	}
 
