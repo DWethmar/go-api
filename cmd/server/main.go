@@ -29,7 +29,7 @@ func main() {
 	}
 	defer db.Close()
 
-	files, err := ioutil.ReadDir("./")
+	files, err := ioutil.ReadDir("/app")
 	if err != nil {
 		log.Fatal(err)
 	}
