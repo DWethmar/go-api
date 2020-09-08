@@ -29,15 +29,9 @@ func RunMigrations(db *sql.DB, dbName, folder string, version int) error {
 		return err
 	}
 
-	v, dirty, err := m.Version()
-
-	if err != nil {
-		return err
-	}
+	v, dirty, _ := m.Version()
 
 	fmt.Printf("migration  current version: %v, dirty: %v", v, dirty)
 
-	m.Steps(version)
-
-	return nil
+	return m.Up()
 }
