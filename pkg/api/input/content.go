@@ -1,4 +1,4 @@
-package request
+package input
 
 import "github.com/dwethmar/go-api/pkg/content"
 

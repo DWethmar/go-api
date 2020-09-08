@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dwethmar/go-api/pkg/api/request"
-	"github.com/dwethmar/go-api/pkg/api/response"
+	"github.com/dwethmar/go-api/pkg/api/input"
+	"github.com/dwethmar/go-api/pkg/api/output"
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/content"
 	"github.com/dwethmar/go-api/pkg/store"
@@ -31,9 +31,9 @@ func ListContent(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		var p []*response.Content
+		var p = make([]*output.Content, 0)
 		for _, d := range entries {
-			p = append(p, &response.Content{
+			p = append(p, &output.Content{
 				ID:        d.ID,
 				Name:      d.Name,
 				Fields:    d.Fields,
@@ -50,7 +50,7 @@ func ListContent(s *store.Store) http.HandlerFunc {
 func CreateContent(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		var input = &request.AddContent{}
+		var input = &input.AddContent{}
 
 		err := json.NewDecoder(r.Body).Decode(&input)
 
@@ -75,7 +75,7 @@ func CreateContent(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		p := &response.Content{
+		p := &output.Content{
 			ID:        c.ID,
 			Name:      c.Name,
 			Fields:    c.Fields,
@@ -95,7 +95,7 @@ func UpdateContent(s *store.Store) http.HandlerFunc {
 			common.SendServerError(w, r)
 		}
 
-		var input = &request.UpdateContent{}
+		var input = &input.UpdateContent{}
 
 		err = json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
@@ -123,7 +123,7 @@ func UpdateContent(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		p := &response.Content{
+		p := &output.Content{
 			ID:        c.ID,
 			Name:      c.Name,
 			Fields:    c.Fields,
@@ -166,7 +166,7 @@ func DeleteContent(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		p := &response.Content{
+		p := &output.Content{
 			ID:        c.ID,
 			Name:      c.Name,
 			Fields:    c.Fields,

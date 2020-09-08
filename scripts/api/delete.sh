@@ -1,5 +1,5 @@
 #!/bin/bash
 
-LASTID=$(http -f GET localhost:8080 | jq '.[-1].id')
+LASTID=$(http --verify=no -f GET https://go-api.192.168.88.100.nip.io/content | jq '.[-1].id')
 
-http -f DELETE localhost:8080/$LASTID
+http --verify=no -f DELETE https://go-api.192.168.88.100.nip.io/content/$LASTID

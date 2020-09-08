@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dwethmar/go-api/pkg/api/request"
-	"github.com/dwethmar/go-api/pkg/api/response"
+	"github.com/dwethmar/go-api/pkg/api/input"
+	"github.com/dwethmar/go-api/pkg/api/output"
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/content"
 	"github.com/dwethmar/go-api/pkg/store"
@@ -45,9 +45,9 @@ func TestContentIndex(t *testing.T) {
 		},
 	}
 
-	var p []*response.Content
+	var p []*output.Content
 	for _, d := range addItems {
-		p = append(p, &response.Content{
+		p = append(p, &output.Content{
 			ID:        d.ID,
 			Name:      d.Name,
 			Fields:    d.Fields,
@@ -95,7 +95,7 @@ func TestContentIndex(t *testing.T) {
 func TestCreateContent(t *testing.T) {
 	now := time.Now()
 
-	addEntry := request.AddContent{
+	addEntry := input.AddContent{
 		Name: "Test2",
 		Fields: content.FieldTranslations{
 			defaultLocale: content.Fields{
@@ -161,7 +161,7 @@ func TestUpdateContent(t *testing.T) {
 		addedEntry, err := store.Content.Get(ID)
 		assert.Nil(t, err)
 
-		updateEntry := request.UpdateContent{
+		updateEntry := input.UpdateContent{
 			Name: "updated name",
 			Fields: content.FieldTranslations{
 				"nl": content.Fields{
