@@ -15,12 +15,10 @@ COPY . .
 RUN make buildArm
 
 # Start fresh from a smaller image
-FROM ubuntu:16.04
+FROM alpine:3.9 
 
-RUN apk update 
-RUN apk upgrade
-RUN apk add ca-certificates
-RUN apk add --no-cache bash
+RUN apt-get update 
+RUN apt-get upgrade
 
 COPY --from=go-builder /go/src/github.com/dwethmar/go-api/server /app/
 
