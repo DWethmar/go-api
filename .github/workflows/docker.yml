@@ -14,7 +14,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
+
     - name: Build and push Docker images for ARM
       uses: docker/build-push-action@v1
       with:
@@ -25,4 +25,3 @@ jobs:
         tags: latest
         tag_with_ref: true
         add_git_labels: true
-        tag_names: true
