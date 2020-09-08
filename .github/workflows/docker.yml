@@ -25,3 +25,4 @@ jobs:
         tags: latest
         tag_with_ref: true
         tag_with_sha: true
+        add_git_labels: true
