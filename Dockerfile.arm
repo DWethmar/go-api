@@ -18,8 +18,9 @@ RUN make buildArm
 FROM alpine:3.9 
 
 RUN apk update 
+RUN apk upgrade
 RUN apk add ca-certificates
-RUN apk add bash
+RUN apk add --no-cache bash
 
 COPY --from=go-builder /go/src/github.com/dwethmar/go-api/server /app/
 
