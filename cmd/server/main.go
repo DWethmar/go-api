@@ -26,8 +26,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	defer db.Close()
+
+	err = database.RunMigrations(db, c.DBName, "file:///migrations")
+	if err != nil {
+		panic(err)
+	}
 
 	server := api.CreateServer(api.NewRouter(store.NewStore(db)))
 	srv := &http.Server{Addr: ":8080", Handler: &server}

@@ -1,4 +1,3 @@
-
 CREATE TABLE public.content_type
 (
     id VARCHAR (36) PRIMARY KEY,
