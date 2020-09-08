@@ -16,7 +16,10 @@ RUN make buildArm
 
 # Start fresh from a smaller image
 FROM alpine:3.9 
+
+RUN apk update 
 RUN apk add ca-certificates
+RUN apk add bash
 
 COPY --from=go-builder /go/src/github.com/dwethmar/go-api/server /app/
 

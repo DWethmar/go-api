@@ -31,7 +31,7 @@ func main() {
 	err = database.RunMigrations(db, c.DBName, "file:///app/migrations")
 	if err != nil {
 		// panic(err)
-		fmt.Print(err)
+		fmt.Println(err)
 	}
 
 	server := api.CreateServer(api.NewRouter(store.NewStore(db)))
