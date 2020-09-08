@@ -15,7 +15,7 @@ COPY . .
 RUN make buildArm
 
 # Start fresh from a smaller image
-FROM alpine:3.9 
+FROM ubuntu:18.04
 
 RUN apt-get update 
 RUN apt-get upgrade
