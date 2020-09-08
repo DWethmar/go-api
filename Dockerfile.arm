@@ -17,8 +17,8 @@ RUN make buildArm
 # Start fresh from a smaller image
 FROM ubuntu:18.04
 
-RUN apt-get update 
-RUN apt-get upgrade
+# RUN apt-get update -y
+# RUN apt-get upgrade  -y
 
 COPY --from=go-builder /go/src/github.com/dwethmar/go-api/server /app/
 
