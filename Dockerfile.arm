@@ -20,7 +20,7 @@ RUN apk add ca-certificates
 
 COPY --from=go-builder /go/src/github.com/dwethmar/go-api/server /app/
 
-COPY scripts/migrations ./app/
+COPY scripts/migrations /app/
 
 EXPOSE 8080
 
