@@ -37,7 +37,7 @@ func NewRouter(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
 	r.Mount("/content", ContentRoutes(store))
-	r.Mount("/type", ContentTypesRoutes(store))
+	r.Mount("/types", ContentTypesRoutes(store))
 
 	return r
 }

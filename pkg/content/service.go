@@ -1,8 +1,6 @@
 package content
 
 import (
-	"time"
-
 	"github.com/dwethmar/go-api/pkg/common"
 )
 
@@ -28,24 +26,11 @@ func (s *service) List() ([]*Content, error) {
 }
 
 func (s *service) Update(entry *Content) error {
-	entry.UpdatedOn = time.Now()
 	return s.repo.Update(entry)
 }
 
 func (s *service) Create(entry *Content) (common.ID, error) {
-	if entry.Fields == nil {
-		entry.Fields = make(FieldTranslations)
-	}
-
-	var contentItem = &Content{
-		ID:        common.NewID(),
-		Name:      entry.Name,
-		Fields:    entry.Fields,
-		CreatedOn: time.Now(),
-		UpdatedOn: time.Now(),
-	}
-
-	return s.repo.Create(contentItem)
+	return s.repo.Create(entry)
 }
 
 func (s *service) Delete(id common.ID) error {

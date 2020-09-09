@@ -19,7 +19,7 @@ import (
 
 var defaultLocale = "nl"
 
-func TestContentIndex(t *testing.T) {
+func TestListContent(t *testing.T) {
 	addItems := []*content.Content{
 		{
 			ID:   common.NewID(),
@@ -85,11 +85,11 @@ func TestContentIndex(t *testing.T) {
 	assert.Equal(t, rType, "application/json", "Content-Type code should be equal")
 
 	// Check the response body is what we expect.
-	// expected, _ := json.Marshal(p)
+	expected, _ := json.Marshal(p)
 
-	// if rr.Body.String() != string(expected) {
-	// 	t.Errorf("handler returned unexpected body: received %v expected %v", rr.Body.String(), string(expected))
-	// }
+	if rr.Body.String() != string(expected) {
+		t.Errorf("handler returned unexpected body: received %v expected %v", rr.Body.String(), string(expected))
+	}
 }
 
 func TestCreateContent(t *testing.T) {

@@ -1,4 +1,4 @@
-package contenttype
+package content
 
 import (
 	"sync"
@@ -6,22 +6,22 @@ import (
 	"github.com/dwethmar/go-api/pkg/common"
 )
 
-// MockRepository mock repository for operating on entry data.
-type MockRepository struct {
-	items []*ContentType
+// InMemRepository mock repository for operating on entry data.
+type InMemRepository struct {
+	items []*Content
 	mux   *sync.Mutex
 }
 
-// List get all content content.
-func (repo *MockRepository) List() ([]*ContentType, error) {
+// List entries.
+func (repo *InMemRepository) List() ([]*Content, error) {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
 	return repo.items, nil
 }
 
-// Get entry.
-func (repo *MockRepository) Get(id common.ID) (*ContentType, error) {
+// Get one entry.
+func (repo *InMemRepository) Get(id common.ID) (*Content, error) {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
@@ -33,8 +33,8 @@ func (repo *MockRepository) Get(id common.ID) (*ContentType, error) {
 	return nil, ErrNotFound
 }
 
-// Create adds new entry.
-func (repo *MockRepository) Create(entry *ContentType) (common.ID, error) {
+// Create new entry.
+func (repo *InMemRepository) Create(entry *Content) (common.ID, error) {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
@@ -43,21 +43,22 @@ func (repo *MockRepository) Create(entry *ContentType) (common.ID, error) {
 }
 
 // Update Updates entry.
-func (repo *MockRepository) Update(entry *ContentType) error {
+func (repo *InMemRepository) Update(entry *Content) error {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
 	for i, n := range repo.items {
 		if entry.ID == n.ID {
-			repo.items = append(repo.items[:i], append([]*ContentType{entry}, repo.items[i:]...)...)
+			repo.items = append(repo.items[:i], append([]*Content{entry}, repo.items[i:]...)...)
 			return nil
 		}
 	}
+
 	return nil
 }
 
 // Delete deletes entry.
-func (repo *MockRepository) Delete(id common.ID) error {
+func (repo *InMemRepository) Delete(id common.ID) error {
 	repo.mux.Lock()
 	defer repo.mux.Unlock()
 
@@ -72,8 +73,8 @@ func (repo *MockRepository) Delete(id common.ID) error {
 
 // NewMockRepository creates new mockservice.
 func NewMockRepository() Repository {
-	return &MockRepository{
-		items: make([]*ContentType, 0),
+	return &InMemRepository{
+		items: make([]*Content, 0),
 		mux:   &sync.Mutex{},
 	}
 }
