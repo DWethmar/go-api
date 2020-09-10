@@ -18,7 +18,7 @@ RUN make buildServerArm
 FROM alpine:3.9 
 RUN apk add ca-certificates
 
-COPY --from=go-builder /go/src/github.com/dwethmar/go-api/server/bin/server /app/server
+COPY --from=go-builder /go/src/github.com/dwethmar/go-api/bin/server /app/server/
 
 COPY ./scripts/migrations/ /app/migrations/
 
