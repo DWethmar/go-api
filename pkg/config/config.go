@@ -44,14 +44,14 @@ func Load() Config {
 	dbMigrationVersion := 1
 
 	return Config{
-		dbHost,
-		dbPort,
-		dbUser,
-		dbPassword,
-		dbName,
-		dbDriverName,
-		migrationFiles,
-		dbMigrationVersion,
-		testWithDB,
+		DBHost:             dbHost,
+		DBPort:             dbPort,
+		DBUser:             dbUser,
+		DBPassword:         dbPassword,
+		DBName:             dbName,
+		DBDriverName:       dbDriverName,
+		MigrationFiles:     migrationFiles,
+		DBMigrationVersion: dbMigrationVersion,
+		TestWithDB:         testWithDB,
 	}
 }

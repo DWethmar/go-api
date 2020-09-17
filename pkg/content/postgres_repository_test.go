@@ -12,9 +12,9 @@ import (
 
 var defaultLocale = "nl"
 
-func TestPostgresRepoPostgresRepoList(t *testing.T) {
+func TestPostgresRepoList(t *testing.T) {
 	c := config.Load()
-	if c.testWithDB {
+	if c.TestWithDB {
 		t.Skip("skipping test case without db")
 	}
 	db, cleanup, err := database.NewTestDB(c)
