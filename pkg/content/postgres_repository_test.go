@@ -12,10 +12,15 @@ import (
 
 var defaultLocale = "nl"
 
-var short = flag.Bool("db", false, "with db")
+var short bool = false
+
+func init() {
+	flag.BoolVar(&short, "db", short, "with db")
+	flag.Parse()
+}
 
 func TestPostgresRepoPostgresRepoList(t *testing.T) {
-	if !*short {
+	if !short {
 		t.Skip("skipping test case without db")
 	}
 	db, cleanup, err := database.NewTestDB()
