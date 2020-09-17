@@ -12,16 +12,13 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
 
-
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
         image: postgres
-        # Provide the password for postgres
-        env:
+        environment:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
+          POSTGRES_DB: go_api
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
