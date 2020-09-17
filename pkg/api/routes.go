@@ -14,11 +14,13 @@ import (
 func ContentRoutes(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", handler.ListContent(store))
-	r.Get("/{id}", middleware.RequireID(handler.GetSingleContent(store)))
-	r.Delete("/{id}", middleware.RequireID(handler.DeleteContent(store)))
-	r.Post("/{id}", middleware.RequireID(handler.UpdateContent(store)))
-	r.Post("/", handler.CreateContent(store))
+	handler := handler.NewContentHandler(store.Content)
+
+	r.Get("/", handler.List)
+	r.Get("/{id}", middleware.RequireID(handler.Get))
+	r.Delete("/{id}", middleware.RequireID(handler.Delete))
+	r.Post("/{id}", middleware.RequireID(handler.Update))
+	r.Post("/", handler.Create)
 
 	return r
 }

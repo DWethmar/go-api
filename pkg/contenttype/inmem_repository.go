@@ -70,8 +70,8 @@ func (repo *InMemRepository) Delete(id common.ID) error {
 	return nil
 }
 
-// NewMockRepository creates new mockservice.
-func NewMockRepository() Repository {
+// NewInMemRepository creates new mockservice.
+func NewInMemRepository() Repository {
 	return &InMemRepository{
 		items: make([]*ContentType, 0),
 		mux:   &sync.Mutex{},

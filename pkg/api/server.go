@@ -15,8 +15,8 @@ type Server struct {
 	router *chi.Mux
 }
 
-// CreateServer creates a new server.
-func CreateServer(router http.Handler) Server {
+// NewServer creates a new server.
+func NewServer(router http.Handler) Server {
 	s := Server{
 		router: chi.NewRouter(),
 	}

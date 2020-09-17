@@ -281,7 +281,7 @@ func hasField(key string, fields []*Field) bool {
 }
 
 // NewPostgresRepository create repo
-func NewPostgresRepository(db *sql.DB) *PostgresRepository {
+func NewPostgresRepository(db *sql.DB) Repository {
 	return &PostgresRepository{
 		db,
 	}

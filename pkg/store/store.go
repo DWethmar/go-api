@@ -29,8 +29,8 @@ func CreateStoreWithOption(options CreateStoreOption) *Store {
 // CreateMockStore creates a store with mock services.
 func CreateMockStore() *Store {
 	return CreateStoreWithOption(CreateStoreOption{
-		ContentRepo:     content.NewMockRepository(),
-		ContentTypeRepo: contenttype.NewMockRepository(),
+		ContentRepo:     content.NewInMemRepository(),
+		ContentTypeRepo: contenttype.NewInMemRepository(),
 	})
 }
 

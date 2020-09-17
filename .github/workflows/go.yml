@@ -13,6 +13,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
@@ -32,3 +47,11 @@ jobs:
 
     - name: Build all
       run: make all
+
+    - name: Test
+      run: go test ./...
+      env:
+        # The hostname used to communicate with the PostgreSQL service container
+        POSTGRES_HOST: postgres
+        # The default PostgreSQL port
+        POSTGRES_PORT: 5432

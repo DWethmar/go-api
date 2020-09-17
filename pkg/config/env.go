@@ -17,7 +17,7 @@ func LoadEnvFile(path ...string) Config {
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
-	return LoadConfig()
+	return Load()
 }
 
 func GetPostgresConnectionInfo(env Config) (string, string) {

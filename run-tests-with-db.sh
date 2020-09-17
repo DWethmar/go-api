@@ -11,7 +11,6 @@ PQ_DB_NAME="testdb"
 PQ_USER="postgres"
 PQ_PASSWORD="postgres"
 DRIVER_NAME="postgres"     
-CREATE_DB_SQL_FILE="${SCRIPTPATH}/scripts/sql/init.sql"     
 
 # connect with: psql -h localhost -p 5433  -U postgres --password
 docker run --name testing-postgres --rm -e POSTGRES_PASSWORD=$PQ_PASSWORD -d -p $PG_PORT:5432 postgres
@@ -32,12 +31,11 @@ clean_up () {
 }
 trap clean_up EXIT
 
-PQ_HOST=$PQ_HOST \
-PG_PORT=$PG_PORT  \
-PQ_USER=$PQ_USER \
-PQ_DB_NAME=$PQ_DB_NAME \
-PQ_PASSWORD=$PQ_PASSWORD \
+POSTGRES_HOST=$PQ_HOST \
+POSTGRES_PORT=$PG_PORT  \
+POSTGRES_USER=$PQ_USER \
+POSTGRES_PASSWORD=$PQ_PASSWORD \
+POSTGRES_DATABASE=$PQ_DB_NAME \
 DRIVER_NAME=$DRIVER_NAME \
-CREATE_DB_SQL_FILE=$CREATE_DB_SQL_FILE \
 go test -v ./...
 

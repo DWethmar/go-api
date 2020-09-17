@@ -153,7 +153,6 @@ func (repo *PostgresRepository) Create(c *Content) (common.ID, error) {
 			if err != nil {
 				return err
 			}
-
 		}
 
 		return err
@@ -250,7 +249,7 @@ func (repo *PostgresRepository) Delete(ID common.ID) error {
 }
 
 // NewPostgresRepository create repo
-func NewPostgresRepository(db *sql.DB) *PostgresRepository {
+func NewPostgresRepository(db *sql.DB) Repository {
 	return &PostgresRepository{
 		db,
 	}

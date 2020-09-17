@@ -33,8 +33,8 @@ clean:
 	rm -f $(SERVER_OUT)
 	rm -f $(SEEDER_OUT)
 run:
-	$(GOBUILD) -v -o $(BINARY_NAME) ./cmd/server/ 
-	./$(BINARY_NAME) -port 8080
+	$(GOBUILD) -v -o $(SERVER_BINARY_NAME) ./cmd/server/ 
+	./$(SERVER_OUT) -port 8080
 run-auth:
 	$(GOBUILD) -v -o auth ./cmd/auth/ 
 	./auth

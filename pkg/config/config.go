@@ -4,24 +4,38 @@ import (
 	"os"
 )
 
+// Config collection of the config variables.
 type Config struct {
-	DBHost         string
-	DBPort         string
-	DBUser         string
-	DBPassword     string
-	DBName         string
-	DBDriverName   string
-	CreateDBScript string
+	DBHost             string
+	DBPort             string
+	DBUser             string
+	DBPassword         string
+	DBName             string
+	DBDriverName       string
+	MigrationFiles     string
+	DBMigrationVersion int
 }
 
-func LoadConfig() Config {
+// Load collects the necessary env vars and returns them in a struct.
+func Load() Config {
 	dbHost := os.Getenv("POSTGRES_HOST")
 	dbPort := os.Getenv("POSTGRES_PORT")
 	dbUser := os.Getenv("POSTGRES_USER")
 	dbPassword := os.Getenv("POSTGRES_PASSWORD")
-	dbName := os.Getenv("POSTGRES_DB_NAME")
+
+	dbName := "go-api"
+	if v, success := os.LookupEnv("POSTGRES_DATABASE"); success {
+		dbName = v
+	}
+
 	dbDriverName := os.Getenv("DB_DRIVER_NAME")
-	createDBScript := os.Getenv("CREATE_DB_SQL_FILE")
+
+	migrationFiles := "file:///app/migrations"
+	if v, success := os.LookupEnv("MIGRATION_FILES"); success {
+		migrationFiles = v
+	}
+
+	dbMigrationVersion := 1
 
 	return Config{
 		dbHost,
@@ -30,6 +44,7 @@ func LoadConfig() Config {
 		dbPassword,
 		dbName,
 		dbDriverName,
-		createDBScript,
+		migrationFiles,
+		dbMigrationVersion,
 	}
 }

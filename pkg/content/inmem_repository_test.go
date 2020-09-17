@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
+	"gotest.tools/v3/assert"
 )
 
 var mock = Content{
@@ -25,8 +26,8 @@ var mock = Content{
 	UpdatedOn: time.Now(),
 }
 
-func TestUnitMockGetAll(t *testing.T) {
-	c := NewMockRepository()
+func TestInMemGetAll(t *testing.T) {
+	c := NewInMemRepository()
 	c.Create(&mock)
 	c.Create(&mock)
 
@@ -37,8 +38,8 @@ func TestUnitMockGetAll(t *testing.T) {
 	}
 }
 
-func TestUnitMockGetOne(t *testing.T) {
-	c := NewMockRepository()
+func TestInMemGetOne(t *testing.T) {
+	c := NewInMemRepository()
 	c.Create(&mock)
 	c.Create(&mock)
 
@@ -56,8 +57,8 @@ func TestUnitMockGetOne(t *testing.T) {
 	}
 }
 
-func TestUnitMockAdd(t *testing.T) {
-	c := NewMockRepository()
+func TestInMemAdd(t *testing.T) {
+	c := NewInMemRepository()
 	c.Create(&mock)
 	c.Create(&mock)
 
@@ -79,13 +80,11 @@ func TestUnitMockAdd(t *testing.T) {
 		return
 	}
 
-	if string(a) != string(b) {
-		t.Errorf("Expected %v but received %v", string(a), string(b))
-	}
+	assert.Equal(t, string(a), string(b), "Entries not the same")
 }
 
-func TestUnitMockUpdate(t *testing.T) {
-	c := NewMockRepository()
+func TestInMemUpdate(t *testing.T) {
+	c := NewInMemRepository()
 	c.Create(&mock)
 	c.Create(&mock)
 
@@ -115,8 +114,8 @@ func TestUnitMockUpdate(t *testing.T) {
 	}
 }
 
-func TestUnitMockDelete(t *testing.T) {
-	c := NewMockRepository()
+func TestInMemDelete(t *testing.T) {
+	c := NewInMemRepository()
 	c.Create(&mock)
 
 	createdEntry, err := c.Get(mock.ID)

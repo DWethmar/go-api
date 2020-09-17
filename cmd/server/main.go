@@ -28,12 +28,12 @@ func main() {
 	}
 	defer db.Close()
 
-	err = database.RunMigrations(db, c.DBName, "file:///app/migrations", 1)
+	err = database.RunMigrations(db, c.DBName, c.MigrationFiles, c.DBMigrationVersion)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	server := api.CreateServer(api.NewRouter(store.NewStore(db)))
+	server := api.NewServer(api.NewRouter(store.NewStore(db)))
 	srv := &http.Server{Addr: ":8080", Handler: &server}
 	log.Printf("Serving on :8080")
 	log.Fatal(srv.ListenAndServe())
