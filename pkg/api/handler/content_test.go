@@ -2,6 +2,8 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -68,6 +70,7 @@ func TestListContent(t *testing.T) {
 		service = content.NewPostgresRepository(db)
 		defer cleanup()
 	} else {
+		log.Print(fmt.Sprintf("Error : %v", err))
 		service = content.NewInMemRepository()
 	}
 
