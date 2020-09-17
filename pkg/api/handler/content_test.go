@@ -64,7 +64,7 @@ func TestListContent(t *testing.T) {
 	var service content.Service
 	db, cleanup, err := database.NewTestDB()
 
-	if true || err == nil {
+	if err == nil {
 		service = content.NewPostgresRepository(db)
 		defer cleanup()
 	} else {

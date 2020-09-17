@@ -20,8 +20,8 @@ func RunMigrations(db *sql.DB, dbName, folder string, version int) error {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		folder, // "file:///migrations",
-		dbName, // "postgres",
+		"file://"+folder, // "file:///migrations",
+		dbName,           // "postgres",
 		driver,
 	)
 

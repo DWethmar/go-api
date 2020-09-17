@@ -30,7 +30,7 @@ func Load() Config {
 
 	dbDriverName := os.Getenv("DB_DRIVER_NAME")
 
-	migrationFiles := "file:///app/migrations"
+	migrationFiles := "/app/migrations"
 	if v, success := os.LookupEnv("MIGRATION_FILES"); success {
 		migrationFiles = v
 	}
