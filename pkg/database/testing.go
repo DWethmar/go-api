@@ -50,9 +50,8 @@ func ExecSQLFile(db *sql.DB, sqlFile string) {
 }
 
 // NewTestDB create new testy db. Returns a cleanup function and error.
-func NewTestDB() (*sql.DB, func(), error) {
+func NewTestDB(c config.Config) (*sql.DB, func(), error) {
 	var db *sql.DB
-	c := config.LoadEnvFile("../../../.env")
 
 	if c.DBDriverName == "" {
 		return nil, nil, errors.New("Config is missing database connection information: DBDriverName")

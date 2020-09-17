@@ -14,6 +14,7 @@ type Config struct {
 	DBDriverName       string
 	MigrationFiles     string
 	DBMigrationVersion int
+	TestWithDB         bool
 }
 
 // Load collects the necessary env vars and returns them in a struct.
@@ -35,6 +36,11 @@ func Load() Config {
 		migrationFiles = v
 	}
 
+	testWithDB := false
+	if _, success := os.LookupEnv("TEST_WITH_DB"); success {
+		testWithDB = success
+	}
+
 	dbMigrationVersion := 1
 
 	return Config{
@@ -46,5 +52,6 @@ func Load() Config {
 		dbDriverName,
 		migrationFiles,
 		dbMigrationVersion,
+		testWithDB,
 	}
 }

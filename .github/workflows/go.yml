@@ -49,7 +49,7 @@ jobs:
       run: make buildServer
 
     - name: Test
-      run: go test -test.v ./... -db
+      run: go test -test.v ./...
       env:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
@@ -58,3 +58,4 @@ jobs:
         POSTGRES_DATABASE: go_api
         DB_DRIVER_NAME: postgres
         MIGRATION_FILES: /home/runner/work/go-api/scripts/migrations/
+        TEST_WITH_DB: true
