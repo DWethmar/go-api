@@ -18,7 +18,7 @@ import (
 
 var defaultLocale = "nl"
 
-func TestListContent(t *testing.T) {
+func TestContentHandler_List(t *testing.T) {
 	addItems := []*content.Content{
 		{
 			ID:   common.NewID(),
@@ -91,7 +91,7 @@ func TestListContent(t *testing.T) {
 	}
 }
 
-func TestCreateContent(t *testing.T) {
+func TestContentHandler_Create(t *testing.T) {
 	now := time.Now()
 
 	addEntry := input.AddContent{
@@ -143,7 +143,7 @@ func TestCreateContent(t *testing.T) {
 	}
 }
 
-func TestUpdateContent(t *testing.T) {
+func TestContentHandler_Update(t *testing.T) {
 	service := content.NewInMemRepository()
 	h := NewContentHandler(service)
 
@@ -209,7 +209,7 @@ func TestUpdateContent(t *testing.T) {
 
 }
 
-func TestDeleteContent(t *testing.T) {
+func TestContentHandler_Delete(t *testing.T) {
 	service := content.NewInMemRepository()
 	h := NewContentHandler(service)
 
