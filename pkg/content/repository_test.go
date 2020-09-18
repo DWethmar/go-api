@@ -8,7 +8,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/config"
 	"github.com/dwethmar/go-api/pkg/database"
-	"gotest.tools/v3/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 var defaultLocale = "nl"
@@ -380,7 +380,7 @@ func TestRepository_Delete(t *testing.T) {
 
 		// Delete entry that doesn't exists anymore.
 		err = repo.Delete(addItems[0].ID)
-		if err != nil {
+		if err != ErrNotFound {
 			t.Error(err)
 		}
 	}

@@ -6,6 +6,8 @@ import (
 	"github.com/dwethmar/go-api/pkg/content"
 )
 
+var defaultLocale = "nl"
+
 func areFieldsEqual(a, b content.FieldTranslations) (bool, error) {
 	ar, err := json.Marshal(a)
 	if err != nil {

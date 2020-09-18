@@ -52,13 +52,7 @@ func (h *contentHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	var p = make([]*output.Content, 0)
 	for _, d := range entries {
-		p = append(p, &output.Content{
-			ID:        d.ID,
-			Name:      d.Name,
-			Fields:    d.Fields,
-			CreatedOn: d.CreatedOn,
-			UpdatedOn: d.UpdatedOn,
-		})
+		p = append(p, output.ContentOut(d))
 	}
 
 	common.SendJSON(w, r, p, http.StatusOK)
@@ -92,15 +86,7 @@ func (h *contentHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := &output.Content{
-		ID:        c.ID,
-		Name:      c.Name,
-		Fields:    c.Fields,
-		CreatedOn: c.CreatedOn,
-		UpdatedOn: c.UpdatedOn,
-	}
-
-	common.SendJSON(w, r, p, http.StatusCreated)
+	common.SendJSON(w, r, output.ContentOut(c), http.StatusCreated)
 }
 
 // UpdateContent updates an existing entry from post data.
@@ -138,15 +124,7 @@ func (h *contentHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := &output.Content{
-		ID:        c.ID,
-		Name:      c.Name,
-		Fields:    c.Fields,
-		CreatedOn: c.CreatedOn,
-		UpdatedOn: c.UpdatedOn,
-	}
-
-	common.SendJSON(w, r, p, http.StatusOK)
+	common.SendJSON(w, r, output.ContentOut(c), http.StatusOK)
 }
 
 // Delete deletes an entry by entry id.
@@ -179,15 +157,7 @@ func (h *contentHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := &output.Content{
-		ID:        c.ID,
-		Name:      c.Name,
-		Fields:    c.Fields,
-		CreatedOn: c.CreatedOn,
-		UpdatedOn: c.UpdatedOn,
-	}
-
-	common.SendJSON(w, r, p, http.StatusOK)
+	common.SendJSON(w, r, output.ContentOut(c), http.StatusOK)
 }
 
 // GetSingleContent gets an single entry by entry id.

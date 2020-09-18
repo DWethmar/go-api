@@ -17,12 +17,12 @@ type ContentType struct {
 
 // Field content model field model
 type Field struct {
-	ID           common.ID
-	EntryModelID common.ID
-	Key          string
-	Name         string
-	FieldType    string
-	Length       int
-	CreatedOn    time.Time
-	UpdatedOn    time.Time
+	ID            common.ID
+	ContentTypeID common.ID
+	Key           string
+	Name          string
+	FieldType     string
+	Length        int
+	CreatedOn     time.Time
+	UpdatedOn     time.Time
 }

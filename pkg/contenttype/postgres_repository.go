@@ -7,8 +7,8 @@ import (
 	"github.com/dwethmar/go-api/pkg/database"
 )
 
-// PostgresRepository repository for operating on content data.
-type PostgresRepository struct {
+// postgresRepository repository for operating on content data.
+type postgresRepository struct {
 	db *sql.DB
 }
 
@@ -25,14 +25,14 @@ var (
 	allContentTypeFields = `
 	SELECT 
 		id,
-		content_model_id, 
+		content_type_id, 
 		key,
 		type,
 		length, 
 		created_on, 
 		updated_on
 	FROM public.content_type_field c
-	WHERE c.content_model_id = $1
+	WHERE c.content_type_id = $1
 	ORDER BY created_on ASC`
 
 	singleContentType = `
@@ -50,7 +50,7 @@ var (
 	VALUES ($1, $2, $3, $4)`
 
 	insertContentTypeField = `
-	INSERT INTO public.content_type_field (id, content_model_id, key, name, type, length, created_on, updated_on)
+	INSERT INTO public.content_type_field (id, content_type_id, key, name, type, length, created_on, updated_on)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	updateContent = `
@@ -67,7 +67,7 @@ var (
 	`
 )
 
-func (repo *PostgresRepository) getFields(contentModelID common.ID) ([]*Field, error) {
+func (repo *postgresRepository) getFields(contentModelID common.ID) ([]*Field, error) {
 	rows, err := repo.db.Query(
 		allContentTypeFields,
 		contentModelID,
@@ -83,7 +83,7 @@ func (repo *PostgresRepository) getFields(contentModelID common.ID) ([]*Field, e
 	for rows.Next() {
 		entry := &Field{}
 		err := rows.Scan(
-			&entry.EntryModelID,
+			&entry.ContentTypeID,
 			&entry.Key,
 			&entry.Name,
 			&entry.FieldType,
@@ -105,7 +105,7 @@ func (repo *PostgresRepository) getFields(contentModelID common.ID) ([]*Field, e
 }
 
 // List get all entries.
-func (repo *PostgresRepository) List() ([]*ContentType, error) {
+func (repo *postgresRepository) List() ([]*ContentType, error) {
 	rows, err := repo.db.Query(allContentType)
 
 	if err != nil {
@@ -145,7 +145,7 @@ func (repo *PostgresRepository) List() ([]*ContentType, error) {
 }
 
 // Get entry.
-func (repo *PostgresRepository) Get(ID common.ID) (*ContentType, error) {
+func (repo *postgresRepository) Get(ID common.ID) (*ContentType, error) {
 	entry := &ContentType{}
 	row := repo.db.QueryRow(singleContentType, ID)
 
@@ -174,7 +174,7 @@ func (repo *PostgresRepository) Get(ID common.ID) (*ContentType, error) {
 }
 
 // Create entry.
-func (repo *PostgresRepository) Create(c *ContentType) (common.ID, error) {
+func (repo *postgresRepository) Create(c *ContentType) (common.ID, error) {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := tx.Exec(
 			insertContentType,
@@ -211,7 +211,7 @@ func (repo *PostgresRepository) Create(c *ContentType) (common.ID, error) {
 }
 
 // Update updates entry.
-func (repo *PostgresRepository) Update(c *ContentType) error {
+func (repo *postgresRepository) Update(c *ContentType) error {
 	err := database.WithTransaction(repo.db, func(tx database.Transaction) error {
 		_, err := tx.Exec(
 			updateContent,
@@ -266,9 +266,19 @@ func (repo *PostgresRepository) Update(c *ContentType) error {
 }
 
 // Delete deletes entry
-func (repo *PostgresRepository) Delete(ID common.ID) error {
-	_, err := repo.db.Exec(deleteContentType, ID)
-	return err
+func (repo *postgresRepository) Delete(ID common.ID) error {
+	r, err := repo.db.Exec(deleteContentType, ID)
+	if err != nil {
+		return err
+	}
+	a, err := r.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if a == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func hasField(key string, fields []*Field) bool {
@@ -282,7 +292,7 @@ func hasField(key string, fields []*Field) bool {
 
 // NewPostgresRepository create repo
 func NewPostgresRepository(db *sql.DB) Repository {
-	return &PostgresRepository{
+	return &postgresRepository{
 		db,
 	}
 }

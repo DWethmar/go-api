@@ -16,8 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var defaultLocale = "nl"
-
 func TestContentHandler_List(t *testing.T) {
 	addItems := []*content.Content{
 		{
@@ -46,13 +44,7 @@ func TestContentHandler_List(t *testing.T) {
 
 	var p []*output.Content
 	for _, d := range addItems {
-		p = append(p, &output.Content{
-			ID:        d.ID,
-			Name:      d.Name,
-			Fields:    d.Fields,
-			CreatedOn: d.CreatedOn,
-			UpdatedOn: d.UpdatedOn,
-		})
+		p = append(p, output.ContentOut(d))
 	}
 
 	req, err := http.NewRequest("GET", "/", nil)

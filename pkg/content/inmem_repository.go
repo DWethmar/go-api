@@ -54,7 +54,7 @@ func (repo *InMemRepository) Update(entry *Content) error {
 		}
 	}
 
-	return nil
+	return ErrNotFound
 }
 
 // Delete deletes entry.
@@ -68,7 +68,8 @@ func (repo *InMemRepository) Delete(id common.ID) error {
 			return nil
 		}
 	}
-	return nil
+
+	return ErrNotFound
 }
 
 // NewInMemRepository creates new mockservice.

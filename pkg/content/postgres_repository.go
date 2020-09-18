@@ -255,8 +255,18 @@ func (repo *PostgresRepository) Update(c *Content) error {
 
 // Delete deletes entry
 func (repo *PostgresRepository) Delete(ID common.ID) error {
-	_, err := repo.db.Exec(deleteContent, ID)
-	return err
+	r, err := repo.db.Exec(deleteContent, ID)
+	if err != nil {
+		return err
+	}
+	a, err := r.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if a == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // NewPostgresRepository create repo

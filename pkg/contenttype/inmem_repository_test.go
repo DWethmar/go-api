@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
-	"gotest.tools/v3/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 var mock = ContentType{
@@ -15,14 +15,14 @@ var mock = ContentType{
 	Name: "wow",
 	Fields: []*Field{
 		{
-			ID:           common.NewID(),
-			EntryModelID: common.NewID(),
-			Key:          "name",
-			Name:         "Name",
-			FieldType:    "string",
-			Length:       10,
-			CreatedOn:    time.Now(),
-			UpdatedOn:    time.Now(),
+			ID:            common.NewID(),
+			ContentTypeID: common.NewID(),
+			Key:           "name",
+			Name:          "Name",
+			FieldType:     "string",
+			Length:        10,
+			CreatedOn:     time.Now(),
+			UpdatedOn:     time.Now(),
 		},
 	},
 	CreatedOn: time.Now(),

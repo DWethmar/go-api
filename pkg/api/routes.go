@@ -29,7 +29,8 @@ func ContentRoutes(store *store.Store) http.Handler {
 func ContentTypesRoutes(store *store.Store) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", handler.ListContentType(store))
+	handler := handler.NewContentTypeHandler(store.ContentType)
+	r.Get("/", handler.List)
 
 	return r
 }
