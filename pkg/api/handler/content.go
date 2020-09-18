@@ -11,7 +11,7 @@ import (
 	"github.com/dwethmar/go-api/pkg/api/output"
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/content"
-	"github.com/go-playground/validator/v10"
+	"github.com/dwethmar/go-api/pkg/validator"
 )
 
 // ErrorResponds is the default error responds.
@@ -21,7 +21,7 @@ type ErrorResponds struct {
 
 type contentHandler struct {
 	content  content.Service
-	validate *validator.Validate
+	validate *validator.Validation
 }
 
 // ContentHandler handle content requests.
@@ -43,9 +43,9 @@ func (h *contentHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var p = make([]*output.Content, 0)
-	for _, d := range entries {
-		p = append(p, output.MapContent(d))
+	var p = make([]*output.Content, len(entries))
+	for i, d := range entries {
+		p[i] = output.MapContent(d)
 	}
 
 	common.SendJSON(w, r, p, http.StatusOK)
@@ -64,30 +64,7 @@ func (h *contentHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	err = h.validate.Struct(add)
 	if err != nil {
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			common.SendServerError(w, r)
-			return
-		}
-
-		var errors = []string{}
-
-		for _, err := range err.(validator.ValidationErrors) {
-			// fmt.Println(err.Namespace()) // can differ when a custom TagNameFunc is registered or
-			// fmt.Println(err.Field())     // by passing alt name to ReportError like below
-			// fmt.Println(err.StructNamespace())
-			// fmt.Println(err.StructField())
-			// fmt.Println(err.Tag())
-			// fmt.Println(err.ActualTag())
-			// fmt.Println(err.Kind())
-			// fmt.Println(err.Type())
-			// fmt.Println(err.Value())
-			// fmt.Println(err.Param())
-			// fmt.Println()
-
-			errors = append(errors, fmt.Sprintf("field %s fails contraint: %s %s", err.Field(), err.ActualTag(), err.Param()))
-		}
-
-		common.SendBadRequestError(w, r, errors)
+		common.SendBadRequestError(w, r, validator.NewErrValidation(err))
 		return
 	}
 
@@ -202,7 +179,7 @@ func (h *contentHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewContentHandler creates new handler
-func NewContentHandler(service content.Service, validate *validator.Validate) ContentHandler {
+func NewContentHandler(service content.Service, validate *validator.Validation) ContentHandler {
 	return &contentHandler{
 		content:  service,
 		validate: validate,

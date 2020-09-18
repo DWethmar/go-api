@@ -9,13 +9,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dwethmar/go-api/internal/validator"
 	"github.com/dwethmar/go-api/pkg/api/input"
 	"github.com/dwethmar/go-api/pkg/api/output"
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/content"
+	"github.com/dwethmar/go-api/pkg/validator"
 	"github.com/stretchr/testify/assert"
 )
+
+// go test ./pkg/api/handler/ -run TestContentHandler_Create
 
 func TestContentHandler_List(t *testing.T) {
 	addItems := []*content.Content{
@@ -59,9 +61,7 @@ func TestContentHandler_List(t *testing.T) {
 	for _, newEntry := range addItems {
 		ID, _ := service.Create(newEntry)
 		entry, err := service.Get(ID)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 		entries = append(entries, entry)
 	}
 

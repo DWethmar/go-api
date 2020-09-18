@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/dwethmar/go-api/internal/validator"
+	"github.com/dwethmar/go-api/pkg/validator"
 	"github.com/dwethmar/go-api/pkg/api/handler"
 	"github.com/dwethmar/go-api/pkg/api/middleware"
 	"github.com/dwethmar/go-api/pkg/store"
