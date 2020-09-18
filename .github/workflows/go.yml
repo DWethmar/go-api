@@ -57,5 +57,5 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_DATABASE: go_api
         DB_DRIVER_NAME: postgres
-        MIGRATION_FILES: ${{GITHUB_WORKSPACE}}/scripts/migrations/
+        MIGRATION_FILES: $GITHUB_WORKSPACE/scripts/migrations/
         TEST_WITH_DB: true
