@@ -31,7 +31,7 @@ func RunMigrations(db *sql.DB, dbName, folder string, version int) error {
 
 	v, dirty, _ := m.Version()
 
-	fmt.Printf("migration  current version: %v, dirty: %v", v, dirty)
+	fmt.Printf("migration current version: %v, dirty: %v.", v, dirty)
 
 	return m.Up()
 }
