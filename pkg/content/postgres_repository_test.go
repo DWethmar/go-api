@@ -14,7 +14,7 @@ var defaultLocale = "nl"
 
 func TestPostgresRepoList(t *testing.T) {
 	c := config.Load()
-	if c.TestWithDB {
+	if !c.TestWithDB {
 		t.Skip("skipping test case without db")
 	}
 	db, cleanup, err := database.NewTestDB(c)
