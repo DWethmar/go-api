@@ -26,7 +26,7 @@ var mock = Content{
 	UpdatedOn: time.Now(),
 }
 
-func TestInMemGetAll(t *testing.T) {
+func TestInMemRepository_List(t *testing.T) {
 	c := NewInMemRepository()
 	c.Create(&mock)
 	c.Create(&mock)
@@ -38,7 +38,7 @@ func TestInMemGetAll(t *testing.T) {
 	}
 }
 
-func TestInMemGetOne(t *testing.T) {
+func TestInMemRepository_Get(t *testing.T) {
 	c := NewInMemRepository()
 	c.Create(&mock)
 	c.Create(&mock)
@@ -57,7 +57,7 @@ func TestInMemGetOne(t *testing.T) {
 	}
 }
 
-func TestInMemAdd(t *testing.T) {
+func TestInMemRepository_Create(t *testing.T) {
 	c := NewInMemRepository()
 	c.Create(&mock)
 	c.Create(&mock)
@@ -83,7 +83,7 @@ func TestInMemAdd(t *testing.T) {
 	assert.Equal(t, string(a), string(b), "Entries not the same")
 }
 
-func TestInMemUpdate(t *testing.T) {
+func TestInMemRepository_Update(t *testing.T) {
 	c := NewInMemRepository()
 	c.Create(&mock)
 	c.Create(&mock)
@@ -114,7 +114,7 @@ func TestInMemUpdate(t *testing.T) {
 	}
 }
 
-func TestInMemDelete(t *testing.T) {
+func TestInMemRepository_Delete(t *testing.T) {
 	c := NewInMemRepository()
 	c.Create(&mock)
 

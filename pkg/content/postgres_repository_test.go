@@ -3,11 +3,11 @@ package content
 import (
 	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/config"
 	"github.com/dwethmar/go-api/pkg/database"
+	"gotest.tools/v3/assert"
 )
 
 var defaultLocale = "nl"
@@ -26,6 +26,11 @@ func TestPostgresRepository_List(t *testing.T) {
 
 	repo := NewPostgresRepository(db)
 
+	// Test empty repo
+	entries, err := repo.List()
+	received, _ := json.Marshal(entries)
+	assert.Equal(t, string(received), "[]", "Didn't expect value")
+
 	addItems := []*Content{
 		{
 			ID:   common.NewID(),
@@ -35,8 +40,8 @@ func TestPostgresRepository_List(t *testing.T) {
 					"attrA": 1,
 				},
 			},
-			CreatedOn: time.Now().Truncate(time.Microsecond),
-			UpdatedOn: time.Now().Truncate(time.Microsecond),
+			CreatedOn: common.Now(),
+			UpdatedOn: common.Now(),
 		},
 		{
 			ID:   common.NewID(),
@@ -46,35 +51,129 @@ func TestPostgresRepository_List(t *testing.T) {
 					"attrA": 1,
 				},
 			},
-			CreatedOn: time.Now().Truncate(time.Microsecond),
-			UpdatedOn: time.Now().Truncate(time.Microsecond),
+			CreatedOn: common.Now(),
+			UpdatedOn: common.Now(),
 		},
 	}
 
-	entries := []*Content{}
 	for _, newEntry := range addItems {
-		ID, _ := repo.Create(newEntry)
-		entry, err := repo.Get(ID)
-		if err != nil {
-			t.Errorf("something went wrong %v", err)
-		}
-		entries = append(entries, entry)
+		repo.Create(newEntry)
 	}
 
-	received, _ := json.Marshal(entries)
-	expected, _ := json.Marshal(addItems)
-
-	if string(received) != string(expected) {
-		t.Errorf("handler returned unexpected body: received %v expected %v", string(received), string(expected))
+	entries, err = repo.List()
+	if err != nil {
+		t.Error(err)
 	}
+
+	received, err = json.Marshal(entries)
+	if err != nil {
+		t.Error(err)
+	}
+
+	expected, err := json.Marshal(addItems)
+	if err != nil {
+		t.Error(err)
+	}
+
+	assert.Equal(t, string(received), string(expected), "Didn't expect value")
 }
 
 func TestPostgresRepository_Get(t *testing.T) {
+	c := config.Load()
+	if !c.TestWithDB {
+		t.Skip("skipping test case without db")
+	}
+	db, err := database.NewTestDB(c)
+	defer db.Close()
 
+	if err != nil {
+		t.Error(err)
+	}
+
+	repo := NewPostgresRepository(db)
+
+	addEntry := &Content{
+		ID:   common.NewID(),
+		Name: "Test1",
+		Fields: FieldTranslations{
+			defaultLocale: Fields{
+				"attrA": 1,
+			},
+		},
+		CreatedOn: common.Now(),
+		UpdatedOn: common.Now(),
+	}
+
+	ID, err := repo.Create(addEntry)
+	if err != nil {
+		t.Error(err)
+	}
+
+	createdEntry, err := repo.Get(ID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	received, err := json.Marshal(createdEntry)
+	if err != nil {
+		t.Error(err)
+	}
+
+	expected, err := json.Marshal(addEntry)
+	if err != nil {
+		t.Error(err)
+	}
+
+	assert.Equal(t, string(received), string(expected), "Didn't expect value.")
 }
 
 func TestPostgresRepository_Create(t *testing.T) {
+	c := config.Load()
+	if !c.TestWithDB {
+		t.Skip("skipping test case without db")
+	}
+	db, err := database.NewTestDB(c)
+	defer db.Close()
 
+	if err != nil {
+		t.Error(err)
+	}
+
+	repo := NewPostgresRepository(db)
+
+	addEntry := &Content{
+		ID:   common.NewID(),
+		Name: "Test1",
+		Fields: FieldTranslations{
+			defaultLocale: Fields{
+				"attrA": 1,
+			},
+		},
+		CreatedOn: common.Now(),
+		UpdatedOn: common.Now(),
+	}
+
+	ID, err := repo.Create(addEntry)
+	if err != nil {
+		t.Error(err)
+	}
+
+	createdEntry, err := repo.Get(ID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	received, err := json.Marshal(createdEntry)
+	if err != nil {
+		t.Error(err)
+	}
+
+	expected, err := json.Marshal(addEntry)
+	if err != nil {
+		t.Error(err)
+	}
+
+	assert.Equal(t, string(received), string(expected), "Didn't expect value.")
 }
 
 func TestPostgresRepository_Update(t *testing.T) {

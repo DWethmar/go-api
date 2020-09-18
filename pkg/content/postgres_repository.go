@@ -3,7 +3,6 @@ package content
 import (
 	"database/sql"
 	"log"
-	"time"
 
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/database"
@@ -98,8 +97,8 @@ func (repo *PostgresRepository) List() ([]*Content, error) {
 
 		// Postgres can only store timestamps in microsecond resolution.
 		// Go supports nanosecond resolution and pq formats them in RFC3339Nano format, which includes nanoseconds.
-		entry.UpdatedOn = entry.UpdatedOn.Truncate(time.Microsecond)
-		entry.CreatedOn = entry.CreatedOn.Truncate(time.Microsecond)
+		entry.UpdatedOn = common.DefaultTimePrecision(&entry.UpdatedOn)
+		entry.CreatedOn = common.DefaultTimePrecision(&entry.CreatedOn)
 
 		entries = append(entries, entry)
 	}
@@ -133,8 +132,8 @@ func (repo *PostgresRepository) Get(ID common.ID) (*Content, error) {
 
 	// Postgres can only store timestamps in microsecond resolution.
 	// Go supports nanosecond resolution and pq formats them in RFC3339Nano format, which includes nanoseconds.
-	entry.UpdatedOn = entry.UpdatedOn.Truncate(time.Microsecond)
-	entry.CreatedOn = entry.CreatedOn.Truncate(time.Microsecond)
+	entry.UpdatedOn = common.DefaultTimePrecision(&entry.UpdatedOn)
+	entry.CreatedOn = common.DefaultTimePrecision(&entry.CreatedOn)
 
 	return entry, nil
 }
