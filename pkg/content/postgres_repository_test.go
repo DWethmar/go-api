@@ -12,7 +12,7 @@ import (
 
 var defaultLocale = "nl"
 
-func TestPostgresRepoList(t *testing.T) {
+func TestPostgresRepository_List(t *testing.T) {
 	c := config.Load()
 	if !c.TestWithDB {
 		t.Skip("skipping test case without db")
@@ -23,6 +23,7 @@ func TestPostgresRepoList(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
 	repo := NewPostgresRepository(db)
 
 	addItems := []*Content{
@@ -34,8 +35,8 @@ func TestPostgresRepoList(t *testing.T) {
 					"attrA": 1,
 				},
 			},
-			CreatedOn: time.Now(),
-			UpdatedOn: time.Now(),
+			CreatedOn: time.Now().Truncate(time.Microsecond),
+			UpdatedOn: time.Now().Truncate(time.Microsecond),
 		},
 		{
 			ID:   common.NewID(),
@@ -45,8 +46,8 @@ func TestPostgresRepoList(t *testing.T) {
 					"attrA": 1,
 				},
 			},
-			CreatedOn: time.Now(),
-			UpdatedOn: time.Now(),
+			CreatedOn: time.Now().Truncate(time.Microsecond),
+			UpdatedOn: time.Now().Truncate(time.Microsecond),
 		},
 	}
 
@@ -68,18 +69,18 @@ func TestPostgresRepoList(t *testing.T) {
 	}
 }
 
-func TestPostgresRepoGet(t *testing.T) {
+func TestPostgresRepository_Get(t *testing.T) {
 
 }
 
-func TestPostgresRepoCreate(t *testing.T) {
+func TestPostgresRepository_Create(t *testing.T) {
 
 }
 
-func TestPostgresRepoUpdate(t *testing.T) {
+func TestPostgresRepository_Update(t *testing.T) {
 
 }
 
-func TestPostgresRepoDelete(t *testing.T) {
+func TestPostgresRepository_Delete(t *testing.T) {
 
 }
