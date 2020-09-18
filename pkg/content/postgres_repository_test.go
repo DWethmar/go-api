@@ -17,11 +17,12 @@ func TestPostgresRepoList(t *testing.T) {
 	if !c.TestWithDB {
 		t.Skip("skipping test case without db")
 	}
-	db, cleanup, err := database.NewTestDB(c)
+	db, err := database.NewTestDB(c)
+	defer db.Close()
+
 	if err != nil {
 		t.Error(err)
 	}
-	defer cleanup()
 	repo := NewPostgresRepository(db)
 
 	addItems := []*Content{

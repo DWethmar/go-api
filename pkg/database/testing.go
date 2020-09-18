@@ -50,39 +50,39 @@ func ExecSQLFile(db *sql.DB, sqlFile string) {
 }
 
 // NewTestDB create new testy db. Returns a cleanup function and error.
-func NewTestDB(c config.Config) (*sql.DB, func(), error) {
+func NewTestDB(c config.Config) (*sql.DB, error) {
 	var db *sql.DB
 
 	if c.DBDriverName == "" {
-		return nil, nil, errors.New("Config is missing database connection information: DBDriverName")
+		return nil, errors.New("Config is missing database connection information: DBDriverName")
 	}
 
 	if c.DBHost == "" {
-		return nil, nil, errors.New("Config is missing database connection information: DBHost")
+		return nil, errors.New("Config is missing database connection information: DBHost")
 	}
 
 	if c.DBName == "" {
-		return nil, nil, errors.New("Config is missing database connection information: DBName")
+		return nil, errors.New("Config is missing database connection information: DBName")
 	}
 
 	if c.DBPassword == "" {
-		return nil, nil, errors.New("Config is missing database connection information: DBPassword")
+		return nil, errors.New("Config is missing database connection information: DBPassword")
 	}
 
 	if c.DBPort == "" {
-		return nil, nil, errors.New("Config is missing database connection information: DBPort")
+		return nil, errors.New("Config is missing database connection information: DBPort")
 	}
 
 	if c.DBUser == "" {
-		return nil, nil, errors.New("Config is missing database connection information: DBUser")
+		return nil, errors.New("Config is missing database connection information: DBUser")
 	}
 
 	if c.MigrationFiles == "" {
-		return nil, nil, errors.New("Config is missing database connection information: MigrationFiles")
+		return nil, errors.New("Config is missing database connection information: MigrationFiles")
 	}
 
 	if c.DBMigrationVersion == 0 {
-		return nil, nil, errors.New("Config is missing database connection information: DBMigrationVersion")
+		return nil, errors.New("Config is missing database connection information: DBMigrationVersion")
 	}
 
 	dbName := c.DBName
@@ -96,7 +96,7 @@ func NewTestDB(c config.Config) (*sql.DB, func(), error) {
 	}
 
 	if err = db.Ping(); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -108,24 +108,14 @@ func NewTestDB(c config.Config) (*sql.DB, func(), error) {
 	db, err = NewDB(driver, cs)
 	if err != nil {
 		fmt.Printf("Could not connect to database with %v %v", driver, cs)
-		return nil, nil, err
+		return nil, err
 	}
 
 	err = RunMigrations(db, c.DBName, c.MigrationFiles, c.DBMigrationVersion)
 	if err != nil {
 		fmt.Printf("Error while running migrations")
-		return nil, nil, err
+		return nil, err
 	}
 
-	return db, func() {
-		db.Close()
-		dbName := c.DBName
-		c.DBName = ""
-		driver, cs := config.GetPostgresConnectionInfo(c)
-		db, err := NewDB(driver, cs)
-		if err != nil {
-			panic("Could not connect to db to drop it.")
-		}
-		defer DropDatabase(db, dbName)
-	}, nil
+	return db, nil
 }
