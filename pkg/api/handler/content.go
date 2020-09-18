@@ -52,7 +52,7 @@ func (h *contentHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	var p = make([]*output.Content, 0)
 	for _, d := range entries {
-		p = append(p, output.ContentOut(d))
+		p = append(p, output.MapContent(d))
 	}
 
 	common.SendJSON(w, r, p, http.StatusOK)
@@ -60,9 +60,9 @@ func (h *contentHandler) List(w http.ResponseWriter, r *http.Request) {
 
 // Create creates a new entry from post data.
 func (h *contentHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var input = &input.AddContent{}
+	var add = &input.AddContent{}
 
-	err := json.NewDecoder(r.Body).Decode(&input)
+	err := json.NewDecoder(r.Body).Decode(&add)
 
 	if err != nil {
 		fmt.Printf("Error while decoding entry: %v", err)
@@ -70,13 +70,7 @@ func (h *contentHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := &content.Content{
-		ID:        common.NewID(),
-		Name:      input.Name,
-		CreatedOn: time.Now(),
-		UpdatedOn: time.Now(),
-		Fields:    input.Fields,
-	}
+	c := input.MapAddContent(add)
 
 	c.ID, err = h.content.Create(c)
 
@@ -86,7 +80,7 @@ func (h *contentHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	common.SendJSON(w, r, output.ContentOut(c), http.StatusCreated)
+	common.SendJSON(w, r, output.MapContent(c), http.StatusCreated)
 }
 
 // UpdateContent updates an existing entry from post data.
@@ -96,9 +90,9 @@ func (h *contentHandler) Update(w http.ResponseWriter, r *http.Request) {
 		common.SendServerError(w, r)
 	}
 
-	var input = &input.UpdateContent{}
+	var update = &input.UpdateContent{}
 
-	err = json.NewDecoder(r.Body).Decode(&input)
+	err = json.NewDecoder(r.Body).Decode(&update)
 	if err != nil {
 		fmt.Printf("Error while decoding entry: %v", err)
 		common.SendServerError(w, r)
@@ -112,8 +106,10 @@ func (h *contentHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c.Name = input.Name
-	c.Fields = input.Fields
+	u := input.MapUpdateContent(update)
+
+	c.Name = u.Name
+	c.Fields = u.Fields
 	c.UpdatedOn = time.Now()
 
 	err = h.content.Update(c)
@@ -124,7 +120,7 @@ func (h *contentHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	common.SendJSON(w, r, output.ContentOut(c), http.StatusOK)
+	common.SendJSON(w, r, output.MapContent(c), http.StatusOK)
 }
 
 // Delete deletes an entry by entry id.
@@ -157,7 +153,7 @@ func (h *contentHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	common.SendJSON(w, r, output.ContentOut(c), http.StatusOK)
+	common.SendJSON(w, r, output.MapContent(c), http.StatusOK)
 }
 
 // GetSingleContent gets an single entry by entry id.

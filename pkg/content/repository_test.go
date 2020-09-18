@@ -22,9 +22,7 @@ func TestRepository_List(t *testing.T) {
 		db, err := database.NewTestDB(c)
 		defer db.Close()
 
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 		repos = append(repos, NewPostgresRepository(db))
 	} else {
 		fmt.Printf("Test without PostgresRepository")
@@ -65,25 +63,17 @@ func TestRepository_List(t *testing.T) {
 
 		for _, newEntry := range addItems {
 			_, err := repo.Create(newEntry)
-			if err != nil {
-				t.Error(err)
-			}
+			assert.Nil(t, err)
 		}
 
 		entries, err = repo.List()
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		received, err = json.Marshal(entries)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		expected, err := json.Marshal(addItems)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		assert.Equal(t, string(received), string(expected), "Didn't expect value")
 	}
@@ -101,9 +91,7 @@ func TestRepository_Get(t *testing.T) {
 		db, err := database.NewTestDB(c)
 		defer db.Close()
 
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 		repos = append(repos, NewPostgresRepository(db))
 	} else {
 		fmt.Printf("Test without PostgresRepository")
@@ -125,24 +113,16 @@ func TestRepository_Get(t *testing.T) {
 		}
 
 		ID, err := repo.Create(addEntry)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		createdEntry, err := repo.Get(ID)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		received, err := json.Marshal(createdEntry)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		expected, err := json.Marshal(addEntry)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		assert.Equal(t, string(received), string(expected), "Didn't expect value.")
 
@@ -167,9 +147,7 @@ func TestRepository_Create(t *testing.T) {
 		db, err := database.NewTestDB(c)
 		defer db.Close()
 
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 		repos = append(repos, NewPostgresRepository(db))
 	} else {
 		fmt.Printf("Test without PostgresRepository")
@@ -191,24 +169,16 @@ func TestRepository_Create(t *testing.T) {
 		}
 
 		ID, err := repo.Create(addEntry)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		createdEntry, err := repo.Get(ID)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		received, err := json.Marshal(createdEntry)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		expected, err := json.Marshal(addEntry)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		assert.Equal(t, string(received), string(expected), "Didn't expect value.")
 	}
@@ -274,42 +244,28 @@ func TestRepository_Update(t *testing.T) {
 		addItems[0].Fields[defaultLocale]["attrA"] = 2
 
 		err := repo.Update(addItems[0])
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		updatedEntry, err := repo.Get(addItems[0].ID)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		received, err := json.Marshal(updatedEntry)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		expected, err := json.Marshal(addItems[0])
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		assert.Equal(t, string(received), string(expected), "Didn't expect value.")
 
 		// Check if the other entry is unaffected
 		otherEntry, err := repo.Get(addItems[1].ID)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		received, err = json.Marshal(otherEntry)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		expected, err = json.Marshal(addItems[1])
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		assert.Equal(t, string(received), string(expected), "Didn't expect value.")
 	}
@@ -327,9 +283,7 @@ func TestRepository_Delete(t *testing.T) {
 		db, err := database.NewTestDB(c)
 		defer db.Close()
 
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 		repos = append(repos, NewPostgresRepository(db))
 	} else {
 		fmt.Printf("Test without PostgresRepository")
@@ -369,14 +323,10 @@ func TestRepository_Delete(t *testing.T) {
 		}
 
 		err := repo.Delete(addItems[0].ID)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		_, err = repo.Get(addItems[1].ID)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Nil(t, err)
 
 		// Delete entry that doesn't exists anymore.
 		err = repo.Delete(addItems[0].ID)

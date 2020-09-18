@@ -22,8 +22,8 @@ type FieldTranslations map[string]Fields
 // Fields model
 type Fields map[string]interface{}
 
-// ContentOut maps to output model.
-func ContentOut(c *content.Content) *Content {
+// MapContent maps to output model.
+func MapContent(c *content.Content) *Content {
 	ct := &Content{
 		ID:        c.ID,
 		Name:      c.Name,

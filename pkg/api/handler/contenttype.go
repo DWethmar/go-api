@@ -33,7 +33,7 @@ func (h *contentTypeHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	var o = []*output.ContentType{}
 	for _, t := range types {
-		o = append(o, output.ContentTypeOut(t))
+		o = append(o, output.MapContentType(t))
 	}
 
 	common.SendJSON(w, r, o, http.StatusOK)

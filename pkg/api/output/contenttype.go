@@ -28,8 +28,8 @@ type ContentTypeField struct {
 	UpdatedOn     time.Time `json:"updatedOn"`
 }
 
-// ContentTypeOut maps to output model.
-func ContentTypeOut(c *contenttype.ContentType) *ContentType {
+// MapContentType maps to output model.
+func MapContentType(c *contenttype.ContentType) *ContentType {
 	ct := &ContentType{
 		ID:        c.ID,
 		Name:      c.Name,

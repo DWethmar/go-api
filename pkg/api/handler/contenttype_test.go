@@ -54,13 +54,11 @@ func TestContentTypeHandler_List(t *testing.T) {
 
 	var p []*output.ContentType
 	for _, d := range addItems {
-		p = append(p, output.ContentTypeOut(d))
+		p = append(p, output.MapContentType(d))
 	}
 
 	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
 	entries := []*contenttype.ContentType{}
 

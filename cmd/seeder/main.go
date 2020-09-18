@@ -13,7 +13,6 @@ import (
 	"sync"
 
 	"github.com/dwethmar/go-api/pkg/api/input"
-	"github.com/dwethmar/go-api/pkg/content"
 )
 
 var (
@@ -39,8 +38,8 @@ func main() {
 	for i := 0; i < amount; i++ {
 		items = append(items, input.AddContent{
 			Name: "miauw",
-			Fields: content.FieldTranslations{
-				"nl": content.Fields{
+			Fields: input.FieldTranslations{
+				"nl": {
 					"attr1": "yes",
 					"attr2": "yes",
 				},

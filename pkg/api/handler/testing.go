@@ -3,12 +3,13 @@ package handler
 import (
 	"encoding/json"
 
+	"github.com/dwethmar/go-api/pkg/api/input"
 	"github.com/dwethmar/go-api/pkg/content"
 )
 
 var defaultLocale = "nl"
 
-func areFieldsEqual(a, b content.FieldTranslations) (bool, error) {
+func areFieldsEqual(a input.FieldTranslations, b content.FieldTranslations) (bool, error) {
 	ar, err := json.Marshal(a)
 	if err != nil {
 		return false, err

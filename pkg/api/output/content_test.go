@@ -12,7 +12,7 @@ import (
 func TestContentOut(t *testing.T) {
 	now := common.Now()
 
-	c := ContentOut(&content.Content{
+	c := MapContent(&content.Content{
 		ID:   common.NewID(),
 		Name: "Test1",
 		Fields: content.FieldTranslations{

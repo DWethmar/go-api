@@ -44,13 +44,11 @@ func TestContentHandler_List(t *testing.T) {
 
 	var p []*output.Content
 	for _, d := range addItems {
-		p = append(p, output.ContentOut(d))
+		p = append(p, output.MapContent(d))
 	}
 
 	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
 	entries := []*content.Content{}
 	rr := httptest.NewRecorder()
@@ -88,8 +86,8 @@ func TestContentHandler_Create(t *testing.T) {
 
 	addEntry := input.AddContent{
 		Name: "Test2",
-		Fields: content.FieldTranslations{
-			defaultLocale: content.Fields{
+		Fields: input.FieldTranslations{
+			defaultLocale: {
 				"attrA": 1,
 			},
 		},
@@ -113,10 +111,7 @@ func TestContentHandler_Create(t *testing.T) {
 
 	// Check the response body is what we expect.
 	addedEntry := content.Content{}
-	err := json.Unmarshal(rr.Body.Bytes(), &addedEntry)
-	if err != nil {
-		t.Errorf("Error while parsing body %v", err)
-	}
+	assert.Nil(t, json.Unmarshal(rr.Body.Bytes(), &addedEntry))
 
 	if now.After(addedEntry.CreatedOn) {
 		t.Errorf("handler returned invalid createdOn: received %v, excepted CreatedOn to be smaller then %v", addedEntry.CreatedOn, now)
@@ -156,8 +151,8 @@ func TestContentHandler_Update(t *testing.T) {
 
 	updateEntry := input.UpdateContent{
 		Name: "updated name",
-		Fields: content.FieldTranslations{
-			"nl": content.Fields{
+		Fields: input.FieldTranslations{
+			"nl": {
 				"attrA": "Value2",
 				"attrB": 2,
 				"attrC": []string{"four", "five", "six"},
@@ -186,10 +181,7 @@ func TestContentHandler_Update(t *testing.T) {
 	// Check the response body is what we expect.
 	updatedEntry := content.Content{}
 	err = json.Unmarshal(rr.Body.Bytes(), &updatedEntry)
-	if err != nil {
-		t.Errorf("Error while parsing body for added content-item %v", err)
-		return
-	}
+	assert.Nil(t, err)
 
 	if equal, err := areFieldsEqual(updateEntry.Fields, updatedEntry.Fields); !equal || err != nil {
 		if err != nil {
@@ -234,9 +226,5 @@ func TestContentHandler_Delete(t *testing.T) {
 	assert.Equal(t, rType, "application/json", "Content-Type code should be equal")
 
 	deletedEntry := content.Content{}
-	err := json.Unmarshal(rr.Body.Bytes(), &deletedEntry)
-	if err != nil {
-		t.Errorf("Error while parsing body for deleted entry %v", err)
-		return
-	}
+	assert.Nil(t, json.Unmarshal(rr.Body.Bytes(), &deletedEntry))
 }
