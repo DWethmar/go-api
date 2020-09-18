@@ -37,8 +37,8 @@ func Load() Config {
 	}
 
 	testWithDB := false
-	if _, success := os.LookupEnv("TEST_WITH_DB"); success {
-		testWithDB = success
+	if v, success := os.LookupEnv("TEST_WITH_DB"); success {
+		testWithDB = success && v == "true"
 	}
 
 	dbMigrationVersion := 1
