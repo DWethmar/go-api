@@ -12,7 +12,6 @@ import (
 func RequireID(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.StringToID(chi.URLParam(r, "id"))
-
 		if err != nil {
 			common.SendBadRequestError(w, r, "invalid ID")
 			return

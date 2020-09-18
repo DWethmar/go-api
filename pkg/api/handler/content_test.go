@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/dwethmar/go-api/internal/validator"
 	"github.com/dwethmar/go-api/pkg/api/input"
 	"github.com/dwethmar/go-api/pkg/api/output"
 	"github.com/dwethmar/go-api/pkg/common"
@@ -53,7 +54,7 @@ func TestContentHandler_List(t *testing.T) {
 	entries := []*content.Content{}
 	rr := httptest.NewRecorder()
 	service := content.NewInMemRepository()
-	h := NewContentHandler(service)
+	h := NewContentHandler(service, validator.NewValidator())
 
 	for _, newEntry := range addItems {
 		ID, _ := service.Create(newEntry)
@@ -67,11 +68,8 @@ func TestContentHandler_List(t *testing.T) {
 	handler := http.HandlerFunc(h.List)
 	handler.ServeHTTP(rr, req)
 
-	status := rr.Code
-	assert.Equal(t, status, http.StatusOK, "Status code should be equal")
-
-	rType := rr.Header().Get("Content-Type")
-	assert.Equal(t, rType, "application/json", "Content-Type code should be equal")
+	assert.Equal(t, rr.Code, http.StatusOK, "Status code should be equal")
+	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
 
 	// Check the response body is what we expect.
 	expected, _ := json.Marshal(p)
@@ -98,16 +96,13 @@ func TestContentHandler_Create(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	service := content.NewInMemRepository()
-	h := NewContentHandler(service)
+	h := NewContentHandler(service, validator.NewValidator())
 
 	handler := http.HandlerFunc(h.Create)
 	handler.ServeHTTP(rr, req)
 
-	status := rr.Code
-	assert.Equal(t, status, http.StatusCreated, "Status code should be equal")
-
-	rType := rr.Header().Get("Content-Type")
-	assert.Equal(t, rType, "application/json", "Content-Type code should be equal")
+	assert.Equal(t, rr.Code, http.StatusCreated, "Status code should be equal")
+	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
 
 	// Check the response body is what we expect.
 	addedEntry := content.Content{}
@@ -130,9 +125,33 @@ func TestContentHandler_Create(t *testing.T) {
 	}
 }
 
+func TestContentHandler_InvalidCreate(t *testing.T) {
+	body, _ := json.Marshal(input.AddContent{
+		Name: "abcdefghijklmnokqrstuvwxyz-abcdefghijklmnokqrstuvwxyz",
+		Fields: input.FieldTranslations{
+			defaultLocale: {
+				"attrA": 1,
+			},
+		},
+	})
+	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(body))
+
+	rr := httptest.NewRecorder()
+	service := content.NewInMemRepository()
+	h := NewContentHandler(service, validator.NewValidator())
+
+	handler := http.HandlerFunc(h.Create)
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusBadRequest, rr.Code, "Status code should be equal")
+	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
+
+	fmt.Printf(rr.Body.String())
+}
+
 func TestContentHandler_Update(t *testing.T) {
 	service := content.NewInMemRepository()
-	h := NewContentHandler(service)
+	h := NewContentHandler(service, validator.NewValidator())
 
 	ID, _ := service.Create(&content.Content{
 		ID:   common.NewID(),
@@ -172,11 +191,8 @@ func TestContentHandler_Update(t *testing.T) {
 	handler := http.HandlerFunc(h.Update)
 	handler.ServeHTTP(rr, req)
 
-	status := rr.Code
-	assert.Equal(t, status, http.StatusOK, "Status code should be equal")
-
-	rType := rr.Header().Get("Content-Type")
-	assert.Equal(t, rType, "application/json", "Content-Type code should be equal")
+	assert.Equal(t, rr.Code, http.StatusOK, "Status code should be equal")
+	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
 
 	// Check the response body is what we expect.
 	updatedEntry := content.Content{}
@@ -195,7 +211,7 @@ func TestContentHandler_Update(t *testing.T) {
 
 func TestContentHandler_Delete(t *testing.T) {
 	service := content.NewInMemRepository()
-	h := NewContentHandler(service)
+	h := NewContentHandler(service, validator.NewValidator())
 
 	ID, _ := service.Create(&content.Content{
 		ID:   common.NewID(),
@@ -219,11 +235,8 @@ func TestContentHandler_Delete(t *testing.T) {
 	handler := http.HandlerFunc(h.Delete)
 	handler.ServeHTTP(rr, req)
 
-	status := rr.Code
-	assert.Equal(t, status, http.StatusOK, "Status code should be equal")
-
-	rType := rr.Header().Get("Content-Type")
-	assert.Equal(t, rType, "application/json", "Content-Type code should be equal")
+	assert.Equal(t, rr.Code, http.StatusOK, "Status code should be equal")
+	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
 
 	deletedEntry := content.Content{}
 	assert.Nil(t, json.Unmarshal(rr.Body.Bytes(), &deletedEntry))

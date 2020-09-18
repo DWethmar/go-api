@@ -3,8 +3,8 @@ package contenttype
 import (
 	"database/sql"
 
+	"github.com/dwethmar/go-api/internal/database"
 	"github.com/dwethmar/go-api/pkg/common"
-	"github.com/dwethmar/go-api/pkg/database"
 )
 
 // postgresRepository repository for operating on content data.

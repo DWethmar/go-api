@@ -15,8 +15,8 @@ type Fields map[string]interface{}
 
 // AddContent model
 type AddContent struct {
-	Name   string            `json:"name"`
-	Fields FieldTranslations `json:"fields"`
+	Name   string            `validate:"lte=50" json:"name"`
+	Fields FieldTranslations `validate:"required" json:"fields"`
 }
 
 // UpdateContent model

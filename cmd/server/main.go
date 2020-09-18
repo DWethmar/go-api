@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/dwethmar/go-api/internal/database"
 	"github.com/dwethmar/go-api/pkg/api"
 	"github.com/dwethmar/go-api/pkg/config"
-	"github.com/dwethmar/go-api/pkg/database"
 	"github.com/dwethmar/go-api/pkg/store"
 
 	_ "github.com/lib/pq"

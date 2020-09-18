@@ -5,7 +5,7 @@ export interface Client {
   getAll(): Promise<Entry[]>;
 }
 
-export function createClient() {
+export function createClient(): Client {
   return new RESTClient({
     host: "http://localhost:8080",
   });

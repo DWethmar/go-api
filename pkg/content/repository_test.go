@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/dwethmar/go-api/internal/database"
 	"github.com/dwethmar/go-api/pkg/common"
 	"github.com/dwethmar/go-api/pkg/config"
-	"github.com/dwethmar/go-api/pkg/database"
 	"github.com/stretchr/testify/assert"
 )
 
