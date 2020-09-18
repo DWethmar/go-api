@@ -98,8 +98,8 @@ func (repo *PostgresRepository) List() ([]*Content, error) {
 
 		// Postgres can only store timestamps in microsecond resolution.
 		// Go supports nanosecond resolution and pq formats them in RFC3339Nano format, which includes nanoseconds.
-		entry.UpdatedOn.Truncate(time.Microsecond)
-		entry.CreatedOn.Truncate(time.Microsecond)
+		entry.UpdatedOn = entry.UpdatedOn.Truncate(time.Microsecond)
+		entry.CreatedOn = entry.CreatedOn.Truncate(time.Microsecond)
 
 		entries = append(entries, entry)
 	}
@@ -133,8 +133,8 @@ func (repo *PostgresRepository) Get(ID common.ID) (*Content, error) {
 
 	// Postgres can only store timestamps in microsecond resolution.
 	// Go supports nanosecond resolution and pq formats them in RFC3339Nano format, which includes nanoseconds.
-	entry.UpdatedOn.Truncate(time.Microsecond)
-	entry.CreatedOn.Truncate(time.Microsecond)
+	entry.UpdatedOn = entry.UpdatedOn.Truncate(time.Microsecond)
+	entry.CreatedOn = entry.CreatedOn.Truncate(time.Microsecond)
 
 	return entry, nil
 }
