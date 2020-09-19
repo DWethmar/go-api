@@ -25,7 +25,7 @@ func TestContentHandler_List(t *testing.T) {
 			ID:   common.NewID(),
 			Name: "Test1",
 			Fields: content.FieldTranslations{
-				defaultLocale: content.Fields{
+				defaultLocale: {
 					"attrA": 1,
 				},
 			},
@@ -36,7 +36,7 @@ func TestContentHandler_List(t *testing.T) {
 			ID:   common.NewID(),
 			Name: "Test2",
 			Fields: content.FieldTranslations{
-				defaultLocale: content.Fields{
+				defaultLocale: {
 					"attrA": 1,
 				},
 			},
@@ -45,9 +45,9 @@ func TestContentHandler_List(t *testing.T) {
 		},
 	}
 
-	var p []*output.Content
-	for _, d := range addItems {
-		p = append(p, output.MapContent(d))
+	var p = make([]*output.Content, len(addItems))
+	for i, d := range addItems {
+		p[i] = output.MapContent(d)
 	}
 
 	req, err := http.NewRequest("GET", "/", nil)
@@ -68,15 +68,12 @@ func TestContentHandler_List(t *testing.T) {
 	handler := http.HandlerFunc(h.List)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, rr.Code, http.StatusOK, "Status code should be equal")
-	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
+	assert.Equal(t, http.StatusOK, rr.Code, "Status code should be equal")
+	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"), "Content-Type code should be equal")
 
 	// Check the response body is what we expect.
 	expected, _ := json.Marshal(p)
-
-	if rr.Body.String() != string(expected) {
-		t.Errorf("handler returned unexpected body: received %v expected %v", rr.Body.String(), string(expected))
-	}
+	assert.Equal(t, string(expected), rr.Body.String(), "handler returned unexpected body")
 }
 
 func TestContentHandler_Create(t *testing.T) {
@@ -101,8 +98,8 @@ func TestContentHandler_Create(t *testing.T) {
 	handler := http.HandlerFunc(h.Create)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, rr.Code, http.StatusCreated, "Status code should be equal")
-	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
+	assert.Equal(t, http.StatusCreated, rr.Code, "Status code should be equal")
+	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"), "Content-Type code should be equal")
 
 	// Check the response body is what we expect.
 	addedEntry := content.Content{}
@@ -144,7 +141,7 @@ func TestContentHandler_InvalidCreate(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusBadRequest, rr.Code, "Status code should be equal")
-	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
+	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"), "Content-Type code should be equal")
 
 	fmt.Printf(rr.Body.String())
 }
@@ -191,8 +188,8 @@ func TestContentHandler_Update(t *testing.T) {
 	handler := http.HandlerFunc(h.Update)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, rr.Code, http.StatusOK, "Status code should be equal")
-	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
+	assert.Equal(t, http.StatusOK, rr.Code, "Status code should be equal")
+	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"), "Content-Type code should be equal")
 
 	// Check the response body is what we expect.
 	updatedEntry := content.Content{}
@@ -235,8 +232,8 @@ func TestContentHandler_Delete(t *testing.T) {
 	handler := http.HandlerFunc(h.Delete)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, rr.Code, http.StatusOK, "Status code should be equal")
-	assert.Equal(t, rr.Header().Get("Content-Type"), "application/json", "Content-Type code should be equal")
+	assert.Equal(t, http.StatusOK, rr.Code, "Status code should be equal")
+	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"), "Content-Type code should be equal")
 
 	deletedEntry := content.Content{}
 	assert.Nil(t, json.Unmarshal(rr.Body.Bytes(), &deletedEntry))

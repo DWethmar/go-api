@@ -2,9 +2,10 @@ package validator
 
 import (
 	"database/sql/driver"
+	"fmt"
 	"reflect"
 
-	"github.com/dwethmar/go-api/pkg/content"
+	"github.com/dwethmar/go-api/pkg/api/input"
 	v "github.com/go-playground/validator/v10"
 )
 
@@ -15,13 +16,15 @@ type Validation = v.Validate
 func NewValidator() *Validation {
 	validate := v.New()
 
-	validate.RegisterCustomTypeFunc(ValidateValuer, content.FieldTranslations{})
+	validate.RegisterCustomTypeFunc(ValidateValuer, input.FieldTranslations{})
 
 	return validate
 }
 
 // ValidateValuer implements validator.CustomTypeFunc
 func ValidateValuer(field reflect.Value) interface{} {
+
+	fmt.Println(":D:D:D:D:")
 
 	if valuer, ok := field.Interface().(driver.Valuer); ok {
 
